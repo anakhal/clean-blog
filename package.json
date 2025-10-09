@@ -1,0 +1,19 @@
+{
+  "name": "clean-blog",
+  "version": "1.0.0",
+  "description": "This project is the application of the book of Greg Lim Title: Beginning nodejs, Express, &amp; MongoDb Developpement",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.3",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "mongoose": "^8.9.5"
+  }
+}
