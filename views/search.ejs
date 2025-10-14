@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+    <%-include('layouts/header')-%>
+    <body>
+        <!-- Navigation-->
+        <%-include('layouts/navbar')-%>
+        <!-- Page Header-->
+        <header class="masthead" style="background-image: url('/img/home-bg.jpg')">
+            <div class="container position-relative px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-md-10 col-lg-8 col-xl-7">
+                        <div class="site-heading">
+                            <h1>Search Posts</h1>
+                            <span class="subheading">Find what you're looking for</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <!-- Main Content-->
+        <div class="container px-4 px-lg-5">
+            <div class="row gx-4 gx-lg-5 justify-content-center">
+                <div class="col-md-10 col-lg-8 col-xl-7">
+                    
+                    <!-- Search Form -->
+                    <div class="my-5">
+                        <form action="/search" method="GET" class="d-flex mb-4">
+                            <input type="text" 
+                                   name="q" 
+                                   class="form-control me-2" 
+                                   placeholder="Search posts..." 
+                                   value="<%= searchQuery %>"
+                                   required>
+                            <button type="submit" class="btn btn-primary">Search</button>
+                        </form>
+                    </div>
+
+                    <!-- Search Results -->
+                    <% if (searchQuery) { %>
+                        <div class="search-info mb-4">
+                            <p><strong><%= resultsCount %></strong> result(s) found for "<%= searchQuery %>"</p>
+                            <hr>
+                        </div>
+                        
+                        <% if (posts.length > 0) { %>
+                            <% posts.forEach(function(post) { %>
+                                <!-- Post preview -->
+                                <div class="post-preview">
+                                    <a href="/post/<%= post._id %>">
+                                        <h2 class="post-title"><%= post.title %></h2>
+                                        <h3 class="post-subtitle"><%= post.body.substring(0, 150) %>...</h3>
+                                    </a>
+                                    <p class="post-meta">
+                                        Posted on <%= new Date(post.createdAt || Date.now()).toDateString() %>
+                                    </p>
+                                </div>
+                                <hr class="my-4" />
+                            <% }); %>
+                        <% } else { %>
+                            <div class="text-center my-5">
+                                <h3>No posts found</h3>
+                                <p>Try searching with different keywords.</p>
+                                <a href="/" class="btn btn-outline-primary">Back to Home</a>
+                            </div>
+                        <% } %>
+                    <% } else { %>
+                        <div class="text-center my-5">
+                            <h3>Enter a search term</h3>
+                            <p>Search through all blog posts by title or content.</p>
+                        </div>
+                    <% } %>
+                    
+                </div>
+            </div>
+        </div>
+        <!-- Footer-->
+        <%-include('layouts/footer')-%>
+        <!-- Bootstrap core JS-->
+        <%-include('layouts/script')-%>
+    </body>
+</html>
