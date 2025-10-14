@@ -6,7 +6,7 @@
         <!-- Navigation-->
         <%-include('layouts/navbar')-%>
         <!-- Page Header-->
-        <header class="masthead" style="background-image: url('/img/contact-bg.jpg')">
+        <header class="masthead" style="background-image: url('/img/create-bg.jpg')">
             <div class="container position-relative px-4 px-lg-5">
                 <div class="row gx-4 gx-lg-5 justify-content-center">
                     <div class="col-md-10 col-lg-8 col-xl-7">
@@ -24,8 +24,9 @@
                 <div class="row gx-4 gx-lg-5 justify-content-center">
                     <div class="col-md-10 col-lg-8 col-xl-7">
                         <p>Create a new blog post by filling out the form below.</p>
+                        <!---form '/posts/strore' -->
                         <div class="my-5">
-                            <form action="/posts/store" method="post">
+                            <form action="/posts/store" method="post" enctype="multipart/form-data">
                                 <div class="control-group">
                                     <div class="form-group floating-label-form-group controls">
                                         <label for="title">Title</label>
@@ -39,6 +40,17 @@
                                     </div>
                                 </div>
                                 <br>
+                                <!-- image upload--->
+                                <div class="control-group">
+                                    <div class="form-group floating-label-form-group controls">
+                                        <label>background-image</label>
+                                        <br>
+                                        <label for="image" class="custom-label"></label>
+                                        <input class="form-control" name="image" id="image" type="file" >
+                                    </div>
+                                </div>
+                                 <!--End upload image-->
+                                 <br>
                                 <div class="form-group">
                                     <button type="submit" class="btn btn-primary" id="createPostButton">Create Post</button>
                                 </div>

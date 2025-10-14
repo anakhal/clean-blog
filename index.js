@@ -1,6 +1,8 @@
 require('dotenv').config();
 const express = require('express');
 const app = express();
+const fileUpload=require('express-fileupload');
+app.use(fileUpload());
 app.use(express.json());
 app.use(express.urlencoded({extended:true}))
 const mongoose=require('mongoose');
@@ -56,8 +58,10 @@ app.post('/posts/store', async (req,res)=>{
   try{
     const blogpost=new BlogPost({
       title:req.body.title,
-      body:req.body.body
+      body:req.body.body,
+      image:'/img/' + req.files.image.name,
     })
+    req.files.image.mv('./public/img/'+req.files.image.name);
     await blogpost.save();
     console.log('Blog post saved successfully:', blogpost.title);
   }catch(error){
