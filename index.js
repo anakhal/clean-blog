@@ -16,21 +16,19 @@ mongoose.set('strictQuery', true);
 mongoose.connect(MONGODB_URI)
   .then(async () => {
     console.log('Connected to MongoDB');
-    // Create a sample post if none exist
-    const count = await BlogPost.countDocuments();
-    if (count === 0) {
-      const sample = new BlogPost({
-        title: 'Les Maths',
-        body: "Les Maths est la science des sages qui aiment souffrir en pensant"
-      });
-      await sample.save();
-      console.log('Created sample blog post');
-    }
   })
   .catch(err => {
     console.error('MongoDB connection error:', err.message);
   });
-
+//validateMiddleWare
+const validateMiddleWare=(req,res,next)=>{
+  if(!req.body.title||!req.body.body||!req.files||!req.files.image) {
+    return res.redirect('/posts/new');
+    }
+    //If validation passes
+    next();
+  }
+app.use('/posts/store',validateMiddleWare);
 app.use(express.static('public'));
 const ejs = require('ejs');
 app.set('view engine','ejs');
