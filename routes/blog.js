@@ -1,0 +1,10 @@
+const express=require('express');
+const router=express.Router();
+const blogController=require('../controllers/blogController');
+const validateMiddleware=require('../middleware/validateMiddleware');
+router.get('/',blogController.index);
+router.post('/posts/store',validateMiddleware,blogController.store);
+router.get('/post/:id',blogController.show);
+router.get('/search',blogController.search);
+router.get('/posts/new',blogController.create);
+module.exports=router;
