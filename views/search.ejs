@@ -43,7 +43,7 @@
                         </div>
                         
                         <% if (posts.length > 0) { %>
-                            <% posts.forEach(function(post) { %>
+                            <% posts.forEach(post=>{ %>
                                 <!-- Post preview -->
                                 <div class="post-preview">
                                     <a href="/post/<%= post._id %>">
