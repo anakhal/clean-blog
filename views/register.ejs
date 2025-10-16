@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+    <!-- Head -->
+     <%-include('layouts/header')-%>
+    <body>
+        <!-- Navigation-->
+        <%-include('layouts/navbar')-%>
+        <!-- Page Header-->
+        <header class="masthead" style="background-image: url('/img/soufiane-bg.jpg')">
+            <div class="container position-relative px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-md-10 col-lg-8 col-xl-7">
+                        <div class="page-heading">
+                           <h1>Register New User</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <!-- Main Content-->
+        <main class="mb-4">
+            <div class="container px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-md-10 col-lg-8 col-xl-7">
+                        <!-- Error message display -->
+                        <% if (typeof error !== 'undefined' && error) { %>
+                            <div class="alert alert-danger" role="alert">
+                                <%= error %>
+                            </div>
+                        <% } %>
+                        
+                        <!-- User Registration Form -->
+                        <div class="my-5">
+                            <form action="/users/register" method="post">
+                                <div class="control-group">
+                                    <div class="form-group floating-label-form-group controls">
+                                        <label for="username">Username</label>
+                                        <input type="text" 
+                                               class="form-control" 
+                                               placeholder="Enter username" 
+                                               id="username" 
+                                               name="username" 
+                                               minlength="3"
+                                               maxlength="30"
+                                               required>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <div class="form-group floating-label-form-group controls">
+                                        <label for="password">Password</label>
+                                        <input type="password" 
+                                               class="form-control" 
+                                               placeholder="Enter password"
+                                               name="password" 
+                                               id="password"
+                                               minlength="6"
+                                               required>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <div class="form-group floating-label-form-group controls">
+                                        <label for="confirmPassword">Confirm Password</label>
+                                        <input type="password" 
+                                               class="form-control" 
+                                               placeholder="Confirm your password"
+                                               name="confirmPassword" 
+                                               id="confirmPassword"
+                                               minlength="6"
+                                               required>
+                                    </div>
+                                </div>
+                                <br>
+                                <br>
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-primary" id="registerButton">Register</button>
+                                    <a href="/users/login" class="btn btn-outline-secondary ms-2">Already have an account? Login</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <!-- Footer-->
+        <%-include('layouts/footer')-%>
+        <!--Client side password verification-->
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const form = document.querySelector('form');
+                const password = document.getElementById('password');
+                const confirmPassword = document.getElementById('confirmPassword');
+                
+                form.addEventListener('submit', function(e) {
+                    if (password.value !== confirmPassword.value) {
+                        e.preventDefault();
+                        alert('Passwords do not match!');
+                        confirmPassword.focus();
+                    }
+                });
+                
+                // Real-time password match feedback
+                confirmPassword.addEventListener('input', function() {
+                    if (password.value !== confirmPassword.value) {
+                        confirmPassword.setCustomValidity('Passwords do not match');
+                    } else {
+                        confirmPassword.setCustomValidity('');
+                    }
+                });
+            });
+        </script>
+    </body>

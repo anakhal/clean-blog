@@ -23,7 +23,9 @@ app.use(express.static('public'));
 app.set('view engine','ejs');
 //setting the routes
 const blogRoutes=require('./routes/blog');
+const userRoutes=require('./routes/users');
 app.use('/',blogRoutes);
+app.use('/users',userRoutes);
 const port = process.env.PORT || 4000;
 app.get('/about', (req, res) => {res.render('about')});
 app.get('/contact', (req, res) => {res.render('contact')});
