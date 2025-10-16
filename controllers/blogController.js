@@ -60,9 +60,11 @@ exports.search=async (req, res) => {
       posts: posts, 
       searchQuery: searchQuery || '',
       resultsCount: posts.length 
-    });
+    })
   } catch (err) {
     console.error(err);
     res.status(500).send('Search error');
   }
 };
+//register
+exports.register=(req,res)=>{res.render('register')};

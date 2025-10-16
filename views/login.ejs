@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+    <!-- Head -->
+     <%-include('layouts/header')-%>
+    <body>
+        <!-- Navigation-->
+        <%-include('layouts/navbar')-%>
+        <!-- Page Header-->
+        <header class="masthead" style="background-image: url('/img/soufiane-bg.jpg')">
+            <div class="container position-relative px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-md-10 col-lg-8 col-xl-7">
+                        <div class="page-heading">
+                           <h1>User Login</h1>
+                           <span class="subheading">Welcome back!</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <!-- Main Content-->
+        <main class="mb-4">
+            <div class="container px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-md-10 col-lg-8 col-xl-7">
+                        <!-- Error message display -->
+                        <% if (typeof error !== 'undefined' && error) { %>
+                            <div class="alert alert-danger" role="alert">
+                                <%= error %>
+                            </div>
+                        <% } %>
+                        
+                        <!-- Success message display -->
+                        <% if (typeof success !== 'undefined' && success) { %>
+                            <div class="alert alert-success" role="alert">
+                                <%= success %>
+                            </div>
+                        <% } %>
+                        
+                        <!-- User Login Form -->
+                        <div class="my-5">
+                            <form action="/users/login" method="post">
+                                <div class="control-group">
+                                    <div class="form-group floating-label-form-group controls">
+                                        <label for="username">Username</label>
+                                        <input type="text" 
+                                               class="form-control" 
+                                               placeholder="Enter your username" 
+                                               id="username" 
+                                               name="username" 
+                                               required>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <div class="form-group floating-label-form-group controls">
+                                        <label for="password">Password</label>
+                                        <input type="password" 
+                                               class="form-control" 
+                                               placeholder="Enter your password"
+                                               name="password" 
+                                               id="password"
+                                               required>
+                                    </div>
+                                </div>
+                                
+                                <!-- Optional: Remember Me -->
+                                <div class="form-group form-check">
+                                    <input type="checkbox" class="form-check-input" id="rememberMe" name="rememberMe">
+                                    <label class="form-check-label" for="rememberMe">
+                                        Remember me
+                                    </label>
+                                </div>
+                                
+                                <br>
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-primary" id="loginButton">Login</button>
+                                    <a href="/users/register" class="btn btn-outline-secondary ms-2">Don't have an account? Register</a>
+                                </div>
+                                
+                                <!-- Forgot Password Link (for future implementation) -->
+                                <div class="text-center mt-3">
+                                    <a href="#" class="text-muted">Forgot your password?</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <!-- Footer-->
+        <%-include('layouts/footer')-%>
+    </body>
+</html>
