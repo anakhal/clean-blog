@@ -89,9 +89,13 @@ exports.login = async (req, res) => {
             });
         }
         
-        // Login successful - set up session (we'll implement session later)
-        // For now, just redirect with success message
-        res.redirect('/?success=Login successful!');
+        // Login successful - Create session!
+        req.session.userId = user._id;
+        req.session.username = user.username;
+        req.session.isLoggedIn = true;
+        
+        console.log('User logged in:', user.username);
+        res.redirect('/?success=Login successful! Welcome back, ' + user.username);
         
     } catch (error) {
         console.error('Login error:', error);
@@ -103,6 +107,14 @@ exports.login = async (req, res) => {
 
 // POST /users/logout - Handle logout
 exports.logout = (req, res) => {
-    // Clear session (we'll implement this when we add sessions)
-    res.redirect('/?success=Logged out successfully!');
+    // Destroy session
+    req.session.destroy((err) => {
+        if (err) {
+            console.error('Session destruction error:', err);
+            return res.redirect('/?error=Logout failed');
+        }
+        
+        console.log('User logged out');
+        res.redirect('/?success=Logged out successfully!');
+    });
 };

@@ -14,7 +14,13 @@
                             <!--<h2 class="subheading"><%= post.body.substring(0, 100) %>...</h2>-->
                             <span class="meta">
                                 Posted by
-                                <a href="#!">Admin</a>
+                                <a href="#!">
+                                    <% if (post.author && post.author.username) { %>
+                                        <%= post.author.username %>
+                                    <% } else { %>
+                                        Unknown Author
+                                    <% } %>
+                                </a>
                                 on <%= new Date(post.createdAt || Date.now()).toDateString() %>
                             </span>
                         </div>
