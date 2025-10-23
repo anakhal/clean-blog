@@ -92,10 +92,17 @@ exports.login = async (req, res) => {
         // Login successful - Create session!
         req.session.userId = user._id;
         req.session.username = user.username;
+        req.session.role = user.role;
         req.session.isLoggedIn = true;
         
-        console.log('User logged in:', user.username);
-        res.redirect('/?success=Login successful! Welcome back, ' + user.username);
+        console.log('User logged in:', user.username, 'Role:', user.role);
+        
+        // Redirect admin to dashboard, regular users to home
+        if (user.role === 'admin') {
+            res.redirect('/admin/dashboard?success=Welcome to admin dashboard, ' + user.username);
+        } else {
+            res.redirect('/?success=Login successful! Welcome back, ' + user.username);
+        }
         
     } catch (error) {
         console.error('Login error:', error);

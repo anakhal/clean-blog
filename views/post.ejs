@@ -1,6 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
     <%-include('layouts/header')-%>
+    <style>
+        /* Reduce masthead spacing and position title at bottom */
+        header.masthead {
+            padding-top: calc(4rem + 57px) !important;
+            padding-bottom: 2rem !important;
+            margin-bottom: 0 !important;
+            display: flex !important;
+            align-items: flex-end !important;
+            min-height: 400px !important;
+        }
+        
+        @media (min-width: 992px) {
+            header.masthead {
+                padding-top: 6rem !important;
+                padding-bottom: 3rem !important;
+                min-height: 500px !important;
+            }
+        }
+        
+        /* Position the post heading container at the bottom */
+        header.masthead .container {
+            margin-top: auto !important;
+        }
+        
+        /* Ensure post content starts right after the header */
+        article.mb-4 {
+            margin-bottom: 2rem !important;
+            padding-top: 2rem !important;
+        }
+        
+        /* Add some spacing between title and content */
+        .post-content {
+            margin-top: 1rem;
+        }
+        
+        /* Make sure the post heading text is readable */
+        .post-heading {
+            background: rgba(0, 0, 0, 0.3) !important;
+            padding: 1.5rem !important;
+            border-radius: 8px !important;
+            backdrop-filter: blur(5px) !important;
+        }
+    </style>
     <body>
         <!-- Navigation-->
         <%-include('layouts/navbar')-%>

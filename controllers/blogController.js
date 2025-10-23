@@ -3,7 +3,10 @@ const BlogPost=require('../models/BlogPost');
 const User = require('../models/User');
 exports.index= async (req, res) => {
   try {
-    const posts = await BlogPost.find({}).populate('author', 'username').sort({ createdAt: -1 });
+    // Only show non-deleted posts to public users
+    const posts = await BlogPost.find({ isDeleted: { $ne: true } })
+      .populate('author', 'username')
+      .sort({ createdAt: -1 });
     res.render('index',{posts});
   } catch (err) {
     console.error(err);
@@ -12,7 +15,14 @@ exports.index= async (req, res) => {
  
 };
 exports.create=(req,res)=>{
-res.render('create');
+    // Debug: Check what's in res.locals
+    console.log('DEBUG - res.locals in create:', {
+        isLoggedIn: res.locals.isLoggedIn,
+        isAdmin: res.locals.isAdmin,
+        user: res.locals.user
+    });
+    
+    res.render('create');
 };
 // Posting the populated form
 exports.store=async (req,res)=>{  
@@ -33,10 +43,17 @@ exports.store=async (req,res)=>{
 };
 exports.show=async(req,res)=>{
   try{
-  const post=await BlogPost.findById(req.params.id).populate('author', 'username');
-  if(!post){return res.status(404).send('Post not Found')};
-   res.render('post',{post});
-}catch(error){
+    const post=await BlogPost.findOne({ 
+      _id: req.params.id, 
+      isDeleted: { $ne: true } 
+    }).populate('author', 'username');
+    
+    if(!post){
+      return res.status(404).send('Post not Found');
+    }
+    
+    res.render('post',{post});
+  }catch(error){
     console.error(error);
     res.status(500).send('Server Error');
   }
@@ -48,13 +65,18 @@ exports.search=async (req, res) => {
     let posts = [];
     
     if (searchQuery) {
-      // Search in both title and body fields
+      // Search in both title and body fields, but only non-deleted posts
       posts = await BlogPost.find({
-        $or: [
-          { title: { $regex: searchQuery, $options: 'i' } },
-          { body: { $regex: searchQuery, $options: 'i' } }
+        $and: [
+          { isDeleted: { $ne: true } },
+          {
+            $or: [
+              { title: { $regex: searchQuery, $options: 'i' } },
+              { body: { $regex: searchQuery, $options: 'i' } }
+            ]
+          }
         ]
-      }).populate('author', 'username').sort({ _id: -1 }); // Sort by newest first
+      }).populate('author', 'username').sort({ createdAt: -1 }); // Sort by newest first
     }
     
     res.render('search', { 

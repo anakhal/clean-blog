@@ -1,0 +1,146 @@
+const BlogPost = require('../models/BlogPost');
+const User = require('../models/User');
+
+// GET /admin/dashboard - Admin dashboard
+exports.dashboard = async (req, res) => {
+    try {
+        // Set cache-control headers to prevent caching
+        res.set({
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+        });
+        
+        const totalPosts = await BlogPost.countDocuments();
+        const totalUsers = await User.countDocuments();
+        const recentPosts = await BlogPost.find()
+            .populate('author', 'username')
+            .sort({ createdAt: -1 })
+            .limit(5);
+        
+        res.render('admin/dashboard', {
+            totalPosts,
+            totalUsers,
+            recentPosts
+        });
+    } catch (error) {
+        console.error('Dashboard error:', error);
+        res.status(500).send('Dashboard error');
+    }
+};
+
+// GET /admin/posts - Manage all posts
+exports.managePosts = async (req, res) => {
+    try {
+        // Set cache-control headers to prevent caching
+        res.set({
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+        });
+        
+        const posts = await BlogPost.find()
+            .populate('author', 'username')
+            .sort({ createdAt: -1 });
+        
+        res.render('admin/posts', { 
+            posts,
+            success: req.query.success,
+            error: req.query.error,
+            timestamp: new Date().toISOString()
+        });
+    } catch (error) {
+        console.error('Manage posts error:', error);
+        res.status(500).send('Error loading posts');
+    }
+};
+
+// GET /admin/posts/:id/edit - Edit post form
+exports.editPost = async (req, res) => {
+    try {
+        const post = await BlogPost.findById(req.params.id).populate('author', 'username');
+        if (!post) {
+            return res.status(404).send('Post not found');
+        }
+        
+        res.render('admin/edit-post', { post });
+    } catch (error) {
+        console.error('Edit post error:', error);
+        res.status(500).send('Error loading post');
+    }
+};
+
+// POST /admin/posts/:id/update - Update post
+exports.updatePost = async (req, res) => {
+    try {
+        const { title, body } = req.body;
+        const updateData = { title, body, updatedAt: new Date() };
+        
+        // Handle image update if new image uploaded
+        if (req.files && req.files.image) {
+            updateData.image = '/img/' + req.files.image.name;
+            req.files.image.mv('./public/img/' + req.files.image.name);
+        }
+        
+        const post = await BlogPost.findByIdAndUpdate(
+            req.params.id,
+            updateData,
+            { new: true }
+        );
+        
+        if (!post) {
+            return res.status(404).send('Post not found');
+        }
+        
+        res.redirect('/admin/posts?success=Post updated successfully');
+    } catch (error) {
+        console.error('Update post error:', error);
+        res.redirect('/admin/posts?error=Error updating post');
+    }
+};
+
+// DELETE /admin/posts/:id - Soft delete post
+exports.deletePost = async (req, res) => {
+    try {
+        await BlogPost.findByIdAndUpdate(req.params.id, { 
+            isDeleted: true, 
+            deletedAt: new Date() 
+        });
+        
+        res.redirect('/admin/posts?success=Post deleted successfully');
+    } catch (error) {
+        console.error('Delete post error:', error);
+        res.redirect('/admin/posts?error=Error deleting post');
+    }
+};
+
+// POST /admin/posts/:id/restore - Restore deleted post
+exports.restorePost = async (req, res) => {
+    try {
+        await BlogPost.findByIdAndUpdate(req.params.id, { 
+            isDeleted: false, 
+            deletedAt: null 
+        });
+        
+        res.redirect('/admin/posts?success=Post restored successfully');
+    } catch (error) {
+        console.error('Restore post error:', error);
+        res.redirect('/admin/posts?error=Error restoring post');
+    }
+};
+
+// GET /admin/users - Manage all users
+exports.manageUsers = async (req, res) => {
+    try {
+        const users = await User.find().sort({ createdAt: -1 });
+        
+        res.render('admin/users', { 
+            users,
+            success: req.query.success,
+            error: req.query.error
+        });
+    } catch (error) {
+        console.error('Manage users error:', error);
+        res.status(500).send('Error loading users');
+    }
+};

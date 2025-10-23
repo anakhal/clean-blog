@@ -8,7 +8,14 @@ const blogPostSchema=new mongoose.Schema({
         required: true // Making it required ensures every new post has an author
     },
     image:String,
-
+    isDeleted: {
+        type: Boolean,
+        default: false
+    },
+    deletedAt: {
+        type: Date,
+        default: null
+    }
 }, { timestamps: true });
 // Create and export the BlogPost model using the schema object
 const BlogPost=mongoose.model('BlogPost', blogPostSchema);
