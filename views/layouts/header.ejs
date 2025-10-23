@@ -12,4 +12,18 @@
         <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css" />
         <!-- Core theme CSS (includes Bootstrap)-->
         <link href="/css/styles.css" rel="stylesheet" />
+                                <!-- MathJax (TeX rendering) -->
+                                <script>
+                                        window.MathJax = {
+                                                tex: {
+                                                        inlineMath: [['$', '$'], ['\\(', '\\)']],
+                                                        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+                                                },
+                                                options: {
+                                                        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+                                                        processHtmlClass: 'mathjax-process'
+                                                }
+                                        };
+                                </script>
+                                <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
 </head>

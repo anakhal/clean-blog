@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+    <%-include('../layouts/header')-%>
+        <body>
+        <style>
+            /* Page-specific: allow admin posts area to use full available width */
+            main.admin-full {
+                width: 100%;
+                max-width: none;
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+            main.admin-full .card {
+                width: 100%;
+                max-width: none;
+                margin: 0;
+            }
+            .table-full {
+                width: 100% !important;
+            }
+            /* let cells wrap to avoid forcing scroll */
+            .table-full th, .table-full td {
+                white-space: normal !important;
+            }
+        </style>
+        <!-- Navigation-->
+        <%-include('../layouts/navbar')-%>
+        
+        <!-- Page Header-->
+        <header class="masthead" style="background-image: url('/img/soufiane-bg.jpg')">
+            <div class="container position-relative px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-md-10 col-lg-8 col-xl-7">
+                        <div class="page-heading">
+                           <h1>Manage Posts</h1>
+                           <span class="subheading">View and manage all blog posts</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Main Content-->
+        <main class="mb-4 admin-full">
+            <div class="container-fluid px-2">
+                <div class="row">
+                    <div class="col-12">
+                        <!-- Success/Error Messages -->
+                        <% if (typeof success !== 'undefined' && success) { %>
+                            <div class="alert alert-success" role="alert">
+                                <%= success %>
+                            </div>
+                        <% } %>
+                        <% if (typeof error !== 'undefined' && error) { %>
+                            <div class="alert alert-danger" role="alert">
+                                <%= error %>
+                            </div>
+                        <% } %>
+                        
+                        <!-- Actions Bar -->
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <a href="/admin/dashboard" class="btn btn-outline-secondary">← Back to Dashboard</a>
+                            <div>
+                                <small class="text-muted me-3">Last updated: <%= new Date(timestamp).toLocaleTimeString() %></small>
+                                <a href="/posts/new" class="btn btn-primary">+ Create New Post</a>
+                            </div>
+                        </div>
+                        
+                        <!-- Posts Table -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>All Posts (<%= posts.length %>)</h3>
+                            </div>
+                            <div class="card-body">
+                                <% if (posts.length > 0) { %>
+                                    <div class="table-container">
+                                        <table class="table table-striped table-full">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width: 40%;">Title</th>
+                                                    <th style="width: 15%;">Author</th>
+                                                    <th style="width: 10%;">Status</th>
+                                                    <th style="width: 12%;">Created</th>
+                                                    <th style="width: 12%;">Updated</th>
+                                                    <th style="width: 11%;">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% posts.forEach(post => { %>
+                                                <tr class="<%= post.isDeleted ? 'table-secondary' : '' %>">
+                                                    <td>
+                                                        <% if (!post.isDeleted) { %>
+                                                            <a href="/post/<%= post._id %>"><%= post.title %></a>
+                                                        <% } else { %>
+                                                            <span class="text-muted"><%= post.title %> (Deleted)</span>
+                                                        <% } %>
+                                                    </td>
+                                                    <td><%= post.author.username %></td>
+                                                    <td>
+                                                        <% if (post.isDeleted) { %>
+                                                            <span class="badge bg-danger">Deleted</span>
+                                                        <% } else { %>
+                                                            <span class="badge bg-success">Published</span>
+                                                        <% } %>
+                                                    </td>
+                                                    <td><%= new Date(post.createdAt).toLocaleDateString() %></td>
+                                                    <td><%= post.updatedAt ? new Date(post.updatedAt).toLocaleDateString() : '-' %></td>
+                                                    <td>
+                                                        <div class="d-flex gap-1">
+                                                            <% if (!post.isDeleted) { %>
+                                                                <a href="/admin/posts/<%= post._id %>/edit" class="btn btn-sm btn-outline-primary" style="height: 31px; line-height: 1.5; font-size: 0.8rem;">Edit</a>
+                                                                <form action="/admin/posts/<%= post._id %>/delete" method="post" class="d-inline">
+                                                                    <button type="submit" class="btn btn-sm btn-outline-danger" style="height: 31px; line-height: 1.5; font-size: 0.8rem;"
+                                                                            onclick="return confirm('Are you sure you want to delete this post?')">
+                                                                        Del
+                                                                    </button>
+                                                                </form>
+                                                            <% } else { %>
+                                                                <form action="/admin/posts/<%= post._id %>/restore" method="post" class="d-inline">
+                                                                    <button type="submit" class="btn btn-sm btn-outline-success" style="height: 31px; line-height: 1.5; font-size: 0.8rem;">
+                                                                        Restore
+                                                                    </button>
+                                                                </form>
+                                                            <% } %>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <% }); %>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                <% } else { %>
+                                    <div class="text-center py-4">
+                                        <p class="text-muted">No posts found.</p>
+                                        <a href="/posts/new" class="btn btn-primary">Create Your First Post</a>
+                                    </div>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <!-- Footer-->
+        <%-include('../layouts/footer')-%>
+    </body>
+</html>

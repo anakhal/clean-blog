@@ -5,13 +5,33 @@
                     <i class="fas fa-bars"></i>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarResponsive">
+                    <!-- DEBUG (hidden): isLoggedIn = <%= typeof isLoggedIn !== 'undefined' ? isLoggedIn : 'undefined' %>, isAdmin = <%= typeof isAdmin !== 'undefined' ? isAdmin : 'undefined' %> -->
                     <ul class="navbar-nav ms-auto py-4 py-lg-0">
                         <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="/">Home</a></li>
                         <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="/about">About</a></li>
                         <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="/contact">Contact</a></li>
-                        <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="/posts/new">New Post</a></li>
                         <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="/search">Search</a></li>
-                        <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="/users/register">Register</a></li>
+                        
+                        <!-- Admin-only links -->
+                        <% if (typeof isAdmin !== 'undefined' && isAdmin) { %>
+                            <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="/posts/new"><i class="fas fa-plus"></i> Create</a></li>
+                            <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="/admin/dashboard">Dashboard</a></li>
+                        
+                        <% } %>
+                        
+                        <!-- Authentication links -->
+                        <% if (typeof isLoggedIn !== 'undefined' && isLoggedIn) { %>
+                            <li class="nav-item">
+                                <a class="nav-link px-lg-3 py-3 py-lg-4" href="#" onclick="event.preventDefault(); this.nextElementSibling.submit();">
+                                    Logout
+                                </a>
+                                <form action="/users/logout" method="post" style="display: none;">
+                                </form>
+                            </li>
+                        <% } else { %>
+                            <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="/users/login">Login</a></li>
+                            <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="/users/register">Register</a></li>
+                        <% } %>
                     </ul>
                 </div>
             </div>

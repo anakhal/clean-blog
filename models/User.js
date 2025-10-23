@@ -13,10 +13,17 @@ const UserSchema=new Schema({
         type:String,
         required: true,
         minlength:6
-
+    },
+    role: {
+        type: String,
+        enum: ['user', 'admin'],
+        default: 'user'
+    },
+    isActive: {
+        type: Boolean,
+        default: true
     }
-},{timestamps:true}
-)
+},{timestamps:true})
 
 // Pre-save middleware to hash password before saving to database
 UserSchema.pre('save', async function(next) {

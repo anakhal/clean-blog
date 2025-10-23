@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+    <%-include('layouts/header')-%>
+    <body>
+        <!-- Navigation-->
+        <%-include('layouts/navbar')-%>
+        
+        <!-- Page Header-->
+        <header class="masthead" style="background-image: url('/img/soufiane-bg.jpg')">
+            <div class="container position-relative px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-md-10 col-lg-8 col-xl-7">
+                        <div class="page-heading">
+                           <h1><%= title || 'Error' %></h1>
+                           <span class="subheading">Something went wrong</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Main Content-->
+        <main class="mb-4">
+            <div class="container px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-md-10 col-lg-8 col-xl-7 text-center">
+                        <div class="alert alert-danger" role="alert">
+                            <h4 class="alert-heading">
+                                <% if (statusCode) { %>
+                                    Error <%= statusCode %>
+                                <% } else { %>
+                                    Error
+                                <% } %>
+                            </h4>
+                            <p><%= message || 'An unexpected error occurred.' %></p>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <a href="/" class="btn btn-primary me-2">← Back to Home</a>
+                            <% if (typeof isLoggedIn === 'undefined' || !isLoggedIn) { %>
+                                <a href="/users/login" class="btn btn-outline-secondary">Login</a>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <!-- Footer-->
+        <%-include('layouts/footer')-%>
+    </body>
+</html>
