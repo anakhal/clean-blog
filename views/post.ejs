@@ -43,6 +43,36 @@
             border-radius: 8px !important;
             backdrop-filter: blur(5px) !important;
         }
+        
+        /* Enhanced styling for post content lists */
+        .post-content ol,
+        .post-content ul {
+            margin-bottom: 1.5rem;
+            padding-left: 2rem;
+        }
+        
+        .post-content ol li,
+        .post-content ul li {
+            margin-bottom: 0.5rem;
+            line-height: 1.6;
+        }
+        
+        .post-content ol {
+            list-style-type: decimal;
+        }
+        
+        .post-content ul {
+            list-style-type: disc;
+        }
+        
+        /* Nested lists */
+        .post-content ol ol,
+        .post-content ul ul,
+        .post-content ol ul,
+        .post-content ul ol {
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
     </style>
     <body>
         <!-- Navigation-->
@@ -78,7 +108,7 @@
                     <div class="col-md-10 col-lg-8 col-xl-7">
                         <!-- Display the full blog post content -->
                         <div class="post-content">
-                            <%= post.body %>
+                            <%- post.body %>
                         </div>
                         
                         <!-- Navigation back to home -->
