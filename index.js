@@ -3,9 +3,44 @@ const express = require('express');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const cors = require('cors');
+const compression = require('compression');
 const app = express();
+
+// Production environment configuration
+const isProduction = process.env.NODE_ENV === 'production';
+const port = process.env.PORT || 4000;
 const fileUpload=require('express-fileupload');
 const mongoose=require('mongoose');
+const winston = require('winston');
+const morgan = require('morgan');
+
+// Configure Winston logger
+const logger = winston.createLogger({
+  level: isProduction ? 'info' : 'debug',
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.errors({ stack: true }),
+    winston.format.json()
+  ),
+  defaultMeta: { service: 'clean-blog' },
+  transports: [
+    new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
+    new winston.transports.File({ filename: 'logs/combined.log' })
+  ]
+});
+
+// Add console logging in development
+if (!isProduction) {
+  logger.add(new winston.transports.Console({
+    format: winston.format.simple()
+  }));
+}
+
+// Enable gzip compression
+app.use(compression());
+
+// Request logging
+app.use(morgan(isProduction ? 'combined' : 'dev'));
 
 // Security middleware - Helmet
 app.use(helmet({
@@ -72,8 +107,8 @@ app.use(helmet({
 
 // Rate limiting middleware
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000, // 15 minutes
+  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100, // limit each IP to 100 requests per windowMs
   message: 'Too many requests from this IP, please try again later.',
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
@@ -82,10 +117,21 @@ const limiter = rateLimit({
 // Apply rate limiting to all requests
 app.use(limiter);
 
+// HTTPS redirect middleware for production
+if (isProduction) {
+  app.use((req, res, next) => {
+    if (req.header('x-forwarded-proto') !== 'https') {
+      res.redirect(`https://${req.header('host')}${req.url}`);
+    } else {
+      next();
+    }
+  });
+}
+
 // CORS configuration
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? ['https://your-domain.com'] // Replace with your actual domain in production
+  origin: isProduction 
+    ? process.env.CORS_ORIGIN || false // Set CORS_ORIGIN in Heroku config vars
     : ['http://localhost:3000', 'http://localhost:4000'],
   credentials: true,
   optionsSuccessStatus: 200
@@ -105,7 +151,12 @@ mongoose.connect(MONGODB_URI)
 app.use(fileUpload());
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
-app.use(express.static('public'));
+// Static file serving with caching for production
+app.use(express.static('public', {
+  maxAge: isProduction ? '1d' : 0, // Cache for 1 day in production
+  etag: true,
+  lastModified: true
+}));
 
 // Session middleware setup
 const session = require('express-session');
@@ -128,7 +179,6 @@ const adminRoutes=require('./routes/admin');
 app.use('/',blogRoutes);
 app.use('/users',userRoutes);
 app.use('/admin',adminRoutes);
-const port = process.env.PORT || 4000;
 
 // Import contact controller and middleware
 const contactController = require('./controllers/contactController');
@@ -137,6 +187,24 @@ const { validateContactForm } = require('./middleware/contactMiddleware');
 // Contact routes
 app.get('/contact', contactController.showContact);
 app.post('/contact', validateContactForm, contactController.sendMessage);
+
+// Health check endpoint for monitoring
+app.get('/health', (req, res) => {
+  const healthcheck = {
+    uptime: process.uptime(),
+    message: 'OK',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development',
+    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+  };
+  
+  try {
+    res.status(200).json(healthcheck);
+  } catch (error) {
+    healthcheck.message = error;
+    res.status(503).json(healthcheck);
+  }
+});
 
 // Other routes
 app.get('/about', (req, res) => {res.render('about')});

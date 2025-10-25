@@ -1,8 +1,12 @@
 {
   "name": "clean-blog",
   "version": "1.0.0",
-  "description": "",
+  "description": "A clean, responsive blog built with Node.js, Express, and MongoDB",
   "main": "index.js",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
@@ -11,6 +15,8 @@
     "test:watch": "jest --watch",
     "audit": "npm audit",
     "build": "echo 'No build step required for this Node.js app'",
+    "heroku-postbuild": "npm run audit --audit-level=critical",
+    "prestart": "npm run audit --audit-level=high",
     "pm2:start": "pm2 start ecosystem.config.js",
     "pm2:stop": "pm2 stop ecosystem.config.js",
     "pm2:restart": "pm2 restart ecosystem.config.js",
