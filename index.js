@@ -17,25 +17,54 @@ app.use(helmet({
         "'unsafe-inline'", 
         "https://fonts.googleapis.com",
         "https://cdnjs.cloudflare.com",
-        "https://cdn.jsdelivr.net"
+        "https://cdn.jsdelivr.net",
+        "https://use.fontawesome.com"
       ],
       fontSrc: [
         "'self'", 
         "https://fonts.gstatic.com",
-        "https://cdnjs.cloudflare.com"
+        "https://fonts.googleapis.com",
+        "https://cdnjs.cloudflare.com",
+        "https://cdn.jsdelivr.net",
+        "https://use.fontawesome.com",
+        "data:",
+        "blob:"
       ],
       scriptSrc: [
         "'self'", 
         "'unsafe-inline'",
+        "'unsafe-eval'", // Required for MathJax
         "https://polyfill.io",
         "https://cdn.jsdelivr.net",
-        "https://cdnjs.cloudflare.com"
+        "https://cdnjs.cloudflare.com",
+        "https://use.fontawesome.com"
+      ],
+      scriptSrcElem: [
+        "'self'",
+        "'unsafe-inline'",
+        "https://polyfill.io",
+        "https://cdn.jsdelivr.net",
+        "https://cdnjs.cloudflare.com",
+        "https://use.fontawesome.com"
+      ],
+      scriptSrcAttr: [
+        "'unsafe-inline'",
+        "'unsafe-hashes'"
       ],
       imgSrc: ["'self'", "data:", "https:", "http:"],
-      connectSrc: ["'self'"],
+      connectSrc: [
+        "'self'",
+        "https://cdn.jsdelivr.net",
+        "https://cdnjs.cloudflare.com",
+        "https://use.fontawesome.com",
+        "https://fonts.googleapis.com",
+        "https://fonts.gstatic.com"
+      ],
       objectSrc: ["'none'"],
       mediaSrc: ["'self'"],
       frameSrc: ["'none'"],
+      workerSrc: ["'self'", "blob:"],
+      childSrc: ["'self'", "blob:"]
     },
   },
   crossOriginEmbedderPolicy: false, // Required for MathJax
@@ -100,8 +129,18 @@ app.use('/',blogRoutes);
 app.use('/users',userRoutes);
 app.use('/admin',adminRoutes);
 const port = process.env.PORT || 4000;
+
+// Import contact controller and middleware
+const contactController = require('./controllers/contactController');
+const { validateContactForm } = require('./middleware/contactMiddleware');
+
+// Contact routes
+app.get('/contact', contactController.showContact);
+app.post('/contact', validateContactForm, contactController.sendMessage);
+
+// Other routes
 app.get('/about', (req, res) => {res.render('about')});
-app.get('/contact', (req, res) => {res.render('contact')});
+
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });

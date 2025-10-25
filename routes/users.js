@@ -11,7 +11,7 @@ router.post('/register', redirectIfAuth, userController.register);
 router.get('/login', redirectIfAuth, userController.showLogin);
 router.post('/login', redirectIfAuth, userController.login);
 
-// User logout route - require authentication
-router.post('/logout', requireAuth, userController.logout);
+// User logout route - only logout if there's a session
+router.post('/logout', userController.logout);
 
 module.exports = router;

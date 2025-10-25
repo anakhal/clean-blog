@@ -23,58 +23,80 @@
             <div class="container px-4 px-lg-5">
                 <div class="row gx-4 gx-lg-5 justify-content-center">
                     <div class="col-md-10 col-lg-8 col-xl-7">
-                        <p>Vous suggérez quelques choses? contactez-moi par Email</p>
+                        <p>Have questions, suggestions, or feedback? I'd love to hear from you! Send me a message using the form below.</p>
+                        
+                        <!-- Success Message -->
+                        <% if (success) { %>
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                <i class="fas fa-check-circle me-2"></i><%= success %>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        <% } %>
+                        
+                        <!-- Error Message -->
+                        <% if (error) { %>
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="fas fa-exclamation-circle me-2"></i><%= error %>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        <% } %>
+                        
+                        <!-- Contact Form -->
                         <div class="my-5">
-                            <!-- * * * * * * * * * * * * * * *-->
-                            <!-- * * SB Forms Contact Form * *-->
-                            <!-- * * * * * * * * * * * * * * *-->
-                            <!-- This form is pre-integrated with SB Forms.-->
-                            <!-- To make this form functional, sign up at-->
-                            <!-- https://startbootstrap.com/solution/contact-forms-->
-                            <!-- to get an API token!-->
-                            <form id="contactForm" data-sb-form-api-token="3ed7586e-2b00-4e91-b219-9352c1c71a5f">
-                                <div class="form-floating">
-                                    <input class="form-control" id="name" type="text" placeholder="Enter your name..." data-sb-validations="required" />
-                                    <label for="name">Name</label>
-                                    <div class="invalid-feedback" data-sb-feedback="name:required">A name is required.</div>
+                            <form action="/contact" method="post" id="contactForm">
+                                <!-- Name Field -->
+                                <div class="form-floating mb-3">
+                                    <input class="form-control" id="name" name="name" type="text" placeholder="Enter your name..." required />
+                                    <label for="name">Name *</label>
                                 </div>
-                                <div class="form-floating">
-                                    <input class="form-control" id="email" type="email" placeholder="Enter your email..." data-sb-validations="required,email" />
-                                    <label for="email">Email address</label>
-                                    <div class="invalid-feedback" data-sb-feedback="email:required">An email is required.</div>
-                                    <div class="invalid-feedback" data-sb-feedback="email:email">Email is not valid.</div>
+                                
+                                <!-- Email Field -->
+                                <div class="form-floating mb-3">
+                                    <input class="form-control" id="email" name="email" type="email" placeholder="Enter your email..." required />
+                                    <label for="email">Email address *</label>
                                 </div>
-                                <div class="form-floating">
-                                    <input class="form-control" id="phone" type="tel" placeholder="Enter your phone number..." data-sb-validations="required" />
-                                    <label for="phone">Phone Number</label>
-                                    <div class="invalid-feedback" data-sb-feedback="phone:required">A phone number is required.</div>
+                                
+                                <!-- Phone Field (Optional) -->
+                                <div class="form-floating mb-3">
+                                    <input class="form-control" id="phone" name="phone" type="tel" placeholder="Enter your phone number..." />
+                                    <label for="phone">Phone Number (optional)</label>
                                 </div>
-                                <div class="form-floating">
-                                    <textarea class="form-control" id="message" placeholder="Enter your message here..." style="height: 12rem" data-sb-validations="required"></textarea>
-                                    <label for="message">Message</label>
-                                    <div class="invalid-feedback" data-sb-feedback="message:required">A message is required.</div>
+                                
+                                <!-- Message Field -->
+                                <div class="form-floating mb-3">
+                                    <textarea class="form-control" id="message" name="message" placeholder="Enter your message here..." style="height: 12rem" required></textarea>
+                                    <label for="message">Message *</label>
                                 </div>
-                                <br />
-                                <!-- Submit success message-->
-                                <!---->
-                                <!-- This is what your users will see when the form-->
-                                <!-- has successfully submitted-->
-                                <div class="d-none" id="submitSuccessMessage">
-                                    <div class="text-center mb-3">
-                                        <div class="fw-bolder">Form submission successful!</div>
-                                        To activate this form, sign up at
-                                        <br />
-                                        <a href="https://startbootstrap.com/solution/contact-forms">https://startbootstrap.com/solution/contact-forms</a>
-                                    </div>
+                                
+                                <!-- Submit Button -->
+                                <div class="d-grid">
+                                    <button class="btn btn-primary btn-lg" type="submit" id="submitButton">
+                                        <i class="fas fa-paper-plane me-2"></i>Send Message
+                                    </button>
                                 </div>
-                                <!-- Submit error message-->
-                                <!---->
-                                <!-- This is what your users will see when there is-->
-                                <!-- an error submitting the form-->
-                                <div class="d-none" id="submitErrorMessage"><div class="text-center text-danger mb-3">Error sending message!</div></div>
-                                <!-- Submit Button-->
-                                <button class="btn btn-primary text-uppercase disabled" id="submitButton" type="submit">Send</button>
+                                
+                                <p class="text-muted mt-3 text-center">
+                                    <small>* Required fields</small>
+                                </p>
                             </form>
+                        </div>
+                        
+                        <!-- Contact Information -->
+                        <div class="row mt-5">
+                            <div class="col-md-6">
+                                <h5><i class="fas fa-envelope me-2"></i>Get in Touch</h5>
+                                <p class="text-muted">
+                                    I typically respond to messages within 24 hours. 
+                                    Looking forward to hearing from you!
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <h5><i class="fas fa-clock me-2"></i>Response Time</h5>
+                                <p class="text-muted">
+                                    Average response time: 24 hours<br>
+                                    I read every message personally.
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>

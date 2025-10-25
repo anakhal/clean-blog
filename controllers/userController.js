@@ -114,14 +114,22 @@ exports.login = async (req, res) => {
 
 // POST /users/logout - Handle logout
 exports.logout = (req, res) => {
+    // Check if user has a session
+    if (!req.session) {
+        console.log('No session found during logout attempt');
+        return res.redirect('/?info=You were not logged in');
+    }
+    
+    const username = req.session.username || 'Unknown user';
+    
     // Destroy session
     req.session.destroy((err) => {
         if (err) {
             console.error('Session destruction error:', err);
-            return res.redirect('/?error=Logout failed');
+            return res.redirect('/?error=Logout failed. Please try again.');
         }
         
-        console.log('User logged out');
+        console.log(`User logged out: ${username}`);
         res.redirect('/?success=Logged out successfully!');
     });
 };

@@ -22,16 +22,49 @@
                         <!-- Authentication links -->
                         <% if (typeof isLoggedIn !== 'undefined' && isLoggedIn) { %>
                             <li class="nav-item">
-                                <a class="nav-link px-lg-3 py-3 py-lg-4" href="#" onclick="event.preventDefault(); this.nextElementSibling.submit();">
-                                    Logout
+                                <a class="nav-link px-lg-3 py-3 py-lg-4" href="#" id="logoutLink">
+                                    <i class="fas fa-sign-out-alt"></i> Logout
                                 </a>
-                                <form action="/users/logout" method="post" style="display: none;">
+                                <form id="logoutForm" action="/users/logout" method="post" style="display: none;">
                                 </form>
                             </li>
                         <% } else { %>
-                            <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="/users/login">Login</a></li>
-                            <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="/users/register">Register</a></li>
+                            <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="/users/login"><i class="fas fa-sign-in-alt"></i> Login</a></li>
+                            <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="/users/register"><i class="fas fa-user-plus"></i> Register</a></li>
                         <% } %>
+                    </ul>
+                </div>
+            </div>
+</nav>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const logoutLink = document.getElementById('logoutLink');
+    if (logoutLink) {
+        logoutLink.addEventListener('click', function(event) {
+            event.preventDefault();
+            handleLogout();
+        });
+    }
+});
+
+function handleLogout() {
+    try {
+        const form = document.getElementById('logoutForm');
+        if (form) {
+            form.submit();
+        } else {
+            console.error('Logout form not found');
+            // Fallback: redirect to logout URL
+            window.location.href = '/users/logout';
+        }
+    } catch (error) {
+        console.error('Logout error:', error);
+        // Fallback: redirect to logout URL
+        window.location.href = '/users/logout';
+    }
+}
+</script>
                     </ul>
                 </div>
             </div>
