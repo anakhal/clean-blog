@@ -172,6 +172,8 @@ app.use(checkAdmin);
 // set view engine
 //const ejs = require('ejs');
 app.set('view engine','ejs');
+//trust proxy;
+app.set('trust proxy', 1);
 //setting the routes
 const blogRoutes=require('./routes/blog');
 const userRoutes=require('./routes/users');
