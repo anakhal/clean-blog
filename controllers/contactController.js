@@ -33,7 +33,15 @@ exports.sendMessage = async (req, res) => {
             auth: {
                 user: process.env.SMTP_USER || 'your-email@gmail.com',
                 pass: process.env.SMTP_PASS || 'your-app-password'
-            }
+            },
+            // Railway-specific timeout settings
+  connectionTimeout: 30000,
+  socketTimeout: 30000,
+  greetingTimeout: 15000,
+  // Important for Railway's network
+  tls: {
+    rejectUnauthorized: false
+  }
         });
         
         // Email content
