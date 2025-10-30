@@ -1,5 +1,3 @@
-
-
 const mongoose=require('mongoose');
 const blogPostSchema=new mongoose.Schema({
     title:String,
@@ -17,7 +15,10 @@ const blogPostSchema=new mongoose.Schema({
     deletedAt: {
         type: Date,
         default: null
-    }
+    },
+    type: { type: String, enum: ['exercise', 'solution'], default: 'exercise' },
+    solution: { type: mongoose.Schema.Types.ObjectId, ref: 'BlogPost', default: null }
+ 
 }, { timestamps: true });
 // Create and export the BlogPost model using the schema object
 const BlogPost=mongoose.model('BlogPost', blogPostSchema);
