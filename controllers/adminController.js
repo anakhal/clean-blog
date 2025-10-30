@@ -13,7 +13,7 @@ exports.dashboard = async (req, res) => {
         
         const totalPosts = await BlogPost.countDocuments();
         const totalUsers = await User.countDocuments();
-        const recentPosts = await BlogPost.find()
+        const recentPosts = await BlogPost.find({type:'exercise'})
             .populate('author', 'username')
             .sort({ createdAt: -1 })
             .limit(5);

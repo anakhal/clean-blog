@@ -30,7 +30,11 @@
                         </a>
                         <p class="post-meta">
                             Posted by
-                            <a href="#!"><%=posts[i].author.username%></a>
+                            <% if (posts[i].author && posts[i].author.username) { %>
+                                <a href="#!"><%=posts[i].author.username%></a>
+                            <% } else { %>
+                                <span class="text-muted">Unknown</span>
+                            <% } %>
                             on <%=new Date().toDateString()%>
                         </p>
                     </div>
