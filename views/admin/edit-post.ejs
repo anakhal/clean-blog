@@ -35,7 +35,7 @@
                             <div class="card-header">
                                 <h3>Edit: <%= post.title %></h3>
                                 <small class="text-muted">
-                                    By <%= post.author.username %> | 
+                                    By admin | 
                                     Created: <%= new Date(post.createdAt).toLocaleDateString() %>
                                     <% if (post.updatedAt) { %>
                                         | Last updated: <%= new Date(post.updatedAt).toLocaleDateString() %>

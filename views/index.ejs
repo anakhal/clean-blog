@@ -29,13 +29,7 @@
                             <h4 class="post-subtitle"><%-posts[i].body.substring(0,200)%></h4>
                         </a>
                         <p class="post-meta">
-                            Posted by
-                            <% if (posts[i].author && posts[i].author.username) { %>
-                                <a href="#!"><%=posts[i].author.username%></a>
-                            <% } else { %>
-                                <span class="text-muted">Unknown</span>
-                            <% } %>
-                            on <%=new Date().toDateString()%>
+                            Posted by admin on <%=new Date().toDateString()%>
                         </p>
                     </div>
                     <!-- Divider-->
