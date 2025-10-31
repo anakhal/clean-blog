@@ -15,31 +15,31 @@ exports.index= async (req, res) => {
  
 };
 exports.create=(req,res)=>{
-    // Debug: Check what's in res.locals
-    console.log('DEBUG - res.locals in create:', {
-        isLoggedIn: res.locals.isLoggedIn,
-        isAdmin: res.locals.isAdmin,
-        user: res.locals.user
-    });
-    
     res.render('create');
 };
 // Posting the populated form
 exports.store=async (req,res)=>{  
-  try{
-    const blogpost=new BlogPost({
-      title:req.body.title,
-      body:req.body.body,
-      author: req.session.userId, // Set the logged-in user as author
-      image:'/img/' + req.files.image.name,
-    })
-    req.files.image.mv('./public/img/'+req.files.image.name);
+  try {
+    if (!req.session.userId) {
+      console.error('No userId in session. Cannot create post.');
+      return res.status(401).send('Unauthorized: Please log in as admin.');
+    }
+    console.log('DEBUG - req.session.userId:', req.session.userId);
+    const blogpost = new BlogPost({
+      title: req.body.title,
+      body: req.body.body,
+      author: req.session.userId, // Always set to logged-in admin
+      image: '/img/' + req.files.image.name,
+    });
+    req.files.image.mv('./public/img/' + req.files.image.name);
     await blogpost.save();
+    console.log('DEBUG - Created blogpost author:', blogpost.author);
     console.log('Blog post saved successfully:', blogpost.title);
-  }catch(error){
-    console.error('Error Posting a blogpost',error);
+    res.redirect('/');
+  } catch (error) {
+    console.error('Error Posting a blogpost', error);
+    res.status(500).send('Error Posting a blogpost');
   }
-  res.redirect('/')
 };
 exports.show=async(req,res)=>{
   try{
