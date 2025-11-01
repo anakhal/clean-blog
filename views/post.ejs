@@ -45,28 +45,51 @@
         }
         
         /* Enhanced styling for post content lists */
-        .post-content ol,
         .post-content ul {
             margin-bottom: 1.5rem;
             padding-left: 2rem;
+            list-style-type: disc;
         }
         
-        .post-content ol li,
         .post-content ul li {
             margin-bottom: 0.5rem;
             line-height: 1.6;
         }
         
+        /* Custom ordered list styling: 1.), 2.), ... and nested a.), b.), ... */
         .post-content ol {
-            list-style-type: decimal;
+            list-style: none !important;
+            counter-reset: outer-counter;
+            padding-left: 0 !important;
+            margin-bottom: 1.5rem;
         }
-        
-        .post-content ul {
-            list-style-type: disc;
+        .post-content ol > li {
+            counter-increment: outer-counter;
+            position: relative;
+            padding-left: 2.5em;
+            margin-bottom: 0.5em;
+            line-height: 1.6;
+        }
+        .post-content ol > li::before {
+            content: counter(outer-counter) ".) ";
+            position: absolute;
+            left: 0;
+            font-weight: normal;
+        }
+        .post-content ol ol {
+            list-style: none !important;
+            counter-reset: inner-counter;
+            margin-top: 0.5em;
+            padding-left: 1em !important;
+        }
+        .post-content ol ol > li {
+            counter-increment: inner-counter;
+        }
+        .post-content ol ol > li::before {
+            content: counter(inner-counter, lower-alpha) ".) ";
         }
         
         /* Nested lists */
-        .post-content ol ol,
         .post-content ul ul,
         .post-content ol ul,
         .post-content ul ol {
