@@ -1,4 +1,33 @@
 @charset "UTF-8";
+
+/* Custom ordered list styling: 1.), 2.), ... and nested a.), b.), ... */
+.post-content ol {
+  list-style: none;
+  counter-reset: outer-counter;
+  padding-left: 0;
+}
+.post-content ol > li {
+  counter-increment: outer-counter;
+  position: relative;
+  padding-left: 2em;
+  margin-bottom: 0.5em;
+}
+.post-content ol > li::before {
+  content: counter(outer-counter) ".) ";
+  position: absolute;
+  left: 0;
+}
+.post-content ol ol {
+  counter-reset: inner-counter;
+  margin-top: 0.5em;
+}
+.post-content ol ol > li {
+  counter-increment: inner-counter;
+}
+.post-content ol ol > li::before {
+  content: counter(inner-counter, lower-alpha) ".) ";
+}
+
 /*!
 * Start Bootstrap - Clean Blog v6.0.9 (https://startbootstrap.com/theme/clean-blog)
 * Copyright 2013-2023 Start Bootstrap
@@ -183,19 +212,28 @@ address {
   line-height: inherit;
 }
 
-ol,
 ul {
   padding-left: 2rem;
 }
 
-ol,
+
 ul,
 dl {
   margin-top: 0;
   margin-bottom: 1rem;
 }
-
-ol ol,
+ol{
+list-style-type:lower-alpha !important;
+margin-bottom: 0%;
+}
+ol ol{
+list-style-type:lower-alpha !important;
+margin-bottom: 0%;
+}
+ol ol ol{
+  margin-bottom: 0;
+  list-style-type:lower-roman;
+}
 ul ul,
 ol ul,
 ul ol {
@@ -384,6 +422,7 @@ button,
 [type=reset],
 [type=submit] {
   -webkit-appearance: button;
+  appearance: button;
 }
 button:not(:disabled),
 [type=button]:not(:disabled),
@@ -442,6 +481,7 @@ legend + * {
 [type=search] {
   outline-offset: -2px;
   -webkit-appearance: textfield;
+  appearance: textfield;
 }
 
 /* rtl:raw:
@@ -463,6 +503,7 @@ legend + * {
 ::file-selector-button {
   font: inherit;
   -webkit-appearance: button;
+  appearance: button;
 }
 
 output {

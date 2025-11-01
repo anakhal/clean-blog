@@ -1,6 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
     <%-include('layouts/header')-%>
+    <style>
+        /* Custom ordered list styling for post excerpts: 1.), 2.), ... and nested a.), b.), ... */
+        .post-subtitle ol {
+            list-style: none !important;
+            counter-reset: outer-counter;
+            padding-left: 0 !important;
+            margin-bottom: 1rem;
+        }
+        .post-subtitle ol > li {
+            counter-increment: outer-counter;
+            position: relative;
+            padding-left: 2.5em;
+            margin-bottom: 0.5em;
+            line-height: 1.6;
+        }
+        .post-subtitle ol > li::before {
+            content: counter(outer-counter) ".) ";
+            position: absolute;
+            left: 0;
+            font-weight: normal;
+        }
+        .post-subtitle ol ol {
+            list-style: none !important;
+            counter-reset: inner-counter;
+            margin-top: 0.5em;
+            padding-left: 1em !important;
+        }
+        .post-subtitle ol ol > li {
+            counter-increment: inner-counter;
+        }
+        .post-subtitle ol ol > li::before {
+            content: counter(inner-counter, lower-alpha) ".) ";
+        }
+    </style>
     <body>
         <!-- Navigation-->
         <%-include('layouts/navbar')-%>
@@ -26,7 +60,7 @@
                     <div class="post-preview">
                         <a href="/post/<%=posts[i]._id%>">
                             <h2 class="post-title"><%=posts[i].title%></h2>
-                            <h4 class="post-subtitle"><%-posts[i].body.substring(0,200)%></h4>
+                            <h3 class="post-subtitle"><%=posts[i].body.replace(/<[^>]*>/g, '').substring(0,200)%>...</h3>
                         </a>
                         <p class="post-meta">
                             Posted by admin on <%=new Date().toDateString()%>
