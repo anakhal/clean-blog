@@ -72,7 +72,9 @@ app.use(helmet({
         "https://polyfill.io",
         "https://cdn.jsdelivr.net",
         "https://cdnjs.cloudflare.com",
-        "https://use.fontawesome.com"
+        "https://use.fontawesome.com",
+        "https://www.googletagmanager.com",
+        "https://www.google-analytics.com"
       ],
       scriptSrcElem: [
         "'self'",
@@ -80,7 +82,9 @@ app.use(helmet({
         "https://polyfill.io",
         "https://cdn.jsdelivr.net",
         "https://cdnjs.cloudflare.com",
-        "https://use.fontawesome.com"
+        "https://use.fontawesome.com",
+        "https://www.googletagmanager.com",
+        "https://www.google-analytics.com"
       ],
       scriptSrcAttr: [
         "'unsafe-inline'",
@@ -93,7 +97,10 @@ app.use(helmet({
         "https://cdnjs.cloudflare.com",
         "https://use.fontawesome.com",
         "https://fonts.googleapis.com",
-        "https://fonts.gstatic.com"
+        "https://fonts.gstatic.com",
+        "https://www.google-analytics.com",
+        "https://www.googletagmanager.com",
+        "https://analytics.google.com"
       ],
       objectSrc: ["'none'"],
       mediaSrc: ["'self'"],
