@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+const ContactMessage = require('../models/ContactMessage');
 
 // GET /contact - Show contact form
 exports.showContact = (req, res) => {
@@ -99,16 +100,50 @@ exports.sendMessage = async (req, res) => {
             `
         };
         
-        // Send emails
-        await transporter.sendMail(mailOptions);
-        await transporter.sendMail(autoReplyOptions);
+        // Try to send emails
+        let emailSent = false;
+        let emailError = null;
         
-        console.log(`Contact form message sent from ${name} (${email})`);
+        try {
+            await transporter.sendMail(mailOptions);
+            await transporter.sendMail(autoReplyOptions);
+            emailSent = true;
+            console.log(`✅ Contact form email sent from ${name} (${email})`);
+        } catch (emailErr) {
+            emailError = emailErr.message;
+            console.error('❌ SMTP Error:', emailErr.message);
+            
+            // Check if it's a Railway SMTP block or connection issue
+            if (emailErr.message.includes('ECONNREFUSED') || 
+                emailErr.message.includes('ETIMEDOUT') ||
+                emailErr.message.includes('blocked') ||
+                emailErr.code === 'ESOCKET') {
+                console.log('⚠️  SMTP blocked (likely Railway trial limitation). Saving message to database.');
+            }
+        }
         
-        res.redirect('/contact?success=Thank you! Your message has been sent successfully. We will get back to you soon.');
+        // Always save to database as backup
+        const contactMessage = new ContactMessage({
+            name,
+            email,
+            phone: phone || null,
+            message,
+            emailSent,
+            emailError
+        });
+        
+        await contactMessage.save();
+        console.log(`💾 Contact message saved to database (ID: ${contactMessage._id})`);
+        
+        // Provide appropriate response
+        if (emailSent) {
+            res.redirect('/contact?success=Thank you! Your message has been sent successfully. We will get back to you soon.');
+        } else {
+            res.redirect('/contact?success=Thank you! Your message has been received and saved. We will get back to you soon. (Note: Email delivery is temporarily unavailable in our trial environment, but your message is safely stored.)');
+        }
         
     } catch (error) {
-        console.error('Contact form error:', error);
-        res.redirect('/contact?error=Sorry, there was an error sending your message. Please try again later.');
+        console.error('❌ Contact form error:', error);
+        res.redirect('/contact?error=Sorry, there was an error processing your message. Please try again later or contact us directly.');
     }
 };

@@ -17,7 +17,11 @@ const blogPostSchema=new mongoose.Schema({
         default: null
     },
     type: { type: String, enum: ['exercise', 'solution'], default: 'exercise' },
-    solution: { type: mongoose.Schema.Types.ObjectId, ref: 'BlogPost', default: null }
+    solution: { type: mongoose.Schema.Types.ObjectId, ref: 'BlogPost', default: null },
+    category: {
+        type: String,
+        default: 'Arithmétique'
+    }
  
 }, { timestamps: true });
 // Create and export the BlogPost model using the schema object

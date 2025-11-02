@@ -1,21 +1,39 @@
 
 const BlogPost=require('../models/BlogPost');
 const User = require('../models/User');
+const Category = require('../models/Category');
 exports.index= async (req, res) => {
   try {
+    const category = req.query.category;
+    const query = { isDeleted: { $ne: true } };
+    
+    // Add category filter if provided
+    if (category) {
+      query.category = category;
+    }
+    
+    // Get all categories for the filter buttons
+    const categories = await Category.find().sort({ name: 1 });
+    
     // Only show non-deleted posts to public users
-    const posts = await BlogPost.find({ isDeleted: { $ne: true } })
+    const posts = await BlogPost.find(query)
       .populate('author', 'username')
       .sort({ createdAt: -1 });
-    res.render('index',{posts});
+    res.render('index', { posts, categories, category: category || null });
   } catch (err) {
     console.error(err);
     res.status(500).send('Server error');
   }
  
 };
-exports.create=(req,res)=>{
-    res.render('create');
+exports.create= async (req,res)=>{
+    try {
+        const categories = await Category.find().sort({ name: 1 });
+        res.render('create', { categories });
+    } catch (err) {
+        console.error(err);
+        res.render('create', { categories: [] });
+    }
 };
 // Posting the populated form
 exports.store=async (req,res)=>{  
@@ -30,6 +48,7 @@ exports.store=async (req,res)=>{
       body: req.body.body,
       author: req.session.userId, // Always set to logged-in admin
       image: '/img/' + req.files.image.name,
+      category: req.body.category || 'Arithmétique', // Save category from form
     });
     req.files.image.mv('./public/img/' + req.files.image.name);
     await blogpost.save();
