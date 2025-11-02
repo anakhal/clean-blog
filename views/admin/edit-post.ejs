@@ -10,7 +10,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <%-include('../layouts/navbar')-%>
         
         <!-- Page Header-->
-        <header class="masthead" style="background-image: url('/img/keith-bg.jpg')">
+        <header class="masthead">
             <div class="container position-relative px-4 px-lg-5">
                 <div class="row gx-4 gx-lg-5 justify-content-center">
                     <div class="col-md-10 col-lg-8 col-xl-7">
@@ -54,6 +54,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                                value="<%= post.title %>" required>
                                     </div>
                                     
+                                    <div class="mb-3">
+                                        <label for="category" class="form-label">Category *</label>
+                                        <select class="form-control" name="category" id="category" required>
+                                            <% if (categories && categories.length > 0) { %>
+                                                <% categories.forEach(cat => { %>
+                                                    <option value="<%= cat.name %>" <%= post.category === cat.name ? 'selected' : '' %>><%= cat.name %></option>
+                                                <% }) %>
+                                            <% } else { %>
+                                                <option value="<%= post.category %>" selected><%= post.category %></option>
+                                            <% } %>
+                                        </select>
+                                    </div>
+
                                     <div class="mb-3">
                                         <label for="image" class="form-label">Featured Image</label>
                                         <input type="file" class="form-control" id="image" name="image" accept="image/*">

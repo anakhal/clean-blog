@@ -1,5 +1,7 @@
 const BlogPost = require('../models/BlogPost');
 const User = require('../models/User');
+const Category = require('../models/Category');
+const ContactMessage = require('../models/ContactMessage');
 
 // GET /admin/dashboard - Admin dashboard
 exports.dashboard = async (req, res) => {
@@ -63,7 +65,8 @@ exports.editPost = async (req, res) => {
             return res.status(404).send('Post not found');
         }
         
-        res.render('admin/edit-post', { post });
+        const categories = await Category.find().sort({ name: 1 });
+        res.render('admin/edit-post', { post, categories });
     } catch (error) {
         console.error('Edit post error:', error);
         res.status(500).send('Error loading post');
@@ -73,8 +76,8 @@ exports.editPost = async (req, res) => {
 // POST /admin/posts/:id/update - Update post
 exports.updatePost = async (req, res) => {
     try {
-        const { title, body } = req.body;
-        const updateData = { title, body, updatedAt: new Date() };
+        const { title, body, category } = req.body;
+        const updateData = { title, body, category: category || 'Arithmétique', updatedAt: new Date() };
         
         // Handle image update if new image uploaded
         if (req.files && req.files.image) {
@@ -129,6 +132,29 @@ exports.restorePost = async (req, res) => {
     }
 };
 
+// POST /admin/posts/:id/delete-permanently - Permanently delete post
+exports.deletePermanently = async (req, res) => {
+    try {
+        const post = await BlogPost.findById(req.params.id);
+        
+        if (!post) {
+            return res.redirect('/admin/posts?error=Post not found');
+        }
+        
+        // Only allow permanent deletion of already soft-deleted posts
+        if (!post.isDeleted) {
+            return res.redirect('/admin/posts?error=Post must be soft-deleted first');
+        }
+        
+        await BlogPost.findByIdAndDelete(req.params.id);
+        
+        res.redirect('/admin/posts?success=Post permanently deleted');
+    } catch (error) {
+        console.error('Permanent delete error:', error);
+        res.redirect('/admin/posts?error=Error permanently deleting post');
+    }
+};
+
 // GET /admin/users - Manage all users
 exports.manageUsers = async (req, res) => {
     try {
@@ -142,5 +168,18 @@ exports.manageUsers = async (req, res) => {
     } catch (error) {
         console.error('Manage users error:', error);
         res.status(500).send('Error loading users');
+    }
+};
+
+// GET /admin/contact-messages - View contact form submissions
+exports.viewContactMessages = async (req, res) => {
+    try {
+        const messages = await ContactMessage.find()
+            .sort({ createdAt: -1 });
+        
+        res.render('admin/contact-messages', { messages });
+    } catch (error) {
+        console.error('View contact messages error:', error);
+        res.status(500).send('Error loading contact messages');
     }
 };
