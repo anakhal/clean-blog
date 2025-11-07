@@ -113,6 +113,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                                         <div class="d-flex gap-1">
                                                             <% if (!post.isDeleted) { %>
                                                                 <a href="/admin/posts/<%= post._id %>/edit" class="btn btn-sm btn-outline-primary" style="height: 31px; line-height: 1.5; font-size: 0.8rem;">Edit</a>
+                                                                <% if (!post.solutionId) { %>
+                                                                    <a href="/posts/new?exerciseId=<%= post._id %>" class="btn btn-sm btn-outline-success" style="height: 31px; line-height: 1.5; font-size: 0.8rem;">Write Solution</a>
+                                                                <% } else { %>
+                                                                    <a href="/admin/posts/<%= post.solutionId._id || post.solutionId %>/edit" class="btn btn-sm btn-outline-info" style="height: 31px; line-height: 1.5; font-size: 0.8rem;">Edit Solution</a>
+                                                                <% } %>
                                                                 <form action="/admin/posts/<%= post._id %>/delete" method="post" class="d-inline">
                                                                     <button type="submit" class="btn btn-sm btn-outline-danger" style="height: 31px; line-height: 1.5; font-size: 0.8rem;"
                                                                             onclick="return confirm('Are you sure you want to delete this post?')">

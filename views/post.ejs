@@ -170,7 +170,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             <div class="solution-link">
                                 <h4>📚 Solution Available</h4>
                                 <p>A solution has been written for this exercise.</p>
-                                <a href="/post/<%= post.solutionId %>" target="_blank" class="btn-view-solution">
+                                <a href="/post/<%= post.solutionId._id || post.solutionId %>" target="_blank" class="btn-view-solution">
                                     View Solution (Opens in New Tab) →
                                 </a>
                             </div>
@@ -186,7 +186,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             <div class="solution-link">
                                 <h4>📝 Related Exercise</h4>
                                 <p>This is a solution to an exercise.</p>
-                                <a href="/post/<%= post.exerciseId %>" class="btn-view-solution">
+                                <a href="/post/<%= post.exerciseId._id || post.exerciseId %>" class="btn-view-solution">
                                     View Exercise →
                                 </a>
                             </div>

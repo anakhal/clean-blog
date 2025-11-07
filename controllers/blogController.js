@@ -5,7 +5,10 @@ const Category = require('../models/Category');
 exports.index= async (req, res) => {
   try {
     const category = req.query.category;
-    const query = { isDeleted: { $ne: true } };
+    const query = { 
+      isDeleted: { $ne: true },
+      type: 'exercise' // Only show exercises, not solutions
+    };
     
     if (category) {
       query.category = category;
@@ -27,10 +30,24 @@ exports.create= async (req,res)=>{
     try {
         const categories = await Category.find().sort({ name: 1 });
         const exerciseId = req.query.exerciseId;
-        res.render('create', { categories, exerciseId: exerciseId || undefined });
+        
+        let exercise = null;
+        if (exerciseId) {
+            exercise = await BlogPost.findById(exerciseId);
+        }
+        
+        res.render('create', { 
+            categories, 
+            exerciseId: exerciseId || undefined,
+            exercise: exercise || null
+        });
     } catch (err) {
         console.error(err);
-        res.render('create', { categories: [], exerciseId: undefined });
+        res.render('create', { 
+            categories: [], 
+            exerciseId: undefined,
+            exercise: null
+        });
     }
 };
 

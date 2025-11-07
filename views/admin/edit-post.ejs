@@ -47,7 +47,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 </small>
                             </div>
                             <div class="card-body">
-                                <form action="/admin/posts/<%= post._id %>/update" method="post" enctype="multipart/form-data">
+                                <form action="/admin/posts/<%= post._id %>/update" method="post">
                                     <div class="mb-3">
                                         <label for="title" class="form-label">Title *</label>
                                         <input type="text" class="form-control" id="title" name="title" 
@@ -67,18 +67,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                         </select>
                                     </div>
 
-                                    <div class="mb-3">
-                                        <label for="image" class="form-label">Featured Image</label>
-                                        <input type="file" class="form-control" id="image" name="image" accept="image/*">
-                                        <% if (post.image) { %>
-                                            <div class="mt-2">
-                                                <small class="text-muted">Current image:</small><br>
-                                                <img src="<%= post.image %>" alt="Current featured image" 
-                                                     style="max-width: 200px; max-height: 150px;" class="img-thumbnail">
-                                            </div>
-                                        <% } %>
-                                    </div>
-                                    
                                     <div class="mb-3">
                                         <label for="body" class="form-label">Content *</label>
                                         <textarea class="form-control" id="body" name="body" rows="15" required><%= post.body %></textarea>

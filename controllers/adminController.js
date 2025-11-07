@@ -22,7 +22,7 @@ exports.dashboard = async (req, res) => {
             type: 'exercise' // Only show exercises
         })
         .populate('author', 'username')
-        .populate('solutionId', 'title') // Populate to check if solution exists
+        .populate('solutionId') // Populate full solution object to get its _id
         .sort({ createdAt: -1 })
         .limit(10);
         
@@ -48,8 +48,10 @@ exports.managePosts = async (req, res) => {
             'Expires': '0'
         });
         
-        const posts = await BlogPost.find()
+        // Filter to show only exercises (not solutions)
+        const posts = await BlogPost.find({ type: 'exercise' })
             .populate('author', 'username')
+            .populate('solutionId') // Populate full solution object to get its _id
             .sort({ createdAt: -1 });
         
         res.render('admin/posts', { 
@@ -84,13 +86,12 @@ exports.editPost = async (req, res) => {
 exports.updatePost = async (req, res) => {
     try {
         const { title, body, category } = req.body;
-        const updateData = { title, body, category: category || 'Arithmétique', updatedAt: new Date() };
-        
-        // Handle image update if new image uploaded
-        if (req.files && req.files.image) {
-            updateData.image = '/img/' + req.files.image.name;
-            req.files.image.mv('./public/img/' + req.files.image.name);
-        }
+        const updateData = { 
+            title, 
+            body, 
+            category: category || 'Arithmétique', 
+            updatedAt: new Date() 
+        };
         
         const post = await BlogPost.findByIdAndUpdate(
             req.params.id,
