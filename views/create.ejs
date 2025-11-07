@@ -90,7 +90,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <div class="row gx-4 gx-lg-5 justify-content-center">
                     <div class="col-md-10 col-lg-8 col-xl-7">
                         <div class="page-heading">
-                            <h1>Create New Post</h1>
+                            <h1><%= typeof exerciseId !== 'undefined' ? 'Create Solution' : 'Create New Post' %></h1>
                             <span class="subheading">Have questions? I have answers.</span>
                         </div>
                     </div>
@@ -103,12 +103,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <div class="row">
                     <div class="col-12">
                         <div class="text-center mb-4">
-                            <h2>Create New Post</h2>
-                            <p>Create a new blog post with live preview</p>
+                            <h2><%= typeof exerciseId !== 'undefined' ? 'Create Solution' : 'Create New Post' %></h2>
+                            <p><%= typeof exerciseId !== 'undefined' ? 'Write a solution for the exercise' : 'Create a new blog post with live preview' %></p>
                         </div>
                         <!---form '/posts/strore' -->
                         <div class="my-5 full-width-form">
-                            <form action="/posts/store" method="post" enctype="multipart/form-data">
+                            <form action="/posts/store" method="post">
+                                <!-- Hidden field for exercise ID if creating a solution -->
+                                <% if (typeof exerciseId !== 'undefined') { %>
+                                    <input type="hidden" name="exerciseId" value="<%= exerciseId %>">
+                                    <input type="hidden" name="type" value="solution">
+                                <% } %>
+                                
                                 <!-- Title and Category in Grid Layout matching Editor/Preview -->
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 2rem;">
                                     <div class="form-group">
@@ -149,25 +155,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                     </div>
                                 </div>
 
-                                <!-- Image Upload -->
-                                <div class="control-group mt-4">
-                                    <div class="form-group floating-label-form-group controls">
-                                        <label for="image">Background Image</label>
-                                        <input class="form-control" name="image" id="image" type="file">
-                                    </div>
-                                </div>
+                                <!-- Image field removed -->
                                  
                                 <br>
                                 <div class="form-group text-center">
                                     <button type="submit" class="btn btn-primary btn-lg px-5" id="createPostButton">
-                                        <i class="fas fa-plus me-2"></i>Create Post
+                                        <i class="fas fa-plus me-2"></i><%= typeof exerciseId !== 'undefined' ? 'Create Solution' : 'Create Post' %>
                                     </button>
                                 </div>
                             </form>
                         </div>
-                    </div>
-                </div>
-            </div>
                     </div>
                 </div>
             </div>

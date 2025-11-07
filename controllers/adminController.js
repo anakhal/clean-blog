@@ -13,21 +13,28 @@ exports.dashboard = async (req, res) => {
             'Expires': '0'
         });
         
-        const totalPosts = await BlogPost.countDocuments();
+        const totalPosts = await BlogPost.countDocuments({ isDeleted: { $ne: true } });
         const totalUsers = await User.countDocuments();
-        const recentPosts = await BlogPost.find({type:'exercise'})
-            .populate('author', 'username')
-            .sort({ createdAt: -1 })
-            .limit(5);
+        
+        // Filter to show only exercises (not solutions)
+        const recentPosts = await BlogPost.find({ 
+            isDeleted: { $ne: true },
+            type: 'exercise' // Only show exercises
+        })
+        .populate('author', 'username')
+        .populate('solutionId', 'title') // Populate to check if solution exists
+        .sort({ createdAt: -1 })
+        .limit(10);
         
         res.render('admin/dashboard', {
             totalPosts,
             totalUsers,
-            recentPosts
+            recentPosts,
+            success: req.query.success || null
         });
     } catch (error) {
         console.error('Dashboard error:', error);
-        res.status(500).send('Dashboard error');
+        res.status(500).send('Error loading dashboard');
     }
 };
 
