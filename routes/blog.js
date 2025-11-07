@@ -12,6 +12,6 @@ router.get('/search', blogController.search);
 
 // Admin-only routes - require admin privileges
 router.get('/posts/new', requireAdmin, blogController.create);
-router.post('/posts/store', requireAdmin, validateMiddleware, blogController.store);
+router.post('/posts/store', requireAdmin, validateMiddleware, blogController.store); // Re-added validateMiddleware
 
 module.exports=router;

@@ -26,7 +26,7 @@ exports.index= async (req, res) => {
 exports.create= async (req,res)=>{
     try {
         const categories = await Category.find().sort({ name: 1 });
-        const exerciseId = req.query.exerciseId; // Get exerciseId if creating a solution
+        const exerciseId = req.query.exerciseId;
         res.render('create', { categories, exerciseId: exerciseId || undefined });
     } catch (err) {
         console.error(err);
@@ -42,7 +42,9 @@ exports.store=async (req,res)=>{
       return res.status(401).send('Unauthorized: Please log in as admin.');
     }
     
+    console.log('DEBUG - Starting post creation...');
     console.log('DEBUG - req.session.userId:', req.session.userId);
+    console.log('DEBUG - req.body:', req.body);
     
     const exerciseId = req.body.exerciseId;
     const type = req.body.type || 'exercise';
@@ -51,26 +53,33 @@ exports.store=async (req,res)=>{
       title: req.body.title,
       body: req.body.body,
       author: req.session.userId,
-      // image field removed
       category: req.body.category || 'Arithmétique',
       type: type,
       exerciseId: exerciseId || null
     });
     
-    await blogpost.save();
-    console.log('DEBUG - Created blogpost:', blogpost.title, 'Type:', blogpost.type);
+    console.log('DEBUG - BlogPost object created:', {
+      title: blogpost.title,
+      type: blogpost.type,
+      author: blogpost.author,
+      category: blogpost.category
+    });
+    
+    const savedPost = await blogpost.save();
+    console.log('DEBUG - Post saved successfully! ID:', savedPost._id);
     
     // If this is a solution, update the exercise with the solutionId
     if (exerciseId && type === 'solution') {
-      await BlogPost.findByIdAndUpdate(exerciseId, { solutionId: blogpost._id });
+      await BlogPost.findByIdAndUpdate(exerciseId, { solutionId: savedPost._id });
       console.log('DEBUG - Linked solution to exercise:', exerciseId);
     }
     
-    console.log('Blog post saved successfully:', blogpost.title);
+    console.log('DEBUG - Redirecting to home page...');
     res.redirect('/');
   } catch (error) {
-    console.error('Error Posting a blogpost', error);
-    res.status(500).send('Error Posting a blogpost');
+    console.error('ERROR - Error Posting a blogpost:', error);
+    console.error('ERROR - Stack trace:', error.stack);
+    res.status(500).send('Error Posting a blogpost: ' + error.message);
   }
 };
 
@@ -95,13 +104,13 @@ exports.show=async(req,res)=>{
   }
 };
 
+// search
 exports.search=async (req, res) => {
   try {
     const searchQuery = req.query.q;
     let posts = [];
     
     if (searchQuery) {
-      // Search in both title and body fields, but only non-deleted posts
       posts = await BlogPost.find({
         $and: [
           { isDeleted: { $ne: true } },
@@ -112,7 +121,7 @@ exports.search=async (req, res) => {
             ]
           }
         ]
-      }).populate('author', 'username').sort({ createdAt: -1 }); // Sort by newest first
+      }).populate('author', 'username').sort({ createdAt: -1 });
     }
     
     res.render('search', { 
@@ -126,4 +135,5 @@ exports.search=async (req, res) => {
   }
 };
 
+//register
 exports.register=(req,res)=>{res.render('register')};

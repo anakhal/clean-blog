@@ -9,7 +9,6 @@ const app = express();
 // Production environment configuration
 const isProduction = process.env.NODE_ENV === 'production';
 const port = process.env.PORT || 4000;
-const fileUpload=require('express-fileupload');
 const mongoose=require('mongoose');
 const winston = require('winston');
 const morgan = require('morgan');
@@ -155,7 +154,6 @@ mongoose.connect(MONGODB_URI)
     console.error('MongoDB connection error:', err.message);
   });
 //Middlewares setup.
-app.use(fileUpload());
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 // Static file serving with caching for production
@@ -175,6 +173,13 @@ const { checkAuth } = require('./middleware/authMiddleware');
 const { checkAdmin } = require('./middleware/adminMiddleware');
 app.use(checkAuth);
 app.use(checkAdmin);
+
+// TEMPORARY DEBUG MIDDLEWARE - add this
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path}`);
+  console.log('Body:', req.body);
+  next();
+});
 
 // set view engine
 //const ejs = require('ejs');
