@@ -137,6 +137,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                                                 <a href="/admin/posts/<%= post._id %>/edit" class="btn btn-sm btn-outline-primary" style="height: 31px; line-height: 1.5; display: flex; align-items: center;">Edit</a>
                                                                 <% if (!post.solutionId) { %>
                                                                     <a href="/posts/new?exerciseId=<%= post._id %>" class="btn btn-sm btn-outline-success" style="height: 31px; line-height: 1.5; display: flex; align-items: center;">Write Solution</a>
+                                                                <% } else { %>
+                                                                    <a href="/admin/posts/<%= post.solutionId._id || post.solutionId %>/edit" class="btn btn-sm btn-outline-info" style="height: 31px; line-height: 1.5; display: flex; align-items: center;">Edit Solution</a>
                                                                 <% } %>
                                                                 <form action="/admin/posts/<%= post._id %>/delete" method="post" class="d-inline" style="margin: 0;">
                                                                     <button type="submit" class="btn btn-sm btn-outline-danger" style="height: 31px; line-height: 1.5; display: flex; align-items: center;"

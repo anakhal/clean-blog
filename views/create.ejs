@@ -119,14 +119,21 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 2rem;">
                                     <div class="form-group">
                                         <label for="title">Title</label>
-                                        <input type="text" class="form-control" placeholder="Blog Post Title" id="title" name="title" required>
+                                        <input type="text" class="form-control" placeholder="Blog Post Title" id="title" name="title" 
+                                               value="<%= typeof exercise !== 'undefined' && exercise ? 'Solution ' + exercise.title : '' %>" required>
                                     </div>
                                     <div class="form-group">
                                         <label for="category">Category</label>
                                         <select class="form-control" name="category" id="category" required>
                                             <% if (categories && categories.length > 0) { %>
+                                                <% 
+                                                const preselectedCategory = (typeof exercise !== 'undefined' && exercise) ? exercise.category : null;
+                                                %>
                                                 <% categories.forEach((cat, index) => { %>
-                                                    <option value="<%= cat.name %>" <%= index === 0 ? 'selected' : '' %>><%= cat.name %></option>
+                                                    <option value="<%= cat.name %>" 
+                                                            <%= (preselectedCategory && cat.name === preselectedCategory) || (!preselectedCategory && index === 0) ? 'selected' : '' %>>
+                                                        <%= cat.name %>
+                                                    </option>
                                                 <% }) %>
                                             <% } else { %>
                                                 <option value="Arithmétique" selected>Arithmétique</option>
