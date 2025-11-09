@@ -201,27 +201,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 };
             }
             
-            // Function to convert simple markdown-like syntax to HTML
-            function simpleMarkdown(text) {
-                return text
-                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')  // **bold**
-                    .replace(/\*(.*?)\*/g, '<em>$1</em>')              // *italic*
-                    .replace(/\n\n/g, '</p><p>')                       // paragraphs
-                    .replace(/\n/g, '<br>');                           // line breaks
-            }
-            
             // Function to update the preview
             function updatePreview() {
                 // Update title preview
                 const titleValue = titleInput.value.trim();
                 previewTitle.textContent = titleValue || 'Your Post Title';
                 
-                // Update body preview with markdown-like formatting
+                // Update body preview - render full HTML including images
                 const bodyValue = bodyTextarea.value.trim();
                 if (bodyValue) {
-                    // Wrap in paragraph tags and apply simple markdown
-                    const formattedContent = '<p>' + simpleMarkdown(bodyValue) + '</p>';
-                    previewBody.innerHTML = formattedContent;
+                    // Directly insert HTML to render images and formatting
+                    previewBody.innerHTML = bodyValue;
                     
                     // Re-render MathJax in the preview area
                     if (window.MathJax && window.MathJax.typesetPromise) {
