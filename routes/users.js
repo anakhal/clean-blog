@@ -1,17 +1,22 @@
 const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/userController');
-const { requireAuth, redirectIfAuth } = require('../middleware/authMiddleware');
+const { verifyRecaptcha } = require('../middleware/recaptchaMiddleware');
+const { loginLimiter, registerLimiter } = require('../middleware/authRateLimiter');
 
-// User registration routes - redirect if already logged in
-router.get('/register', redirectIfAuth, userController.showRegister);
-router.post('/register', redirectIfAuth, userController.register);
+// GET /users/register
+router.get('/register', userController.showRegister);
 
-// User login routes - redirect if already logged in  
-router.get('/login', redirectIfAuth, userController.showLogin);
-router.post('/login', redirectIfAuth, userController.login);
+// POST /users/register - Avec protection reCAPTCHA et rate limiting
+router.post('/register', registerLimiter, verifyRecaptcha, userController.register);
 
-// User logout route - only logout if there's a session
+// GET /users/login
+router.get('/login', userController.showLogin);
+
+// POST /users/login - Avec protection reCAPTCHA et rate limiting
+router.post('/login', loginLimiter, verifyRecaptcha, userController.login);
+
+// POST /users/logout
 router.post('/logout', userController.logout);
 
 module.exports = router;

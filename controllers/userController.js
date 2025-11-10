@@ -2,7 +2,9 @@ const User = require('../models/User');
 
 // GET /users/register - Show registration form
 exports.showRegister = (req, res) => {
-    res.render('register');
+    res.render('register', {
+        recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY
+    });
 };
 
 // POST /users/register - Handle registration form submission
@@ -13,19 +15,22 @@ exports.register = async (req, res) => {
         // Server-side validation
         if (!username || !password || !confirmPassword) {
             return res.render('register', {
-                error: 'All fields are required'
+                error: 'All fields are required',
+                recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY
             });
         }
         
         if (password !== confirmPassword) {
             return res.render('register', {
-                error: 'Passwords do not match'
+                error: 'Passwords do not match',
+                recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY
             });
         }
         
         if (password.length < 6) {
             return res.render('register', {
-                error: 'Password must be at least 6 characters long'
+                error: 'Password must be at least 6 characters long',
+                recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY
             });
         }
         
@@ -33,7 +38,8 @@ exports.register = async (req, res) => {
         const existingUser = await User.findOne({ username });
         if (existingUser) {
             return res.render('register', {
-                error: 'Username already exists'
+                error: 'Username already exists',
+                recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY
             });
         }
         
@@ -51,14 +57,17 @@ exports.register = async (req, res) => {
     } catch (error) {
         console.error('Registration error:', error);
         res.render('register', {
-            error: 'An error occurred during registration. Please try again.'
+            error: 'An error occurred during registration. Please try again.',
+            recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY
         });
     }
 };
 
 // GET /users/login - Show login form
 exports.showLogin = (req, res) => {
-    res.render('login');
+    res.render('login', {
+        recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY
+    });
 };
 
 // POST /users/login - Handle login form submission
@@ -69,7 +78,8 @@ exports.login = async (req, res) => {
         // Server-side validation
         if (!username || !password) {
             return res.render('login', {
-                error: 'Username and password are required'
+                error: 'Username and password are required',
+                recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY
             });
         }
         
@@ -77,7 +87,8 @@ exports.login = async (req, res) => {
         const user = await User.findOne({ username });
         if (!user) {
             return res.render('login', {
-                error: 'Invalid username or password'
+                error: 'Invalid username or password',
+                recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY
             });
         }
         
@@ -85,7 +96,8 @@ exports.login = async (req, res) => {
         const isValidPassword = await user.comparePassword(password);
         if (!isValidPassword) {
             return res.render('login', {
-                error: 'Invalid username or password'
+                error: 'Invalid username or password',
+                recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY
             });
         }
         
@@ -107,7 +119,8 @@ exports.login = async (req, res) => {
     } catch (error) {
         console.error('Login error:', error);
         res.render('login', {
-            error: 'An error occurred during login. Please try again.'
+            error: 'An error occurred during login. Please try again.',
+            recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY
         });
     }
 };

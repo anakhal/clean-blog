@@ -67,13 +67,15 @@ app.use(helmet({
       scriptSrc: [
         "'self'", 
         "'unsafe-inline'",
-        "'unsafe-eval'", // Required for MathJax
+        "'unsafe-eval'",
         "https://polyfill.io",
         "https://cdn.jsdelivr.net",
         "https://cdnjs.cloudflare.com",
         "https://use.fontawesome.com",
         "https://www.googletagmanager.com",
-        "https://www.google-analytics.com"
+        "https://www.google-analytics.com",
+        "https://www.google.com",           // Pour reCAPTCHA
+        "https://www.gstatic.com"           // Pour reCAPTCHA
       ],
       scriptSrcElem: [
         "'self'",
@@ -83,7 +85,9 @@ app.use(helmet({
         "https://cdnjs.cloudflare.com",
         "https://use.fontawesome.com",
         "https://www.googletagmanager.com",
-        "https://www.google-analytics.com"
+        "https://www.google-analytics.com",
+        "https://www.google.com",           // Pour reCAPTCHA
+        "https://www.gstatic.com"           // Pour reCAPTCHA
       ],
       scriptSrcAttr: [
         "'unsafe-inline'",
@@ -101,9 +105,12 @@ app.use(helmet({
         "https://www.googletagmanager.com",
         "https://analytics.google.com"
       ],
+      frameSrc: [
+        "'self'",
+        "https://www.google.com"            // Pour reCAPTCHA iframe
+      ],
       objectSrc: ["'none'"],
       mediaSrc: ["'self'"],
-      frameSrc: ["'none'"],
       workerSrc: ["'self'", "blob:"],
       childSrc: ["'self'", "blob:"]
     },

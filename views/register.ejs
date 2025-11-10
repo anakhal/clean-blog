@@ -1,115 +1,120 @@
 <!DOCTYPE html>
 <html lang="en">
-    <!-- Head -->
-     <%-include('layouts/header')-%>
+    <%-include('layouts/header')-%>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <body>
         <!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WPZ6BNP4"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
-        <!-- Navigation-->
+        <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WPZ6BNP4"
+        height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+        <!-- End Google Tag Manager (noscript) -->
+        
         <%-include('layouts/navbar')-%>
-        <!-- Page Header-->
+        
         <header class="masthead">
             <div class="container position-relative px-4 px-lg-5">
                 <div class="row gx-4 gx-lg-5 justify-content-center">
                     <div class="col-md-10 col-lg-8 col-xl-7">
                         <div class="page-heading">
-                           <h1>Register New User</h1>
+                           <h1>Register</h1>
+                           <span class="subheading">Create a new account</span>
                         </div>
                     </div>
                 </div>
             </div>
         </header>
-        <!-- Main Content-->
+        
         <main class="mb-4">
             <div class="container px-4 px-lg-5">
                 <div class="row gx-4 gx-lg-5 justify-content-center">
                     <div class="col-md-10 col-lg-8 col-xl-7">
-                        <!-- Error message display -->
                         <% if (typeof error !== 'undefined' && error) { %>
                             <div class="alert alert-danger" role="alert">
                                 <%= error %>
                             </div>
                         <% } %>
                         
-                        <!-- User Registration Form -->
+                        <p>Create a new account</p>
+                        
                         <div class="my-5">
                             <form action="/users/register" method="post">
                                 <div class="control-group">
                                     <div class="form-group floating-label-form-group controls">
-                                        <label for="username">Username</label>
-                                        <input type="text" 
-                                               class="form-control" 
-                                               placeholder="Enter username" 
-                                               id="username" 
-                                               name="username" 
-                                               minlength="3"
-                                               maxlength="30"
-                                               required>
+                                        <label>Username</label>
+                                        <input class="form-control" id="username" name="username" type="text" placeholder="Enter username" required minlength="3">
+                                        <p class="help-block text-danger"></p>
                                     </div>
                                 </div>
+                                
                                 <div class="control-group">
                                     <div class="form-group floating-label-form-group controls">
-                                        <label for="password">Password</label>
-                                        <input type="password" 
-                                               class="form-control" 
-                                               placeholder="Enter password"
-                                               name="password" 
-                                               id="password"
-                                               minlength="6"
-                                               required>
+                                        <label>Password</label>
+                                        <div style="position: relative;">
+                                            <input class="form-control" id="password" name="password" type="password" placeholder="Password (min 6 characters)" required minlength="6">
+                                            <button type="button" class="togglePassword" data-target="password" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); border: none; background: transparent; cursor: pointer; font-size: 1.2em; padding: 5px 10px;">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                        <p class="help-block text-danger"></p>
                                     </div>
                                 </div>
+                                
                                 <div class="control-group">
                                     <div class="form-group floating-label-form-group controls">
-                                        <label for="confirmPassword">Confirm Password</label>
-                                        <input type="password" 
-                                               class="form-control" 
-                                               placeholder="Confirm your password"
-                                               name="confirmPassword" 
-                                               id="confirmPassword"
-                                               minlength="6"
-                                               required>
+                                        <label>Confirm Password</label>
+                                        <div style="position: relative;">
+                                            <input class="form-control" id="confirmPassword" name="confirmPassword" type="password" placeholder="Confirm Password" required minlength="6">
+                                            <button type="button" class="togglePassword" data-target="confirmPassword" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); border: none; background: transparent; cursor: pointer; font-size: 1.2em; padding: 5px 10px;">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                        <p class="help-block text-danger"></p>
                                     </div>
                                 </div>
-                                <br>
-                                <br>
-                                <div class="form-group">
-                                    <button type="submit" class="btn btn-primary" id="registerButton">Register</button>
-                                    <a href="/users/login" class="btn btn-outline-secondary ms-2">Already have an account? Login</a>
+                                
+                                <div class="control-group">
+                                    <div class="form-group">
+                                        <% if (typeof recaptchaSiteKey !== 'undefined' && recaptchaSiteKey) { %>
+                                            <div class="g-recaptcha" data-sitekey="<%= recaptchaSiteKey %>"></div>
+                                        <% } else { %>
+                                            <p class="text-danger">reCAPTCHA not configured</p>
+                                        <% } %>
+                                    </div>
                                 </div>
+                                
+                                <br>
+                                <button type="submit" class="btn btn-primary text-uppercase">Register</button>
                             </form>
+                        </div>
+                        
+                        <div class="text-center mt-3">
+                            <p>Already have an account? <a href="/users/login">Login</a></p>
                         </div>
                     </div>
                 </div>
             </div>
         </main>
-        <!-- Footer-->
+        
         <%-include('layouts/footer')-%>
-        <!--Client side password verification-->
+        
         <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const form = document.querySelector('form');
-                const password = document.getElementById('password');
-                const confirmPassword = document.getElementById('confirmPassword');
-                
-                form.addEventListener('submit', function(e) {
-                    if (password.value !== confirmPassword.value) {
-                        e.preventDefault();
-                        alert('Passwords do not match!');
-                        confirmPassword.focus();
-                    }
-                });
-                
-                // Real-time password match feedback
-                confirmPassword.addEventListener('input', function() {
-                    if (password.value !== confirmPassword.value) {
-                        confirmPassword.setCustomValidity('Passwords do not match');
+            // Toggle password visibility for all password fields
+            document.querySelectorAll('.togglePassword').forEach(button => {
+                button.addEventListener('click', function() {
+                    const targetId = this.getAttribute('data-target');
+                    const passwordInput = document.getElementById(targetId);
+                    const eyeIcon = this.querySelector('i');
+                    
+                    if (passwordInput.type === 'password') {
+                        passwordInput.type = 'text';
+                        eyeIcon.classList.remove('fa-eye');
+                        eyeIcon.classList.add('fa-eye-slash');
                     } else {
-                        confirmPassword.setCustomValidity('');
+                        passwordInput.type = 'password';
+                        eyeIcon.classList.remove('fa-eye-slash');
+                        eyeIcon.classList.add('fa-eye');
                     }
                 });
             });
         </script>
     </body>
+</html>
