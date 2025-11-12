@@ -9,17 +9,21 @@ const app = express();
 // Production environment configuration
 const isProduction = process.env.NODE_ENV === 'production';
 const port = process.env.PORT || 4000;
-const mongoose=require('mongoose');
+const mongoose = require('mongoose');
 const winston = require('winston');
 const morgan = require('morgan');
 
-// After loading env, add quick diagnostics (do not expose secrets in full)
+// After loading env, add quick diagnostics
 console.log('=== Startup diagnostics ===');
 const envKeys = Object.keys(process.env);
 console.log('Env vars count:', envKeys.length);
 
 // Check critical env vars presence (mask values)
-function mask(v){ if(!v) return '<MISSING>'; return v.length>8 ? v.slice(0,4)+'...'+v.slice(-4) : '*****'; }
+function mask(v) { 
+  if (!v) return '<MISSING>'; 
+  return v.length > 8 ? v.slice(0, 4) + '...' + v.slice(-4) : '*****'; 
+}
+
 console.log('MONGODB_URI:', process.env.MONGODB_URI ? 'present' : '<MISSING>');
 console.log('SESSION_SECRET:', process.env.SESSION_SECRET ? 'present' : '<MISSING>');
 console.log('RECAPTCHA_SITE_KEY:', process.env.RECAPTCHA_SITE_KEY ? 'present' : '<MISSING>');
@@ -63,88 +67,32 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      styleSrc: [
-        "'self'", 
-        "'unsafe-inline'", 
-        "https://fonts.googleapis.com",
-        "https://cdnjs.cloudflare.com",
-        "https://cdn.jsdelivr.net",
-        "https://use.fontawesome.com"
-      ],
-      fontSrc: [
-        "'self'", 
-        "https://fonts.gstatic.com",
-        "https://fonts.googleapis.com",
-        "https://cdnjs.cloudflare.com",
-        "https://cdn.jsdelivr.net",
-        "https://use.fontawesome.com",
-        "data:",
-        "blob:"
-      ],
-      scriptSrc: [
-        "'self'", 
-        "'unsafe-inline'",
-        "'unsafe-eval'",
-        "https://polyfill.io",
-        "https://cdn.jsdelivr.net",
-        "https://cdnjs.cloudflare.com",
-        "https://use.fontawesome.com",
-        "https://www.googletagmanager.com",
-        "https://www.google-analytics.com",
-        "https://www.google.com",           // Pour reCAPTCHA
-        "https://www.gstatic.com"           // Pour reCAPTCHA
-      ],
-      scriptSrcElem: [
-        "'self'",
-        "'unsafe-inline'",
-        "https://polyfill.io",
-        "https://cdn.jsdelivr.net",
-        "https://cdnjs.cloudflare.com",
-        "https://use.fontawesome.com",
-        "https://www.googletagmanager.com",
-        "https://www.google-analytics.com",
-        "https://www.google.com",           // Pour reCAPTCHA
-        "https://www.gstatic.com"           // Pour reCAPTCHA
-      ],
-      scriptSrcAttr: [
-        "'unsafe-inline'",
-        "'unsafe-hashes'"
-      ],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net", "https://use.fontawesome.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net", "https://use.fontawesome.com", "data:", "blob:"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://polyfill.io", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com", "https://use.fontawesome.com", "https://www.googletagmanager.com", "https://www.google-analytics.com", "https://www.google.com", "https://www.gstatic.com"],
+      scriptSrcElem: ["'self'", "'unsafe-inline'", "https://polyfill.io", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com", "https://use.fontawesome.com", "https://www.googletagmanager.com", "https://www.google-analytics.com", "https://www.google.com", "https://www.gstatic.com"],
+      scriptSrcAttr: ["'unsafe-inline'", "'unsafe-hashes'"],
       imgSrc: ["'self'", "data:", "https:", "http:"],
-      connectSrc: [
-        "'self'",
-        "https://cdn.jsdelivr.net",
-        "https://cdnjs.cloudflare.com",
-        "https://use.fontawesome.com",
-        "https://fonts.googleapis.com",
-        "https://fonts.gstatic.com",
-        "https://www.google-analytics.com",
-        "https://www.googletagmanager.com",
-        "https://analytics.google.com"
-      ],
-      frameSrc: [
-        "'self'",
-        "https://www.google.com"            // Pour reCAPTCHA iframe
-      ],
+      connectSrc: ["'self'", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com", "https://use.fontawesome.com", "https://fonts.googleapis.com", "https://fonts.gstatic.com", "https://www.google-analytics.com", "https://www.googletagmanager.com", "https://analytics.google.com"],
+      frameSrc: ["'self'", "https://www.google.com"],
       objectSrc: ["'none'"],
       mediaSrc: ["'self'"],
       workerSrc: ["'self'", "blob:"],
       childSrc: ["'self'", "blob:"]
-    },
+    }
   },
-  crossOriginEmbedderPolicy: false, // Required for MathJax
-));
+  crossOriginEmbedderPolicy: false
+}));
 
 // Rate limiting middleware
 const limiter = rateLimit({
-  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000, // 15 minutes
-  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100, // limit each IP to 100 requests per windowMs
+  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000,
+  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
   message: 'Too many requests from this IP, please try again later.',
-  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  standardHeaders: true,
+  legacyHeaders: false
 });
 
-// Apply rate limiting to all requests
 app.use(limiter);
 
 // HTTPS redirect middleware for production
@@ -160,29 +108,25 @@ if (isProduction) {
 
 // CORS configuration
 app.use(cors({
-  origin: isProduction 
-    ? process.env.CORS_ORIGIN || false // Set CORS_ORIGIN in Heroku config vars
-    : ['http://localhost:3000', 'http://localhost:4000'],
+  origin: isProduction ? (process.env.CORS_ORIGIN || false) : ['http://localhost:3000', 'http://localhost:4000'],
   credentials: true,
   optionsSuccessStatus: 200
 }));
 
-// Use environment variable or default
+// MongoDB connection
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/clean-blog-database';
 mongoose.set('strictQuery', true);
 mongoose.connect(MONGODB_URI)
-  .then(async () => {
-    console.log('Connected to MongoDB');
-  })
-  .catch(err => {
-    console.error('MongoDB connection error:', err.message);
-  });
-//Middlewares setup.
+  .then(() => console.log('Connected to MongoDB'))
+  .catch(err => console.error('MongoDB connection error:', err.message));
+
+// Middlewares setup
 app.use(express.json());
-app.use(express.urlencoded({extended:true}));
-// Static file serving with caching for production
+app.use(express.urlencoded({ extended: true }));
+
+// Static file serving
 app.use(express.static('public', {
-  maxAge: isProduction ? '1d' : 0, // Cache for 1 day in production
+  maxAge: isProduction ? '1d' : 0,
   etag: true,
   lastModified: true
 }));
@@ -192,41 +136,38 @@ const session = require('express-session');
 const sessionConfig = require('./config/session');
 app.use(session(sessionConfig));
 
-// Authentication middleware - make user info available to all templates
+// Authentication middleware
 const { checkAuth } = require('./middleware/authMiddleware');
 const { checkAdmin } = require('./middleware/adminMiddleware');
 app.use(checkAuth);
 app.use(checkAdmin);
 
-// TEMPORARY DEBUG MIDDLEWARE - add this
+// Debug middleware
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.path}`);
   console.log('Body:', req.body);
   next();
 });
 
-// set view engine
-//const ejs = require('ejs');
-app.set('view engine','ejs');
-//trust proxy;
+// Set view engine
+app.set('view engine', 'ejs');
 app.set('trust proxy', 1);
-//setting the routes
-const blogRoutes=require('./routes/blog');
-const userRoutes=require('./routes/users');
-const adminRoutes=require('./routes/admin');
-app.use('/',blogRoutes);
-app.use('/users',userRoutes);
-app.use('/admin',adminRoutes);
 
-// Import contact controller and middleware
-const contactController = require('./controllers/contactController');
-const { validateContactForm } = require('./middleware/contactMiddleware');
+// Routes
+const blogRoutes = require('./routes/blog');
+const userRoutes = require('./routes/users');
+const adminRoutes = require('./routes/admin');
+app.use('/', blogRoutes);
+app.use('/users', userRoutes);
+app.use('/admin', adminRoutes);
 
 // Contact routes
+const contactController = require('./controllers/contactController');
+const { validateContactForm } = require('./middleware/contactMiddleware');
 app.get('/contact', contactController.showContact);
 app.post('/contact', validateContactForm, contactController.sendMessage);
 
-// Health check endpoint for monitoring
+// Health check endpoint
 app.get('/health', (req, res) => {
   const healthcheck = {
     uptime: process.uptime(),
@@ -245,8 +186,9 @@ app.get('/health', (req, res) => {
 });
 
 // Other routes
-app.get('/about', (req, res) => {res.render('about')});
+app.get('/about', (req, res) => res.render('about'));
 
+// Start server
 app.listen(port, '0.0.0.0', () => {
   console.log(`Server is running on http://localhost:${port} (bound to 0.0.0.0)`);
 });
