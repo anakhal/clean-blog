@@ -13,6 +13,23 @@ const mongoose=require('mongoose');
 const winston = require('winston');
 const morgan = require('morgan');
 
+// After loading env, add quick diagnostics (do not expose secrets in full)
+console.log('=== Startup diagnostics ===');
+const envKeys = Object.keys(process.env);
+console.log('Env vars count:', envKeys.length);
+
+// Check critical env vars presence (mask values)
+function mask(v){ if(!v) return '<MISSING>'; return v.length>8 ? v.slice(0,4)+'...'+v.slice(-4) : '*****'; }
+console.log('MONGODB_URI:', process.env.MONGODB_URI ? 'present' : '<MISSING>');
+console.log('SESSION_SECRET:', process.env.SESSION_SECRET ? 'present' : '<MISSING>');
+console.log('RECAPTCHA_SITE_KEY:', process.env.RECAPTCHA_SITE_KEY ? 'present' : '<MISSING>');
+console.log('RECAPTCHA_SECRET_KEY:', process.env.RECAPTCHA_SECRET_KEY ? 'present' : '<MISSING>');
+console.log('SMTP_USER:', process.env.SMTP_USER ? mask(process.env.SMTP_USER) : '<MISSING>');
+console.log('SMTP_PASS:', process.env.SMTP_PASS ? 'present' : '<MISSING>');
+console.log('PORT (env):', process.env.PORT || '(not set, using default)');
+console.log('NODE_ENV:', process.env.NODE_ENV || '(not set)');
+console.log('=== End diagnostics ===\n');
+
 // Configure Winston logger
 const logger = winston.createLogger({
   level: isProduction ? 'info' : 'debug',
@@ -229,23 +246,6 @@ app.get('/health', (req, res) => {
 
 // Other routes
 app.get('/about', (req, res) => {res.render('about')});
-
-// After loading env, add quick diagnostics (do not expose secrets in full)
-console.log('=== Startup diagnostics ===');
-const envKeys = Object.keys(process.env);
-console.log('Env vars count:', envKeys.length);
-
-// Check critical env vars presence (mask values)
-function mask(v){ if(!v) return '<MISSING>'; return v.length>8 ? v.slice(0,4)+'...'+v.slice(-4) : '*****'; }
-console.log('MONGODB_URI:', process.env.MONGODB_URI ? 'present' : '<MISSING>');
-console.log('SESSION_SECRET:', process.env.SESSION_SECRET ? 'present' : '<MISSING>');
-console.log('RECAPTCHA_SITE_KEY:', process.env.RECAPTCHA_SITE_KEY ? 'present' : '<MISSING>');
-console.log('RECAPTCHA_SECRET_KEY:', process.env.RECAPTCHA_SECRET_KEY ? 'present' : '<MISSING>');
-console.log('SMTP_USER:', process.env.SMTP_USER ? mask(process.env.SMTP_USER) : '<MISSING>');
-console.log('SMTP_PASS:', process.env.SMTP_PASS ? 'present' : '<MISSING>');
-console.log('PORT (env):', process.env.PORT || '(not set, using default)');
-console.log('NODE_ENV:', process.env.NODE_ENV || '(not set)');
-// end diagnostics
 
 app.listen(port, '0.0.0.0', () => {
   console.log(`Server is running on http://localhost:${port} (bound to 0.0.0.0)`);
