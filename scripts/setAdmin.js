@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const User = require('../models/User');
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
 
 // Security check - only allow in development
 if (process.env.NODE_ENV === 'production') {
@@ -10,6 +11,14 @@ if (process.env.NODE_ENV === 'production') {
 
 async function setUserAsAdmin(username) {
     try {
+        // Verify .env is loaded
+        if (!process.env.MONGODB_URI) {
+            console.log('❌ MONGODB_URI not found in .env');
+            console.log('Current directory:', __dirname);
+            console.log('Looking for .env at:', path.join(__dirname, '..', '.env'));
+            process.exit(1);
+        }
+        
         // Connect to MongoDB
         console.log('Connecting to MongoDB...');
         await mongoose.connect(process.env.MONGODB_URI);
