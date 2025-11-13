@@ -65,7 +65,14 @@ async function setUserAsAdmin(username) {
     }
 }
 
-// Get username from command line argument or use default
-const username = process.argv[2] || 'nakhal69';
+// Get username from command line argument (required)
+const username = process.argv[2];
+
+if (!username) {
+    console.log('❌ Usage: node scripts/setAdmin.js <username>');
+    console.log('Example: node scripts/setAdmin.js nakhal69');
+    process.exit(1);
+}
+
 console.log(`🔧 Setting user '${username}' as admin...`);
 setUserAsAdmin(username);
