@@ -8,11 +8,11 @@ const sessionConfig = {
     resave: false,              // Don't save session if unmodified
     saveUninitialized: false,   // Don't create session until something stored
     store: MongoStore.create({
-        mongoUrl: process.env.MONGODB_URI || 'mongodb://localhost:27017/myDbName',
+        mongoUrl: process.env.MONGODB_URI,
         touchAfter: 24 * 60 * 60   // 24 hours in seconds (24 * 60 * 60 = 86,400 seconds)
     }),
     cookie: {
-        secure: false,          // Set to true in production with HTTPS
+        secure: process.env.NODE_ENV === 'production',          // Set to true in production with HTTPS
         httpOnly: true,         // Prevent XSS attacks
         maxAge: 7 * 24 * 60 * 60 * 1000  // 7 days in milliseconds (7 * 24 * 60 * 60 * 1000 = 604,800,000 ms)
     }
