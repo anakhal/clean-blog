@@ -21,6 +21,18 @@ exports.verifyRecaptcha = async (req, res, next) => {
                 remoteip: req.ip
             }
         });
+
+        // Diagnostic logging (do not log secrets)
+        console.log('reCAPTCHA verification result:', {
+            success: response.data.success,
+            score: response.data.score,
+            action: response.data.action,
+            hostname: response.data.hostname,
+            'error-codes': response.data['error-codes']
+        });
+
+        // Attach verification result to request for controllers
+        req.recaptcha = response.data;
         
         if (response.data.success) {
             next();
@@ -33,7 +45,7 @@ exports.verifyRecaptcha = async (req, res, next) => {
             });
         }
     } catch (error) {
-        console.error('reCAPTCHA verification error:', error);
+        console.error('reCAPTCHA verification error:', error.message);
         const errorMessage = 'Verification error. Please try again.';
         const viewName = req.path.includes('register') ? 'register' : 'login';
         return res.render(viewName, { 

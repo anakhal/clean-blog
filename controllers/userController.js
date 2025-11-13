@@ -75,7 +75,20 @@ exports.login = async (req, res) => {
     try {
         const { username, password } = req.body;
         
-        // Server-side validation
+        // Log recaptcha verification attached by middleware
+        console.log('Login attempt for user:', username);
+        if (req.recaptcha) {
+            console.log('reCAPTCHA attached to request:', {
+                success: req.recaptcha.success,
+                score: req.recaptcha.score,
+                action: req.recaptcha.action,
+                hostname: req.recaptcha.hostname,
+                errors: req.recaptcha['error-codes']
+            });
+        } else {
+            console.log('No reCAPTCHA result attached to request');
+        }
+        
         if (!username || !password) {
             return res.render('login', {
                 error: 'Username and password are required',
@@ -86,6 +99,7 @@ exports.login = async (req, res) => {
         // Find user by username
         const user = await User.findOne({ username });
         if (!user) {
+            console.log('Login failed: user not found:', username);
             return res.render('login', {
                 error: 'Invalid username or password',
                 recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY
@@ -95,19 +109,19 @@ exports.login = async (req, res) => {
         // Check password using the comparePassword method
         const isValidPassword = await user.comparePassword(password);
         if (!isValidPassword) {
+            console.log('Login failed: invalid password for user:', username);
             return res.render('login', {
                 error: 'Invalid username or password',
                 recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY
             });
         }
         
-        // Login successful - Create session!
+        // Login successful - create session
         req.session.userId = user._id;
         req.session.username = user.username;
         req.session.role = user.role;
         req.session.isLoggedIn = true;
-        
-        console.log('User logged in:', user.username, 'Role:', user.role);
+        console.log('User logged in successfully:', user.username, 'role:', user.role);
         
         // Redirect admin to dashboard, regular users to home
         if (user.role === 'admin') {

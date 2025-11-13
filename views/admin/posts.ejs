@@ -99,7 +99,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                                             <span class="text-muted"><%= post.title %> (Deleted)</span>
                                                         <% } %>
                                                     </td>
-                                                    <td>admin</td>
+                                                    <td>
+                                                        <%= post.author ? post.author.username : 'Unknown' %>
+                                                    </td>
                                                     <td>
                                                         <% if (post.isDeleted) { %>
                                                             <span class="badge bg-danger">Deleted</span>

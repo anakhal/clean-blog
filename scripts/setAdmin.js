@@ -74,5 +74,5 @@ if (!username) {
     process.exit(1);
 }
 
-console.log(`🔧 Setting user '${username}' as admin...`);
+console.log(`🔧 Setting user as admin...`); // Sans afficher le username
 setUserAsAdmin(username);
