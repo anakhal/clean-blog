@@ -36,7 +36,7 @@ exports.sendMessage = async (req, res) => {
 
             const msg = {
                 to: process.env.CONTACT_EMAIL || process.env.SMTP_USER, // Where to send the contact form
-                from: process.env.SMTP_USER, // Verified Sender Identity
+                from: process.env.CONTACT_EMAIL || process.env.SMTP_USER, // Verified Sender Identity
                 replyTo: email, // Reply to the user
                 subject: `New Contact Form Message from ${name}`,
                 text: `Name: ${name}\nEmail: ${email}\nPhone: ${phone}\n\nMessage:\n${message}`,
