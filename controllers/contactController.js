@@ -29,18 +29,18 @@ exports.sendMessage = async (req, res) => {
         // Create transporter
         const transporter = nodemailer.createTransport({
             host: process.env.SMTP_HOST || 'smtp.gmail.com',
-            port: process.env.SMTP_PORT || 587,
-            secure: false, // true for 465, false for other ports
+            port: 465, // Force port 465 for Gmail
+            secure: true, // true for 465, false for other ports
             auth: {
-                user: process.env.SMTP_USER ,
+                user: process.env.SMTP_USER,
                 pass: process.env.SMTP_PASS
             },
-             connectionTimeout: 30000,
-    socketTimeout: 30000,
-    greetingTimeout: 15000,
-    tls: {
-        rejectUnauthorized: false
-    }
+            connectionTimeout: 30000,
+            socketTimeout: 30000,
+            greetingTimeout: 15000,
+            tls: {
+                rejectUnauthorized: false
+            }
         });
         
         // Email content
