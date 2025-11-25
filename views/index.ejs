@@ -85,6 +85,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         </a>
                         <p class="post-meta">
                             <span class="badge bg-primary me-2"><%=posts[i].category || 'Arithmétique'%></span>
+                            <% if (posts[i].solutionId) { %>
+                                <span class="badge bg-success me-2">Solution</span>
+                            <% } %>
                             Posted by admin on <%=new Date().toDateString()%>
                         </p>
                     </div>
