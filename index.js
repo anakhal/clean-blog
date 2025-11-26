@@ -15,7 +15,12 @@ const morgan = require('morgan');
 // 🔒 Redirect middleware (place this FIRST)
 app.use((req, res, next) => {
   if (req.headers.host === 'mathematiques-bac.org') {
-    return res.redirect(301, 'https://www.mathematiques-bac.org' + req.url);
+    // Only redirect if it's a valid relative path (prevents open redirect attacks)
+    if (req.url.startsWith('/') && !req.url.startsWith('//')) {
+      return res.redirect(301, `https://www.mathematiques-bac.org${req.url}`);
+    }
+    // Fallback to homepage if suspicious URL
+    return res.redirect(301, 'https://www.mathematiques-bac.org/');
   }
   next();
 });
@@ -25,9 +30,9 @@ const envKeys = Object.keys(process.env);
 console.log('Env vars count:', envKeys.length);
 
 // Check critical env vars presence (mask values)
-function mask(v) { 
-  if (!v) return '<MISSING>'; 
-  return v.length > 8 ? v.slice(0, 4) + '...' + v.slice(-4) : '*****'; 
+function mask(v) {
+  if (!v) return '<MISSING>';
+  return v.length > 8 ? v.slice(0, 4) + '...' + v.slice(-4) : '*****';
 }
 
 console.log('MONGODB_URI:', process.env.MONGODB_URI ? 'present' : '<MISSING>');
@@ -73,18 +78,18 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net", "https://use.fontawesome.com"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net", "https://use.fontawesome.com", "https://www.google.com", "https://www.gstatic.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net", "https://use.fontawesome.com", "data:", "blob:"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://polyfill.io", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com", "https://use.fontawesome.com", "https://www.googletagmanager.com", "https://www.google-analytics.com", "https://www.google.com", "https://www.gstatic.com"],
-      scriptSrcElem: ["'self'", "'unsafe-inline'", "https://polyfill.io", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com", "https://use.fontawesome.com", "https://www.googletagmanager.com", "https://www.google-analytics.com", "https://www.google.com", "https://www.gstatic.com"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://polyfill.io", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com", "https://use.fontawesome.com", "https://www.googletagmanager.com", "https://www.google-analytics.com", "https://www.google.com", "https://www.gstatic.com", "https://www.recaptcha.net"],
+      scriptSrcElem: ["'self'", "'unsafe-inline'", "https://polyfill.io", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com", "https://use.fontawesome.com", "https://www.googletagmanager.com", "https://www.google-analytics.com", "https://www.google.com", "https://www.gstatic.com", "https://www.recaptcha.net"],
       scriptSrcAttr: ["'unsafe-inline'", "'unsafe-hashes'"],
       imgSrc: ["'self'", "data:", "https:", "http:"],
-      connectSrc: ["'self'", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com", "https://use.fontawesome.com", "https://fonts.googleapis.com", "https://fonts.gstatic.com", "https://www.google-analytics.com", "https://www.googletagmanager.com", "https://analytics.google.com"],
-      frameSrc: ["'self'", "https://www.google.com"],
+      connectSrc: ["'self'", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com", "https://use.fontawesome.com", "https://fonts.googleapis.com", "https://fonts.gstatic.com", "https://www.google-analytics.com", "https://www.googletagmanager.com", "https://analytics.google.com", "https://www.google.com", "https://www.gstatic.com", "https://www.recaptcha.net"],
+      frameSrc: ["'self'", "https://www.google.com", "https://www.recaptcha.net"],
       objectSrc: ["'none'"],
       mediaSrc: ["'self'"],
       workerSrc: ["'self'", "blob:"],
-      childSrc: ["'self'", "blob:"]
+      childSrc: ["'self'", "blob:", "https://www.google.com", "https://www.recaptcha.net"]
     }
   },
   crossOriginEmbedderPolicy: false
@@ -182,7 +187,7 @@ app.get('/health', (req, res) => {
     environment: process.env.NODE_ENV || 'development',
     database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
   };
-  
+
   try {
     res.status(200).json(healthcheck);
   } catch (error) {

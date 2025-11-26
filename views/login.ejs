@@ -1,107 +1,125 @@
 <!DOCTYPE html>
 <html lang="en">
-    <!-- Head -->
-     <%-include('layouts/header')-%>
-    <!-- reCAPTCHA Script -->
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+<!-- Head -->
+<%- include('layouts/header') -%>
+    <!-- reCAPTCHA v3 Script -->
+    <script src="https://www.google.com/recaptcha/api.js?render=<%= recaptchaSiteKey %>" async defer></script>
+
     <body>
         <!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WPZ6BNP4"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
+        <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WPZ6BNP4" height="0" width="0"
+                style="display:none;visibility:hidden"></iframe></noscript>
+        <!-- End Google Tag Manager (noscript) -->
         <!-- Navigation-->
-        <%-include('layouts/navbar')-%>
-        <!-- Page Header-->
-        <header class="masthead">
-            <div class="container position-relative px-4 px-lg-5">
-                <div class="row gx-4 gx-lg-5 justify-content-center">
-                    <div class="col-md-10 col-lg-8 col-xl-7">
-                        <div class="page-heading">
-                           <h1>Login</h1>
-                           <span class="subheading">Access your account</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </header>
-        <!-- Main Content-->
-        <main class="mb-4">
-            <div class="container px-4 px-lg-5">
-                <div class="row gx-4 gx-lg-5 justify-content-center">
-                    <div class="col-md-10 col-lg-8 col-xl-7">
-                        <!-- Error message display -->
-                        <% if (typeof error !== 'undefined' && error) { %>
-                            <div class="alert alert-danger" role="alert">
-                                <%= error %>
+        <%- include('layouts/navbar') -%>
+            <!-- Page Header-->
+            <header class="masthead">
+                <div class="container position-relative px-4 px-lg-5">
+                    <div class="row gx-4 gx-lg-5 justify-content-center">
+                        <div class="col-md-10 col-lg-8 col-xl-7">
+                            <div class="page-heading">
+                                <h1>Login</h1>
+                                <span class="subheading">Access your account</span>
                             </div>
-                        <% } %>
-                        
-                        <p>Login to your account</p>
-                        
-                        <!-- User Login Form -->
-                        <div class="my-5">
-                            <form action="/users/login" method="post">
-                                <div class="control-group">
-                                    <div class="form-group floating-label-form-group controls">
-                                        <label>Username</label>
-                                        <input class="form-control" id="username" name="username" type="text" placeholder="Enter your username" required>
-                                        <p class="help-block text-danger"></p>
-                                    </div>
-                                </div>
-                                
-                                <div class="control-group">
-                                    <div class="form-group floating-label-form-group controls">
-                                        <label>Password</label>
-                                        <div style="position: relative;">
-                                            <input class="form-control" id="password" name="password" type="password" placeholder="Password" required>
-                                            <button type="button" id="togglePassword" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); border: none; background: transparent; cursor: pointer; font-size: 1.2em; padding: 5px 10px;">
-                                                <i class="fas fa-eye" id="eyeIcon"></i>
-                                            </button>
-                                        </div>
-                                        <p class="help-block text-danger"></p>
-                                    </div>
-                                </div>
-                                
-                                <div class="control-group">
-                                    <div class="form-group">
-                                        <% if (typeof recaptchaSiteKey !== 'undefined' && recaptchaSiteKey) { %>
-                                            <div class="g-recaptcha" data-sitekey="<%= recaptchaSiteKey %>"></div>
-                                        <% } else { %>
-                                            <p class="text-danger">reCAPTCHA not configured</p>
-                                        <% } %>
-                                    </div>
-                                </div>
-                                
-                                <br>
-                                <button type="submit" class="btn btn-primary text-uppercase" id="submitButton">Login</button>
-                            </form>
-                        </div>
-                        
-                        <div class="text-center mt-3">
-                            <p>Don't have an account? <a href="/users/register">Register</a></p>
                         </div>
                     </div>
                 </div>
-            </div>
-        </main>
-        <!-- Footer-->
-        <%-include('layouts/footer')-%>
-        <script>
-            // Toggle password visibility
-            document.getElementById('togglePassword').addEventListener('click', function() {
-                const passwordInput = document.getElementById('password');
-                const eyeIcon = document.getElementById('eyeIcon');
-                
-                if (passwordInput.type === 'password') {
-                    passwordInput.type = 'text';
-                    eyeIcon.classList.remove('fa-eye');
-                    eyeIcon.classList.add('fa-eye-slash');
-                } else {
-                    passwordInput.type = 'password';
-                    eyeIcon.classList.remove('fa-eye-slash');
-                    eyeIcon.classList.add('fa-eye');
-                }
-            });
-        </script>
+            </header>
+            <!-- Main Content-->
+            <main class="mb-4">
+                <div class="container px-4 px-lg-5">
+                    <div class="row gx-4 gx-lg-5 justify-content-center">
+                        <div class="col-md-10 col-lg-8 col-xl-7">
+                            <!-- Error message display -->
+                            <% if (typeof error !=='undefined' && error) { %>
+                                <div class="alert alert-danger" role="alert">
+                                    <%= error %>
+                                </div>
+                                <% } %>
+
+                                    <p>Login to your account</p>
+
+                                    <!-- User Login Form -->
+                                    <div class="my-5">
+                                        <form action="/users/login" method="post">
+                                            <div class="control-group">
+                                                <div class="form-group floating-label-form-group controls">
+                                                    <label>Username</label>
+                                                    <input class="form-control" id="username" name="username"
+                                                        type="text" placeholder="Enter your username" required>
+                                                    <p class="help-block text-danger"></p>
+                                                </div>
+                                            </div>
+
+                                            <div class="control-group">
+                                                <div class="form-group floating-label-form-group controls">
+                                                    <label>Password</label>
+                                                    <div style="position: relative;">
+                                                        <input class="form-control" id="password" name="password"
+                                                            type="password" placeholder="Password" required>
+                                                        <button type="button" id="togglePassword"
+                                                            style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); border: none; background: transparent; cursor: pointer; font-size: 1.2em; padding: 5px 10px;">
+                                                            <i class="fas fa-eye" id="eyeIcon"></i>
+                                                        </button>
+                                                    </div>
+                                                    <p class="help-block text-danger"></p>
+                                                </div>
+                                            </div>
+
+                                            <!-- reCAPTCHA v3 is invisible, no widget needed -->
+                                            <input type="hidden" id="g-recaptcha-response" name="g-recaptcha-response">
+
+                                            <br>
+                                            <button type="submit" class="btn btn-primary text-uppercase"
+                                                id="submitButton">Login</button>
+                                        </form>
+                                    </div>
+
+                                    <div class="text-center mt-3">
+                                        <p>Don't have an account? <a href="/users/register">Register</a></p>
+                                    </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+            <!-- Footer-->
+            <%- include('layouts/footer') -%>
+                <script>
+                    // Toggle password visibility
+                    document.getElementById('togglePassword').addEventListener('click', function () {
+                        const passwordInput = document.getElementById('password');
+                        const eyeIcon = document.getElementById('eyeIcon');
+
+                        if (passwordInput.type === 'password') {
+                            passwordInput.type = 'text';
+                            eyeIcon.classList.remove('fa-eye');
+                            eyeIcon.classList.add('fa-eye-slash');
+                        } else {
+                            passwordInput.type = 'password';
+                            eyeIcon.classList.remove('fa-eye-slash');
+                            eyeIcon.classList.add('fa-eye');
+                        }
+                    });
+
+                    // reCAPTCHA v3 - Execute on form submit
+                    const loginForm = document.querySelector('form[action="/users/login"]');
+                    if (loginForm) {
+                        loginForm.addEventListener('submit', function (e) {
+                            e.preventDefault();
+                            const siteKey = '<%= recaptchaSiteKey %>';
+                            if (siteKey && typeof grecaptcha !== 'undefined') {
+                                grecaptcha.ready(function () {
+                                    grecaptcha.execute(siteKey, { action: 'login' }).then(function (token) {
+                                        document.getElementById('g-recaptcha-response').value = token;
+                                        loginForm.submit();
+                                    });
+                                });
+                            } else {
+                                loginForm.submit();
+                            }
+                        });
+                    }
+                </script>
     </body>
+
 </html>
