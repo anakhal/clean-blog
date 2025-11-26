@@ -12,7 +12,13 @@ const port = process.env.PORT || 4000;
 const mongoose = require('mongoose');
 const winston = require('winston');
 const morgan = require('morgan');
-
+// 🔒 Redirect middleware (place this FIRST)
+app.use((req, res, next) => {
+  if (req.headers.host === 'mathematiques-bac.org') {
+    return res.redirect(301, 'https://www.mathematiques-bac.org' + req.url);
+  }
+  next();
+});
 // After loading env, add quick diagnostics
 console.log('=== Startup diagnostics ===');
 const envKeys = Object.keys(process.env);
