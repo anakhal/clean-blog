@@ -196,6 +196,11 @@ app.get('/health', (req, res) => {
   }
 });
 
+// SEO routes
+const sitemapController = require('./controllers/sitemapController');
+app.get('/sitemap.xml', sitemapController.generateSitemap);
+app.get('/robots.txt', sitemapController.generateRobots);
+
 // Other routes
 app.get('/about', (req, res) => res.render('about'));
 

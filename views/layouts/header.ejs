@@ -1,50 +1,51 @@
 <head>
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-X4Z905G4M2"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-X4Z905G4M2"></script>
+        <script>
+                window.dataLayer = window.dataLayer || [];
+                function gtag() { dataLayer.push(arguments); }
+                gtag('js', new Date());
 
-  gtag('config', 'G-X4Z905G4M2');
-</script>
+                gtag('config', 'G-X4Z905G4M2');
+        </script>
 
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-        <meta name="description" content="" />
-        <meta name="author" content="" />
-        <title>Mathematiques-Bac</title>
+        <!-- SEO Meta Tags with Safe Fallbacks -->
+        <title>
+                <%= typeof seo !=='undefined' && seo?.title ? seo.title
+                        : 'Mathématiques Bac Marocain - Exercices et Solutions' %>
+        </title>
+        <meta name="description"
+                content="<%= typeof seo !== 'undefined' && seo?.description ? seo.description : 'Exercices et solutions de mathématiques pour le baccalauréat marocain. Cours complets et exercices corrigés.' %>" />
+        <meta name="keywords"
+                content="<%= typeof seo !== 'undefined' && seo?.keywords ? seo.keywords : 'mathématiques, bac marocain, exercices, solutions, arithmétique, algèbre, géométrie' %>" />
+        <meta name="author" content="Abdelhadi Nakhal" />
+        <meta name="robots" content="index, follow" />
+
+        <!-- Open Graph for Social Sharing -->
+        <meta property="og:title"
+                content="<%= typeof seo !== 'undefined' && seo?.title ? seo.title : 'Mathématiques Bac Marocain' %>" />
+        <meta property="og:description"
+                content="<%= typeof seo !== 'undefined' && seo?.description ? seo.description : 'Exercices et solutions de mathématiques pour le baccalauréat marocain' %>" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://www.mathematiques-bac.org" />
+        <meta property="og:image" content="https://www.mathematiques-bac.org/assets/img/home-bg.jpg" />
         <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
         <!-- Font Awesome icons (CSS version for better CSP compatibility)-->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" 
-              integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" 
-              crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+                integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+                crossorigin="anonymous" referrerpolicy="no-referrer" />
         <!-- Google fonts - Updated API with CSP-friendly preconnect -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400;1,700&family=Open+Sans:ital,wght@0,300;0,400;0,600;0,700;0,800;1,300;1,400;1,600;1,700;1,800&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400;1,700&family=Open+Sans:ital,wght@0,300;0,400;0,600;0,700;0,800;1,300;1,400;1,600;1,700;1,800&display=swap"
+                rel="stylesheet">
         <!-- Core theme CSS (includes Bootstrap)-->
         <link href="/css/styles.css?v=2.0" rel="stylesheet" />
-                                <!-- MathJax (TeX rendering) - Alternative CDN to bypass cache -->
-                                <script>
-                                        window.MathJax = {
-                                                tex: {
-                                                        inlineMath: [['$', '$'], ['\\(', '\\)']],
-                                                        displayMath: [['$$', '$$'], ['\\[', '\\]']],
-                                                        processEscapes: true
-                                                },
-                                                options: {
-                                                        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
-                                                },
-                                                startup: {
-                                                        pageReady: () => {
-                                                                return MathJax.startup.defaultPageReady().then(() => {
-                                                                        console.log('✅ MathJax 3.1.2 loaded from alternative CDN');
-                                                                }).catch((err) => {
-                                                                        console.error('❌ MathJax loading error:', err);
-                                                                });
-                                                        }
-                                                }
-                                        };
-                                </script>
-                                <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.1.2/es5/tex-chtml.min.js" id="MathJax-script" async></script>
+        <!-- MathJax (TeX rendering) - Alternative CDN to bypass cache -->
+        <script>
+                                        wind                                                                              inlineMath: [['$', '$'], ['                                               displayMath: [['$$', '$$'], ['                                               proces                                                                                                             skipHtmlTags: ['script', 'noscript', 'style', 'tex                                                                                                             page                                                       return MathJax.startup.defaultPageReady(                                                               console.log('✅ MathJax 3.1.2 loaded from alte                                                       }).ca                                                               console.error('❌ MathJax loading                                                                                                                                        };
+        </script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.1.2/es5/tex-chtml.min.js" id="MathJax-script"
+                async></script>
 </head>
