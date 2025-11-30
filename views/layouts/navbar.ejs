@@ -12,14 +12,14 @@
                         <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="/about">About</a></li>
                         <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="/contact">Contact</a></li>
                         <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="/search">Search</a></li>
-                        
+
                         <!-- Admin-only links -->
                         <% if (typeof isAdmin !== 'undefined' && isAdmin) { %>
                             <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="/posts/new"><i class="fas fa-plus"></i> Create</a></li>
                             <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="/admin/dashboard">Dashboard</a></li>
-                        
+
                         <% } %>
-                        
+
                         <!-- Authentication links -->
                         <% if (typeof isLoggedIn !== 'undefined' && isLoggedIn) { %>
                             <li class="nav-item">
