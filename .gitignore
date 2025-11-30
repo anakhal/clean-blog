@@ -80,3 +80,5 @@ dist
 
 # MacOS
 .DS_Store
+.env.backup
+.env.new
