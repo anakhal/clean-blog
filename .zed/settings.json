@@ -1,0 +1,9 @@
+{
+  "file_scan_exclusions": [
+    "**/.git",
+    "**/node_modules",
+    "**/logs"
+  ],
+  "tab_size": 2,
+  "formatter": "auto"
+}

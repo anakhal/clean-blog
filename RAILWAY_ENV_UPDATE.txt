@@ -1,0 +1,54 @@
+═══════════════════════════════════════════════════════════
+RAILWAY ENVIRONMENT VARIABLES - UPDATE REQUIRED
+═══════════════════════════════════════════════════════════
+
+Go to: https://railway.app/
+Select your project: clean-blog
+Go to: Variables tab
+
+UPDATE THESE VARIABLES:
+═══════════════════════════════════════════════════════════
+
+1. MONGODB_URI
+   New value: (copy from .env file)
+
+2. SESSION_SECRET
+   New value: (copy from .env file)
+
+3. ADMIN_PASSWORD
+   New value: Admin123!
+
+4. RECAPTCHA_SITE_KEY
+   New value: 6LcL4xwsAAAAAJmtfPZWTpBBhgX8zlcLkyMgngDV
+
+5. RECAPTCHA_SECRET_KEY
+   New value: 6LcL4xwsAAAAAF4QJuHoobjkdYCwJzfEoHu03F1G
+
+6. SENDGRID_API_KEY
+   Current value: (already working, keep it)
+
+7. CONTACT_EMAIL
+   Current value: nakhal69@gmail.com (keep it)
+
+8. NODE_ENV
+   Current value: production (keep it)
+
+9. PORT
+   Current value: (Railway sets this automatically)
+
+REMOVE THESE (if they exist):
+═══════════════════════════════════════════════════════════
+- SMTP_HOST
+- SMTP_PORT
+- SMTP_USER
+- SMTP_PASS
+
+These are no longer needed since we removed SMTP support.
+
+═══════════════════════════════════════════════════════════
+AFTER UPDATING:
+═══════════════════════════════════════════════════════════
+Railway will automatically redeploy your app with the new variables.
+Your production site will then use the new secure credentials.
+
+═══════════════════════════════════════════════════════════

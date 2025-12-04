@@ -10,6 +10,7 @@
 
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
         <!-- SEO Meta Tags with Safe Fallbacks -->
         <title>
                 <%= typeof seo !=='undefined' && seo?.title ? seo.title
@@ -20,7 +21,15 @@
         <meta name="keywords"
                 content="<%= typeof seo !== 'undefined' && seo?.keywords ? seo.keywords : 'mathématiques, bac marocain, exercices, solutions, arithmétique, algèbre, géométrie' %>" />
         <meta name="author" content="Abdelhadi Nakhal" />
-        <meta name="robots" content="index, follow" />
+        <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+
+        <!-- Canonical URL -->
+        <link rel="canonical" href="<%= typeof seo !== 'undefined' && seo?.canonical ? seo.canonical : 'https://www.mathematiques-bac.org/' %>" />
+
+        <!-- Language and Region -->
+        <meta http-equiv="content-language" content="fr-MA" />
+        <meta name="geo.region" content="MA" />
+        <meta name="geo.placename" content="Morocco" />
 
         <!-- Open Graph for Social Sharing -->
         <meta property="og:title"
@@ -28,8 +37,44 @@
         <meta property="og:description"
                 content="<%= typeof seo !== 'undefined' && seo?.description ? seo.description : 'Exercices et solutions de mathématiques pour le baccalauréat marocain' %>" />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://www.mathematiques-bac.org" />
-        <meta property="og:image" content="https://www.mathematiques-bac.org/assets/img/home-bg.jpg" />
+        <meta property="og:url" content="<%= typeof seo !== 'undefined' && seo?.canonical ? seo.canonical : 'https://www.mathematiques-bac.org' %>" />
+        <meta property="og:image" content="<%= typeof seo !== 'undefined' && seo?.ogImage ? seo.ogImage : 'https://www.mathematiques-bac.org/assets/img/home-bg.jpg' %>" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:site_name" content="Mathématiques Bac Marocain" />
+        <meta property="og:locale" content="fr_MA" />
+
+        <!-- Twitter Card -->
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="<%= typeof seo !== 'undefined' && seo?.title ? seo.title : 'Mathématiques Bac Marocain' %>" />
+        <meta name="twitter:description" content="<%= typeof seo !== 'undefined' && seo?.description ? seo.description : 'Exercices et solutions de mathématiques pour le baccalauréat marocain' %>" />
+        <meta name="twitter:image" content="<%= typeof seo !== 'undefined' && seo?.ogImage ? seo.ogImage : 'https://www.mathematiques-bac.org/assets/img/home-bg.jpg' %>" />
+
+        <!-- Structured Data - Educational Website -->
+        <script type="application/ld+json">
+        {
+                "@context": "https://schema.org",
+                "@type": "EducationalWebsite",
+                "name": "Mathématiques Bac Marocain",
+                "description": "Plateforme d'exercices corrigés et de cours de mathématiques pour le baccalauréat marocain",
+                "url": "https://www.mathematiques-bac.org",
+                "inLanguage": "fr-MA",
+                "publisher": {
+                        "@type": "Organization",
+                        "name": "Mathématiques Bac Marocain",
+                        "url": "https://www.mathematiques-bac.org"
+                },
+                "educationalLevel": "SecondaryEducation",
+                "audience": {
+                        "@type": "EducationalAudience",
+                        "educationalRole": "student"
+                },
+                "about": {
+                        "@type": "Thing",
+                        "name": "Mathematics Education"
+                }
+        }
+        </script>
         <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
         <!-- Font Awesome icons (CSS version for better CSP compatibility)-->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
