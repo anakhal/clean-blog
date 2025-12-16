@@ -1,16 +1,16 @@
-# Tri Alphabétique et Filtre par Catégorie
+# Tri Chronologique et Filtre par Catégorie
 
 ## Branche
 `feature/alphabetical-sorting-and-category-filter`
 
 ## Changements Implémentés
 
-### 1. Tri Alphabétique des Exercices
+### 1. Tri Chronologique des Exercices
 
-Les exercices sont maintenant affichés par ordre alphabétique du titre dans :
-- **Homepage** (`/`) : Tous les exercices sont triés alphabétiquement (A1, A2, B1, B2, etc.)
-- **Dashboard Admin** (`/admin/dashboard`) : Les 10 exercices récents sont triés alphabétiquement
-- **Gestion des Posts** (`/admin/posts`) : Tous les exercices sont triés alphabétiquement
+Les exercices sont maintenant affichés par ordre chronologique (du premier créé au dernier créé) dans :
+- **Homepage** (`/`) : Tous les exercices sont triés par date de création (ordre croissant)
+- **Dashboard Admin** (`/admin/dashboard`) : Les 10 exercices récents sont triés par date de création
+- **Gestion des Posts** (`/admin/posts`) : Tous les exercices sont triés par date de création
 
 ### 2. Filtre par Catégorie dans le Dashboard
 
@@ -23,11 +23,11 @@ Le filtre permet de voir uniquement les exercices d'une catégorie spécifique (
 ## Fichiers Modifiés
 
 ### Controllers
-- `controllers/blogController.js` : Changement du tri de `createdAt: -1` à `title: 1`
+- `controllers/blogController.js` : Changement du tri de `createdAt: -1` à `createdAt: 1` (chronologique)
 - `controllers/adminController.js` : 
   - Ajout du filtre par catégorie dans `dashboard()`
   - Ajout du filtre par catégorie dans `managePosts()`
-  - Changement du tri de `createdAt: -1` à `title: 1`
+  - Changement du tri de `createdAt: -1` à `createdAt: 1` (chronologique)
 
 ### Vues
 - `views/admin/dashboard.ejs` : 
@@ -41,16 +41,16 @@ Le filtre permet de voir uniquement les exercices d'une catégorie spécifique (
 ## Fonctionnalités
 
 ### Homepage
-- ✅ Exercices triés alphabétiquement par titre
+- ✅ Exercices triés chronologiquement (du premier au dernier créé)
 - ✅ Filtre par catégorie existant (déjà implémenté)
 
 ### Dashboard Admin
-- ✅ Exercices triés alphabétiquement par titre
+- ✅ Exercices triés chronologiquement (du premier au dernier créé)
 - ✅ Nouveau filtre par catégorie
-- ✅ Affichage des 10 premiers exercices (alphabétiquement)
+- ✅ Affichage des 10 premiers exercices (chronologiquement)
 
 ### Gestion des Posts
-- ✅ Tous les exercices triés alphabétiquement par titre
+- ✅ Tous les exercices triés chronologiquement (du premier au dernier créé)
 - ✅ Nouveau filtre par catégorie
 - ✅ Indication de la catégorie active dans le titre
 
@@ -68,19 +68,23 @@ Le filtre permet de voir uniquement les exercices d'une catégorie spécifique (
 
 ## Tests Recommandés
 
-1. Vérifier que les exercices sur la homepage sont triés alphabétiquement
+1. Vérifier que les exercices sur la homepage sont triés chronologiquement (du plus ancien au plus récent)
 2. Vérifier que le filtre par catégorie fonctionne dans le dashboard
 3. Vérifier que le filtre par catégorie fonctionne dans la gestion des posts
-4. Vérifier que le tri alphabétique est maintenu après le filtrage
+4. Vérifier que le tri chronologique est maintenu après le filtrage
 5. Vérifier que "All Categories" affiche tous les exercices
 
-## Commit
+## Commits
 ```
-Tri alphabétique des exercices et filtre par catégorie dans le dashboard
+1. Tri alphabétique des exercices et filtre par catégorie dans le dashboard
+   - Tri alphabétique par titre dans la homepage (blogController.js)
+   - Tri alphabétique par titre dans le dashboard (adminController.js)
+   - Ajout du filtre par catégorie dans le dashboard (dashboard.ejs)
+   - Ajout du filtre par catégorie dans la page de gestion des posts (posts.ejs)
 
-- Tri alphabétique par titre dans la homepage (blogController.js)
-- Tri alphabétique par titre dans le dashboard (adminController.js)
-- Ajout du filtre par catégorie dans le dashboard (dashboard.ejs)
-- Ajout du filtre par catégorie dans la page de gestion des posts (posts.ejs)
-- Les exercices sont maintenant affichés dans l'ordre : Exercice A1, A2, etc.
+2. Changement du tri: chronologique au lieu d'alphabétique
+   - Homepage: tri par date de création (du premier au dernier créé)
+   - Dashboard: tri par date de création (du premier au dernier créé)
+   - Gestion des posts: tri par date de création (du premier au dernier créé)
+   - Le filtre par catégorie reste fonctionnel
 ```
