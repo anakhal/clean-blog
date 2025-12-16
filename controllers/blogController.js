@@ -18,7 +18,7 @@ exports.index = async (req, res) => {
 
     const posts = await BlogPost.find(query)
       .populate("author", "username")
-      .sort({ createdAt: -1 });
+      .sort({ title: 1 }); // Tri alphabétique par titre
 
     // SEO metadata for homepage
     const seo = {
