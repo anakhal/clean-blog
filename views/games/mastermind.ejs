@@ -4,53 +4,81 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Code Breaker - Mathematiques-Bac</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css">
+    <!-- Clean Blog CSS -->
+    <link href="/css/styles.css" rel="stylesheet">
+    <!-- Mastermind Game CSS -->
     <link rel="stylesheet" href="/games/mastermind/style.css">
     <style>
-        /* Override pour intégration avec clean-blog */
-        body { 
-            padding-top: 56px !important; 
-            background: linear-gradient(135deg, #2c1810 0%, #4a2c1a 100%) !important;
+        /* Navbar styling */
+        #mainNav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background-color: white !important;
+            border-bottom: 1px solid #dee2e6;
         }
-        
+
+        #mainNav .navbar-brand,
+        #mainNav .nav-link {
+            color: #212529 !important;
+        }
+
+        #mainNav .nav-link:hover {
+            color: #0085A1 !important;
+        }
+
+        /* Override pour intégration avec clean-blog */
+        body {
+            padding-top: 76px !important;
+            background: linear-gradient(135deg, #2c1810 0%, #4a2c1a 100%) !important;
+            margin: 0;
+        }
+
         /* Réduire la taille max du jeu à 75% */
         .game-container {
             max-width: 750px !important;
         }
-        
+
         /* Réduire la hauteur minimum */
         .game-main {
             min-height: 525px !important;
         }
-        
+
         /* Réduire légèrement la taille des pegs */
         .peg {
             width: 34px !important;
             height: 34px !important;
             margin: 3px !important;
         }
-        
+
         .color-peg {
             width: 50px !important;
             height: 50px !important;
         }
-        
+
         /* Réduire les rangées de jeu */
         .game-row {
             height: 50px !important;
             padding: 8px 10px !important;
         }
-        
+
         .feedback-square {
             width: 56px !important;
             height: 50px !important;
             padding: 5px !important;
         }
-        
+
         .feedback-hole .feedback-peg {
             width: 11px !important;
             height: 11px !important;
         }
-        
+
         /* Réduire les boutons */
         .row-undo-btn,
         .row-submit-btn {
@@ -58,26 +86,26 @@
             height: 36px !important;
             font-size: 1.1em !important;
         }
-        
+
         /* Ajuster l'espacement */
         .game-main {
             gap: 18px !important;
             padding: 18px !important;
         }
-        
+
         .game-board {
             padding: 18px !important;
         }
-        
+
         .control-panel {
             padding: 18px !important;
         }
-        
+
         /* Ajuster les titres */
         .game-header h1 {
             font-size: 1.6em !important;
         }
-        
+
         .game-header p {
             font-size: 0.95em !important;
         }
@@ -88,9 +116,42 @@
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WPZ6BNP4"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
-    
-    <%-include('../layouts/navbar')-%>
-    
+
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav" style="background-color: white;">
+        <div class="container px-4 px-lg-5">
+            <a class="navbar-brand" href="/" style="color: #212529;">Mathématiques Bac</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                Menu
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav ms-auto py-4 py-lg-0">
+                    <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="/" style="color: #212529;">Exercices</a></li>
+                    <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="/games/mastermind" style="color: #0085A1; font-weight: 600;">🎮 Jeu</a></li>
+                    <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="/about" style="color: #212529;">About</a></li>
+                    <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="/contact" style="color: #212529;">Contact</a></li>
+                    <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="/search" style="color: #212529;">Search</a></li>
+                    <% if (typeof isAdmin !== 'undefined' && isAdmin) { %>
+                        <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="/posts/new" style="color: #212529;"><i class="fas fa-plus"></i> Create</a></li>
+                        <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="/admin/dashboard" style="color: #212529;">Dashboard</a></li>
+                    <% } %>
+                    <% if (typeof isLoggedIn !== 'undefined' && isLoggedIn) { %>
+                        <li class="nav-item">
+                            <a class="nav-link px-lg-3 py-3 py-lg-4" href="#" id="logoutLink" style="color: #212529;">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                            <form id="logoutForm" action="/users/logout" method="post" style="display: none;"></form>
+                        </li>
+                    <% } else { %>
+                        <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="/users/login" style="color: #212529;"><i class="fas fa-sign-in-alt"></i> Login</a></li>
+                        <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="/users/register" style="color: #212529;"><i class="fas fa-user-plus"></i> Register</a></li>
+                    <% } %>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
     <div class="game-container">
         <header class="game-header">
             <h1>🧩 Code Breaker</h1>
@@ -122,7 +183,7 @@
                     <div class="feedback-panels" id="feedback-panels">
                         <!-- Feedback squares will be generated by JavaScript -->
                     </div>
-                    
+
                     <!-- All 10 Game rows for attempts -->
                     <div class="game-rows" id="game-rows">
                         <!-- All 10 rows will be pre-generated by JavaScript -->
@@ -182,7 +243,7 @@
             <div class="help-content">
                 <h3>🎯 Objective:</h3>
                 <p>Crack the secret 4-color code in 10 attempts or less!</p>
-                
+
                 <h3>🎨 How to Play:</h3>
                 <ul>
                     <li><strong>Click</strong> any peg in the active row to open a color picker</li>
@@ -227,6 +288,27 @@
         <p>Code Breaker - A logic puzzle game inspired by classic code-breaking board games</p>
     </footer>
 
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Mastermind Game Script -->
     <script src="/games/mastermind/script.js"></script>
+
+    <!-- Logout functionality -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const logoutLink = document.getElementById('logoutLink');
+            if (logoutLink) {
+                logoutLink.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    const form = document.getElementById('logoutForm');
+                    if (form) {
+                        form.submit();
+                    } else {
+                        window.location.href = '/users/logout';
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>
