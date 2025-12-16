@@ -29,11 +29,11 @@ exports.dashboard = async (req, res) => {
     const totalUsers = await User.countDocuments();
     const categories = await Category.find().sort({ name: 1 });
 
-    // Filter to show only exercises (not solutions), sorted alphabetically by title
+    // Filter to show only exercises (not solutions), sorted chronologically
     const recentPosts = await BlogPost.find(query)
       .populate("author", "username")
       .populate("solutionId") // Populate full solution object to get its _id
-      .sort({ title: 1 }) // Tri alphabétique par titre
+      .sort({ createdAt: 1 }) // Tri chronologique : du premier créé au dernier créé
       .limit(10);
 
     res.render("admin/dashboard", {
@@ -69,11 +69,11 @@ exports.managePosts = async (req, res) => {
 
     const categories = await Category.find().sort({ name: 1 });
 
-    // Filter to show only exercises (not solutions), sorted alphabetically by title
+    // Filter to show only exercises (not solutions), sorted chronologically
     const posts = await BlogPost.find(query)
       .populate("author", "username")
       .populate("solutionId") // Populate full solution object to get its _id
-      .sort({ title: 1 }); // Tri alphabétique par titre
+      .sort({ createdAt: 1 }); // Tri chronologique : du premier créé au dernier créé
 
     res.render("admin/posts", {
       posts,
