@@ -207,6 +207,23 @@
                         const previewTitle = document.getElementById('preview-title');
                         const previewBody = document.getElementById('preview-body');
 
+                        // Check if MathJax is available
+                        function isMathJaxReady() {
+                            return window.MathJax && window.MathJax.typesetPromise;
+                        }
+
+                        function debounce(func, wait) {
+                            let timeout;
+                            return function executedFunction(...args) {
+                                const later = () => {
+                                    clearTimeout(timeout);
+                                    func(...args);
+                                };
+                                clearTimeout(timeout);
+                                timeout = setTimeout(later, wait);
+                            };
+                        }
+
                         function updatePreview() {
                             const titleValue = titleInput.value.trim();
                             previewTitle.textContent = titleValue || 'Your Post Title';
@@ -215,18 +232,45 @@
                             if (bodyValue) {
                                 previewBody.innerHTML = bodyValue;
 
-                                if (window.MathJax && window.MathJax.typesetPromise) {
-                                    MathJax.typesetPromise([previewBody]).catch(function (err) {
-                                        console.log('MathJax rendering error:', err.message);
+                                if (isMathJaxReady()) {
+                                    MathJax.typesetPromise([previewBody]).then(() => {
+                                        console.log('✅ MathJax rendered successfully in preview');
+                                    }).catch(function (err) {
+                                        console.error('❌ MathJax rendering error:', err);
                                     });
+                                } else {
+                                    console.warn('⚠️ MathJax not ready yet, will retry...');
+                                    setTimeout(() => {
+                                        if (isMathJaxReady()) {
+                                            MathJax.typesetPromise([previewBody]).catch(err => {
+                                                console.error('❌ MathJax rendering error on retry:', err);
+                                            });
+                                        } else {
+                                            console.error('❌ MathJax failed to load');
+                                        }
+                                    }, 500);
                                 }
                             } else {
                                 previewBody.innerHTML = '<em>Start typing to see your content preview...</em>';
                             }
                         }
 
-                        titleInput.addEventListener('input', updatePreview);
-                        bodyTextarea.addEventListener('input', updatePreview);
+                        const debouncedUpdate = debounce(updatePreview, 300);
+                        titleInput.addEventListener('input', debouncedUpdate);
+                        bodyTextarea.addEventListener('input', debouncedUpdate);
+
+                        // Wait for MathJax to be ready before initial preview
+                        function initializePreview() {
+                            if (isMathJaxReady()) {
+                                updatePreview();
+                                console.log('✅ Live preview initialized with MathJax support!');
+                            } else {
+                                console.log('⏳ Waiting for MathJax to load...');
+                                setTimeout(initializePreview, 100);
+                            }
+                        }
+
+                        initializePreview();
                     });
                 </script>
     </body>

@@ -3,7 +3,9 @@ const User = require('../models/User');
 // GET /users/register - Show registration form
 exports.showRegister = (req, res) => {
     res.render('register', {
-        recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY
+        recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY,
+        showAds: false,
+        noindex: true
     });
 };
 
@@ -16,21 +18,24 @@ exports.register = async (req, res) => {
         if (!username || !password || !confirmPassword) {
             return res.render('register', {
                 error: 'All fields are required',
-                recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY
+                recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY,
+                showAds: false
             });
         }
         
         if (password !== confirmPassword) {
             return res.render('register', {
                 error: 'Passwords do not match',
-                recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY
+                recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY,
+                showAds: false
             });
         }
         
         if (password.length < 6) {
             return res.render('register', {
                 error: 'Password must be at least 6 characters long',
-                recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY
+                recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY,
+                showAds: false
             });
         }
         
@@ -39,7 +44,8 @@ exports.register = async (req, res) => {
         if (existingUser) {
             return res.render('register', {
                 error: 'Username already exists',
-                recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY
+                recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY,
+                showAds: false
             });
         }
         
@@ -58,7 +64,8 @@ exports.register = async (req, res) => {
         console.error('Registration error:', error);
         res.render('register', {
             error: 'An error occurred during registration. Please try again.',
-            recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY
+            recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY,
+            showAds: false
         });
     }
 };
@@ -66,7 +73,9 @@ exports.register = async (req, res) => {
 // GET /users/login - Show login form
 exports.showLogin = (req, res) => {
     res.render('login', {
-        recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY
+        recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY,
+        showAds: false,
+        noindex: true
     });
 };
 
@@ -92,7 +101,8 @@ exports.login = async (req, res) => {
         if (!username || !password) {
             return res.render('login', {
                 error: 'Username and password are required',
-                recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY
+                recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY,
+                showAds: false
             });
         }
         
@@ -102,7 +112,8 @@ exports.login = async (req, res) => {
             console.log('Login failed: user not found:', username);
             return res.render('login', {
                 error: 'Invalid username or password',
-                recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY
+                recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY,
+                showAds: false
             });
         }
         
@@ -112,7 +123,8 @@ exports.login = async (req, res) => {
             console.log('Login failed: invalid password for user:', username);
             return res.render('login', {
                 error: 'Invalid username or password',
-                recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY
+                recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY,
+                showAds: false
             });
         }
         
@@ -134,7 +146,8 @@ exports.login = async (req, res) => {
         console.error('Login error:', error);
         res.render('login', {
             error: 'An error occurred during login. Please try again.',
-            recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY
+            recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY,
+            showAds: false
         });
     }
 };

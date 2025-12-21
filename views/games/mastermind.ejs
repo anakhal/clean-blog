@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Google AdSense -->
+    <% if (typeof showAds !== 'undefined' && showAds === true) { %>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8275998168885235"
+         crossorigin="anonymous"></script>
+    <% } %>
+    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Code Breaker - Mathematiques-Bac</title>
@@ -152,6 +158,16 @@
         </div>
     </nav>
 
+    <!-- Google AdSense: Top of Game Page -->
+    <% if (typeof showAds !== 'undefined' && showAds === true) { %>
+    <div style="text-align: center; margin: 20px auto; max-width: 750px; padding: 10px; background: rgba(255,255,255,0.9); border-radius: 8px;">
+        <p style="color: #6c757d; margin-bottom: 5px; font-size: 12px;">Advertisement</p>
+        <div style="min-height: 90px; display: flex; align-items: center; justify-content: center; background: #f8f9fa; border-radius: 4px;">
+            <span style="color: #6c757d;">AdSense Ad Unit (Game Top)</span>
+        </div>
+    </div>
+    <% } %>
+    
     <div class="game-container">
         <header class="game-header">
             <h1>🧩 Code Breaker</h1>
@@ -284,6 +300,16 @@
         </div>
     </div>
 
+    <!-- Google AdSense: Bottom of Game Page -->
+    <% if (typeof showAds !== 'undefined' && showAds === true) { %>
+    <div style="text-align: center; margin: 20px auto; max-width: 750px; padding: 10px; background: rgba(255,255,255,0.9); border-radius: 8px;">
+        <p style="color: #6c757d; margin-bottom: 5px; font-size: 12px;">Advertisement</p>
+        <div style="min-height: 250px; display: flex; align-items: center; justify-content: center; background: #f8f9fa; border-radius: 4px;">
+            <span style="color: #6c757d;">AdSense Ad Unit (Game Bottom)</span>
+        </div>
+    </div>
+    <% } %>
+    
     <footer style="text-align: center; padding: 20px; color: rgba(255, 255, 255, 0.7); font-size: 0.9em;">
         <p>Code Breaker - A logic puzzle game inspired by classic code-breaking board games</p>
     </footer>

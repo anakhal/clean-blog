@@ -37,7 +37,9 @@ exports.index = async (req, res) => {
       ogImage: "https://www.mathematiques-bac.org/assets/img/home-bg.jpg",
     };
 
-    res.render("index", { posts, categories, category: category || null, seo });
+    // Only show ads if there is sufficient content (at least 3 posts)
+    const hasEnoughContent = posts.length >= 3;
+    res.render("index", { posts, categories, category: category || null, seo, showAds: hasEnoughContent });
   } catch (err) {
     console.error(err);
     res.status(500).send("Server error");
@@ -58,6 +60,8 @@ exports.create = async (req, res) => {
       categories,
       exerciseId: exerciseId || undefined,
       exercise: exercise || null,
+      showAds: false,
+      noindex: true,
     });
   } catch (err) {
     console.error(err);
@@ -65,6 +69,8 @@ exports.create = async (req, res) => {
       categories: [],
       exerciseId: undefined,
       exercise: null,
+      showAds: false,
+      noindex: true,
     });
   }
 };
@@ -146,7 +152,11 @@ exports.show = async (req, res) => {
       ogImage: "https://www.mathematiques-bac.org/assets/img/post-bg.jpg",
     };
 
-    res.render("post", { post, seo });
+    // Only show ads if post has sufficient content (300+ characters of actual text)
+    // Strip HTML and check content length to comply with AdSense policy
+    const textContent = post.body.replace(/<[^>]*>/g, '').trim();
+    const hasEnoughContent = textContent.length >= 300;
+    res.render("post", { post, seo, showAds: hasEnoughContent });
   } catch (error) {
     console.error(error);
     res.status(500).send("Server Error");
@@ -193,6 +203,8 @@ exports.search = async (req, res) => {
       searchQuery: searchQuery || "",
       resultsCount: posts.length,
       seo,
+      showAds: false,
+      noindex: true, // Prevent search page from being indexed
     });
   } catch (err) {
     console.error(err);
@@ -202,5 +214,5 @@ exports.search = async (req, res) => {
 
 //register
 exports.register = (req, res) => {
-  res.render("register");
+  res.render("register", { showAds: false, noindex: true });
 };

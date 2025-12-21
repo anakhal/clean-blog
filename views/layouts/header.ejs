@@ -10,6 +10,14 @@
 
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+        <!-- 🔴 IMPORTANT: Ajoutez votre code de vérification Google Search Console ici -->
+        <!-- Décommentez la ligne ci-dessous et remplacez YOUR_VERIFICATION_CODE par votre code -->
+        <!-- <meta name="google-site-verification" content="YOUR_VERIFICATION_CODE" /> -->
+        
+        <!-- Bing Webmaster Tools Verification (optionnel) -->
+        <!-- <meta name="msvalidate.01" content="YOUR_BING_VERIFICATION_CODE" /> -->
 
         <!-- SEO Meta Tags with Safe Fallbacks -->
         <title>
@@ -21,7 +29,14 @@
         <meta name="keywords"
                 content="<%= typeof seo !== 'undefined' && seo?.keywords ? seo.keywords : 'mathématiques, bac marocain, exercices, solutions, arithmétique, algèbre, géométrie' %>" />
         <meta name="author" content="Abdelhadi Nakhal" />
+        <% if (typeof noindex !== 'undefined' && noindex === true) { %>
+        <meta name="robots" content="noindex, nofollow" />
+        <meta name="googlebot" content="noindex, nofollow" />
+        <% } else { %>
         <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+        <meta name="googlebot" content="index, follow" />
+        <meta name="bingbot" content="index, follow" />
+        <% } %>
 
         <!-- Canonical URL -->
         <link rel="canonical" href="<%= typeof seo !== 'undefined' && seo?.canonical ? seo.canonical : 'https://www.mathematiques-bac.org/' %>" />

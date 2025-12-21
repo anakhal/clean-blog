@@ -207,6 +207,24 @@
                         const previewTitle = document.getElementById('preview-title');
                         const previewBody = document.getElementById('preview-body');
 
+                        // Check if MathJax is available
+                        function isMathJaxReady() {
+                            return window.MathJax && window.MathJax.typesetPromise;
+                        }
+
+                        // Debounce function - prevents too many updates while typing
+                        function debounce(func, wait) {
+                            let timeout;
+                            return function executedFunction(...args) {
+                                const later = () => {
+                                    clearTimeout(timeout);
+                                    func(...args);
+                                };
+                                clearTimeout(timeout);
+                                timeout = setTimeout(later, wait);
+                            };
+                        }
+
                         // Function to update the preview
                         function updatePreview() {
                             // Update title preview
@@ -220,23 +238,51 @@
                                 previewBody.innerHTML = bodyValue;
 
                                 // Re-render MathJax in the preview area
-                                if (window.MathJax && window.MathJax.typesetPromise) {
-                                    MathJax.typesetPromise([previewBody]).catch(function (err) {
-                                        console.log('MathJax rendering error:', err.message);
+                                if (isMathJaxReady()) {
+                                    MathJax.typesetPromise([previewBody]).then(() => {
+                                        console.log('✅ MathJax rendered successfully in preview');
+                                    }).catch(function (err) {
+                                        console.error('❌ MathJax rendering error:', err);
                                     });
+                                } else {
+                                    console.warn('⚠️ MathJax not ready yet, will retry...');
+                                    // Retry after a short delay
+                                    setTimeout(() => {
+                                        if (isMathJaxReady()) {
+                                            MathJax.typesetPromise([previewBody]).catch(err => {
+                                                console.error('❌ MathJax rendering error on retry:', err);
+                                            });
+                                        } else {
+                                            console.error('❌ MathJax failed to load');
+                                        }
+                                    }, 500);
                                 }
                             } else {
                                 previewBody.innerHTML = '<em>Start typing to see your content preview...</em>';
                             }
                         }
 
+                        // Create debounced version of updatePreview (300ms delay)
+                        const debouncedUpdate = debounce(updatePreview, 300);
+
                         // Add event listeners for real-time updates
-                        titleInput.addEventListener('input', updatePreview);
-                        bodyTextarea.addEventListener('input', updatePreview);
+                        titleInput.addEventListener('input', debouncedUpdate);
+                        bodyTextarea.addEventListener('input', debouncedUpdate);
+
+                        // Wait for MathJax to be ready before initial preview
+                        function initializePreview() {
+                            if (isMathJaxReady()) {
+                                updatePreview();
+                                console.log('✅ Live preview initialized with MathJax support!');
+                            } else {
+                                console.log('⏳ Waiting for MathJax to load...');
+                                setTimeout(initializePreview, 100);
+                            }
+                        }
+
+                        initializePreview();
                     });
                 </script>
-
-                <!-- Bootstrap core JS-->
 
     </body>
 
