@@ -82,3 +82,6 @@ dist
 .DS_Store
 .env.backup
 .env.new
+
+# Editor configurations
+.zed
