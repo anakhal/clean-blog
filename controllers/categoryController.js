@@ -4,7 +4,7 @@ const Category = require('../models/Category');
 exports.index = async (req, res) => {
     try {
         const categories = await Category.find().sort({ name: 1 });
-        res.render('admin/categories', { categories });
+        res.render('admin/categories', { categories, showAds: false });
     } catch (err) {
         console.error(err);
         res.status(500).send('Server error');

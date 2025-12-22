@@ -37,7 +37,7 @@ exports.index = async (req, res) => {
       ogImage: "https://www.mathematiques-bac.org/assets/img/home-bg.jpg",
     };
 
-    res.render("index", { posts, categories, category: category || null, seo });
+    res.render("index", { posts, categories, category: category || null, seo, showAds: true });
   } catch (err) {
     console.error(err);
     res.status(500).send("Server error");
@@ -58,6 +58,7 @@ exports.create = async (req, res) => {
       categories,
       exerciseId: exerciseId || undefined,
       exercise: exercise || null,
+      showAds: false,
     });
   } catch (err) {
     console.error(err);
@@ -65,6 +66,7 @@ exports.create = async (req, res) => {
       categories: [],
       exerciseId: undefined,
       exercise: null,
+      showAds: false,
     });
   }
 };
@@ -146,7 +148,7 @@ exports.show = async (req, res) => {
       ogImage: "https://www.mathematiques-bac.org/assets/img/post-bg.jpg",
     };
 
-    res.render("post", { post, seo });
+    res.render("post", { post, seo, showAds: true });
   } catch (error) {
     console.error(error);
     res.status(500).send("Server Error");
@@ -193,6 +195,7 @@ exports.search = async (req, res) => {
       searchQuery: searchQuery || "",
       resultsCount: posts.length,
       seo,
+      showAds: false,
     });
   } catch (err) {
     console.error(err);

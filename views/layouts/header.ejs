@@ -1,7 +1,9 @@
 <head>
-        <!-- Google AdSense -->
+        <!-- Google AdSense - Only loaded on content pages -->
+        <% if (typeof showAds !== 'undefined' && showAds === true) { %>
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8275998168885235"
              crossorigin="anonymous"></script>
+        <% } %>
         
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-X4Z905G4M2"></script>
         <script>

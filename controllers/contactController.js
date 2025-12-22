@@ -6,6 +6,7 @@ exports.showContact = (req, res) => {
         title: "Contact Us",
         error: req.query.error || null,
         success: req.query.success || null,
+        showAds: false,
     });
 };
 

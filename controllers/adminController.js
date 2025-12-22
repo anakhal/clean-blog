@@ -43,6 +43,7 @@ exports.dashboard = async (req, res) => {
       categories,
       category: category || null,
       success: req.query.success || null,
+      showAds: false,
     });
   } catch (error) {
     console.error("Dashboard error:", error);
@@ -82,6 +83,7 @@ exports.managePosts = async (req, res) => {
       success: req.query.success,
       error: req.query.error,
       timestamp: new Date().toISOString(),
+      showAds: false,
     });
   } catch (error) {
     console.error("Manage posts error:", error);
@@ -101,7 +103,7 @@ exports.editPost = async (req, res) => {
     }
 
     const categories = await Category.find().sort({ name: 1 });
-    res.render("admin/edit-post", { post, categories });
+    res.render("admin/edit-post", { post, categories, showAds: false });
   } catch (error) {
     console.error("Edit post error:", error);
     res.status(500).send("Error loading post");
@@ -196,6 +198,7 @@ exports.manageUsers = async (req, res) => {
       users,
       success: req.query.success,
       error: req.query.error,
+      showAds: false,
     });
   } catch (error) {
     console.error("Manage users error:", error);
@@ -208,7 +211,7 @@ exports.viewContactMessages = async (req, res) => {
   try {
     const messages = await ContactMessage.find().sort({ createdAt: -1 });
 
-    res.render("admin/contact-messages", { messages });
+    res.render("admin/contact-messages", { messages, showAds: false });
   } catch (error) {
     console.error("View contact messages error:", error);
     res.status(500).send("Error loading contact messages");

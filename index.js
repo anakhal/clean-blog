@@ -301,7 +301,7 @@ app.get("/sitemap.xml", sitemapController.generateSitemap);
 app.get("/robots.txt", sitemapController.generateRobots);
 
 // Other routes
-app.get("/about", (req, res) => res.render("about"));
+app.get("/about", (req, res) => res.render("about", { showAds: false }));
 
 // Start server
 app.listen(port, "0.0.0.0", () => {

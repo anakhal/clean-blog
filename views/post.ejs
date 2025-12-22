@@ -166,6 +166,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         </div>
                         
                         <!-- Google AdSense: After Content -->
+                        <% if (typeof showAds !== 'undefined' && showAds === true) { %>
                         <div class="text-center my-4 p-3 bg-light border rounded">
                             <p class="text-muted mb-2"><small>Advertisement</small></p>
                             <!-- Replace this placeholder with your AdSense code after approval -->
@@ -173,6 +174,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 <span class="text-muted">AdSense Ad Unit (After Post Content)</span>
                             </div>
                         </div>
+                        <% } %>
                         
                         <!-- Solution Link for Exercises -->
                         <% if (post.type === 'exercise' && post.solutionId) { %>

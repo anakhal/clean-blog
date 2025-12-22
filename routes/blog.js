@@ -12,7 +12,7 @@ router.get("/", blogController.index);
 router.get("/post/:id", blogController.show);
 router.get("/search", blogController.search);
 router.get("/games/mastermind", (req, res) => {
-  res.render("games/mastermind");
+  res.render("games/mastermind", { showAds: true });
 });
 
 // Sitemap XML route
