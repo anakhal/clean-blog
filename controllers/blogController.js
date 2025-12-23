@@ -205,5 +205,5 @@ exports.search = async (req, res) => {
 
 //register
 exports.register = (req, res) => {
-  res.render("register");
+  res.render("register", { showAds: false });
 };

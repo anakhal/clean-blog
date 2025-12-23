@@ -32,7 +32,8 @@ const errorHandler = (err, req, res, next) => {
         title: 'Error',
         statusCode,
         message: isDevelopment ? message : 'Something went wrong',
-        stack: isDevelopment ? err.stack : null
+        stack: isDevelopment ? err.stack : null,
+        showAds: false
     });
 };
 
