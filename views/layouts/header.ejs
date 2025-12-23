@@ -16,6 +16,7 @@
 
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
         <!-- SEO Meta Tags with Safe Fallbacks -->
         <title>
@@ -28,6 +29,8 @@
                 content="<%= typeof seo !== 'undefined' && seo?.keywords ? seo.keywords : 'mathématiques, bac marocain, exercices, solutions, arithmétique, algèbre, géométrie' %>" />
         <meta name="author" content="Abdelhadi Nakhal" />
         <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+        <meta name="googlebot" content="index, follow" />
+        <meta name="bingbot" content="index, follow" />
 
         <!-- Canonical URL -->
         <link rel="canonical" href="<%= typeof seo !== 'undefined' && seo?.canonical ? seo.canonical : 'https://www.mathematiques-bac.org/' %>" />

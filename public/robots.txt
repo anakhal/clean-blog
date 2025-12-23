@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+
+# Disallow admin and user areas
+Disallow: /admin/
+Disallow: /users/
+Disallow: /login
+Disallow: /register
+
+# Allow important pages
+Allow: /about
+Allow: /search
+Allow: /post/*
+
+# Sitemap
+Sitemap: https://www.mathematiques-bac.org/sitemap.xml

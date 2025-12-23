@@ -207,6 +207,27 @@ if (isProduction) {
     });
 }
 
+// SEO Headers middleware
+app.use((req, res, next) => {
+    // Set proper headers for SEO
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+    
+    // Don't set X-Robots-Tag on main content pages
+    if (!req.path.includes('/admin') && 
+        !req.path.includes('/users') && 
+        !req.path.includes('/login') &&
+        !req.path.includes('/register')) {
+        // Allow indexing on public pages
+        res.setHeader('X-Robots-Tag', 'index, follow');
+    } else {
+        // Block indexing on private/admin pages
+        res.setHeader('X-Robots-Tag', 'noindex, nofollow');
+    }
+    
+    next();
+});
+
 // CORS configuration
 app.use(
     cors({
