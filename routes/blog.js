@@ -12,7 +12,7 @@ router.get("/", blogController.index);
 router.get("/post/:id", blogController.show);
 router.get("/search", blogController.search);
 router.get("/games/mastermind", (req, res) => {
-  res.render("games/mastermind", { showAds: true });
+  res.render("games/mastermind", { showAds: false }); // Games = behavioral content, no ads allowed per AdSense policy
 });
 
 // Admin-only routes - require admin privileges
