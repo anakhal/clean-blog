@@ -12,6 +12,11 @@ const port = process.env.PORT || 4000;
 const mongoose = require("mongoose");
 const winston = require("winston");
 const morgan = require("morgan");
+// Expose Umami configuration to templates via app.locals
+// Set these env vars on Railway: UMAMI_SRC (full URL to script.js) and UMAMI_WEBSITE_ID
+// Example UMAMI_SRC=https://umami.example.com/script.js
+const UMAMI_SRC = process.env.UMAMI_SRC || "";
+const UMAMI_WEBSITE_ID = process.env.UMAMI_WEBSITE_ID || "";
 // 🔒 Redirect middleware (place this FIRST)
 app.use((req, res, next) => {
     if (req.headers.host === "mathematiques-bac.org") {
@@ -97,89 +102,96 @@ app.use(compression());
 app.use(morgan(isProduction ? "combined" : "dev"));
 
 // Security middleware - Helmet
+// Build CSP directives and include Umami origin if provided
+const cspDirectives = {
+    defaultSrc: ["'self'"],
+    styleSrc: [
+        "'self'",
+        "'unsafe-inline'",
+        "https://fonts.googleapis.com",
+        "https://cdnjs.cloudflare.com",
+        "https://cdn.jsdelivr.net",
+        "https://use.fontawesome.com",
+        "https://www.google.com",
+        "https://www.gstatic.com",
+    ],
+    fontSrc: [
+        "'self'",
+        "https://fonts.gstatic.com",
+        "https://fonts.googleapis.com",
+        "https://cdnjs.cloudflare.com",
+        "https://cdn.jsdelivr.net",
+        "https://use.fontawesome.com",
+        "data:",
+        "blob:",
+    ],
+    scriptSrc: [
+        "'self'",
+        "'unsafe-inline'",
+        "'unsafe-eval'",
+        "https://polyfill.io",
+        "https://cdn.jsdelivr.net",
+        "https://cdnjs.cloudflare.com",
+        "https://use.fontawesome.com",
+        "https://www.googletagmanager.com",
+        "https://www.google-analytics.com",
+        "https://www.google.com",
+        "https://www.gstatic.com",
+        "https://www.recaptcha.net",
+    ],
+    scriptSrcElem: [
+        "'self'",
+        "'unsafe-inline'",
+        "https://polyfill.io",
+        "https://cdn.jsdelivr.net",
+        "https://cdnjs.cloudflare.com",
+        "https://use.fontawesome.com",
+        "https://www.googletagmanager.com",
+        "https://www.google-analytics.com",
+        "https://www.google.com",
+        "https://www.gstatic.com",
+        "https://www.recaptcha.net",
+    ],
+    scriptSrcAttr: ["'unsafe-inline'", "'unsafe-hashes'"],
+    imgSrc: ["'self'", "data:", "https:", "http:"],
+    connectSrc: [
+        "'self'",
+        "https://cdn.jsdelivr.net",
+        "https://cdnjs.cloudflare.com",
+        "https://use.fontawesome.com",
+        "https://fonts.googleapis.com",
+        "https://fonts.gstatic.com",
+        "https://www.google-analytics.com",
+        "https://www.googletagmanager.com",
+        "https://analytics.google.com",
+        "https://www.google.com",
+        "https://www.gstatic.com",
+        "https://www.recaptcha.net",
+    ],
+    frameSrc: ["'self'", "https://www.google.com", "https://www.recaptcha.net"],
+    objectSrc: ["'none'"],
+    mediaSrc: ["'self'"],
+    workerSrc: ["'self'", "blob:"],
+    childSrc: ["'self'", "blob:", "https://www.google.com", "https://www.recaptcha.net"],
+};
+
+if (UMAMI_SRC) {
+    try {
+        const umamiUrl = new URL(UMAMI_SRC);
+        const umamiOrigin = umamiUrl.origin;
+        // Allow loading the script and making connections to the Umami origin
+        cspDirectives.scriptSrc.push(umamiOrigin);
+        cspDirectives.scriptSrcElem.push(umamiOrigin);
+        cspDirectives.connectSrc.push(umamiOrigin);
+    } catch (e) {
+        console.warn('Invalid UMAMI_SRC, skipping CSP addition:', UMAMI_SRC);
+    }
+}
+
 app.use(
     helmet({
         contentSecurityPolicy: {
-            directives: {
-                defaultSrc: ["'self'"],
-                styleSrc: [
-                    "'self'",
-                    "'unsafe-inline'",
-                    "https://fonts.googleapis.com",
-                    "https://cdnjs.cloudflare.com",
-                    "https://cdn.jsdelivr.net",
-                    "https://use.fontawesome.com",
-                    "https://www.google.com",
-                    "https://www.gstatic.com",
-                ],
-                fontSrc: [
-                    "'self'",
-                    "https://fonts.gstatic.com",
-                    "https://fonts.googleapis.com",
-                    "https://cdnjs.cloudflare.com",
-                    "https://cdn.jsdelivr.net",
-                    "https://use.fontawesome.com",
-                    "data:",
-                    "blob:",
-                ],
-                scriptSrc: [
-                    "'self'",
-                    "'unsafe-inline'",
-                    "'unsafe-eval'",
-                    "https://polyfill.io",
-                    "https://cdn.jsdelivr.net",
-                    "https://cdnjs.cloudflare.com",
-                    "https://use.fontawesome.com",
-                    "https://www.googletagmanager.com",
-                    "https://www.google-analytics.com",
-                    "https://www.google.com",
-                    "https://www.gstatic.com",
-                    "https://www.recaptcha.net",
-                ],
-                scriptSrcElem: [
-                    "'self'",
-                    "'unsafe-inline'",
-                    "https://polyfill.io",
-                    "https://cdn.jsdelivr.net",
-                    "https://cdnjs.cloudflare.com",
-                    "https://use.fontawesome.com",
-                    "https://www.googletagmanager.com",
-                    "https://www.google-analytics.com",
-                    "https://www.google.com",
-                    "https://www.gstatic.com",
-                    "https://www.recaptcha.net",
-                ],
-                scriptSrcAttr: ["'unsafe-inline'", "'unsafe-hashes'"],
-                imgSrc: ["'self'", "data:", "https:", "http:"],
-                connectSrc: [
-                    "'self'",
-                    "https://cdn.jsdelivr.net",
-                    "https://cdnjs.cloudflare.com",
-                    "https://use.fontawesome.com",
-                    "https://fonts.googleapis.com",
-                    "https://fonts.gstatic.com",
-                    "https://www.google-analytics.com",
-                    "https://www.googletagmanager.com",
-                    "https://analytics.google.com",
-                    "https://www.google.com",
-                    "https://www.gstatic.com",
-                    "https://www.recaptcha.net",
-                ],
-                frameSrc: [
-                    "'self'",
-                    "https://www.google.com",
-                    "https://www.recaptcha.net",
-                ],
-                objectSrc: ["'none'"],
-                mediaSrc: ["'self'"],
-                workerSrc: ["'self'", "blob:"],
-                childSrc: [
-                    "'self'",
-                    "blob:",
-                    "https://www.google.com",
-                    "https://www.recaptcha.net",
-                ],
-            },
+            directives: cspDirectives,
         },
         crossOriginEmbedderPolicy: false,
     }),
@@ -282,6 +294,13 @@ app.use((req, res, next) => {
 // Set view engine
 app.set("view engine", "ejs");
 app.set("trust proxy", 1);
+
+// Make Umami config and environment flag available to all templates
+app.locals.umami = {
+    src: UMAMI_SRC,
+    websiteId: UMAMI_WEBSITE_ID,
+};
+app.locals.isProduction = isProduction;
 
 // Routes
 const blogRoutes = require("./routes/blog");

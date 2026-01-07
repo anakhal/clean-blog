@@ -120,6 +120,9 @@
                 });
         </script>
         <script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js" id="MathJax-script" async></script>
-         <script defer src="https://umami-production-d7d9.up.railway.app/script.js" 
-          data-website-id="889bcb4b-b8c0-425a-a32d-937f5f7afce2"></script>
+        <% if (isProduction && umami && umami.src && umami.websiteId) { %>
+        <script defer src="<%= umami.src %>" data-website-id="<%= umami.websiteId %>"></script>
+        <% } else { %>
+        <!-- Umami not loaded: set UMAMI_SRC and UMAMI_WEBSITE_ID in Railway for production tracking -->
+        <% } %>
 </head>
