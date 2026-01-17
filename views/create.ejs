@@ -140,9 +140,9 @@
                                                             <% const preselectedCategory=(typeof exercise !=='undefined'
                                                                 && exercise) ? exercise.category : null; %>
                                                                 <% categories.forEach((cat, index)=> { %>
-                                                                    <option value="<%= cat.name %>"
+                                                                    <option value="<%= cat._id %>"
                                                                         <%=(preselectedCategory &&
-                                                                        cat.name===preselectedCategory) ||
+                                                                        (cat.name===preselectedCategory || cat._id.toString()===preselectedCategory.toString())) ||
                                                                         (!preselectedCategory && index===0) ? 'selected'
                                                                         : '' %>>
                                                                         <%= cat.name %>

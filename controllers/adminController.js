@@ -13,14 +13,15 @@ exports.dashboard = async (req, res) => {
       Expires: "0",
     });
 
-    const category = req.query.category;
+    const categoryName = req.query.category;
     const query = {
       isDeleted: { $ne: true },
       type: "exercise", // Only show exercises
     };
 
-    if (category) {
-      query.category = category;
+    if (categoryName) {
+      const categoryDoc = await Category.findOne({ name: categoryName });
+      if (categoryDoc) query.category = categoryDoc._id;
     }
 
     const totalPosts = await BlogPost.countDocuments({
@@ -32,6 +33,7 @@ exports.dashboard = async (req, res) => {
     // Filter to show only exercises (not solutions), sorted chronologically
     const recentPosts = await BlogPost.find(query)
       .populate("author", "username")
+      .populate("category")
       .populate("solutionId") // Populate full solution object to get its _id
       .sort({ createdAt: 1 }) // Tri chronologique : du premier créé au dernier créé
       .limit(10);
@@ -61,11 +63,12 @@ exports.managePosts = async (req, res) => {
       Expires: "0",
     });
 
-    const category = req.query.category;
+    const categoryName = req.query.category;
     const query = { type: "exercise" };
 
-    if (category) {
-      query.category = category;
+    if (categoryName) {
+      const categoryDoc = await Category.findOne({ name: categoryName });
+      if (categoryDoc) query.category = categoryDoc._id;
     }
 
     const categories = await Category.find().sort({ name: 1 });
@@ -73,6 +76,7 @@ exports.managePosts = async (req, res) => {
     // Filter to show only exercises (not solutions), sorted chronologically
     const posts = await BlogPost.find(query)
       .populate("author", "username")
+      .populate("category")
       .populate("solutionId") // Populate full solution object to get its _id
       .sort({ createdAt: 1 }); // Tri chronologique : du premier créé au dernier créé
 
@@ -117,7 +121,7 @@ exports.updatePost = async (req, res) => {
     const updateData = {
       title,
       body,
-      category: category || "Arithmétique",
+      category: category,
       updatedAt: new Date(),
     };
 

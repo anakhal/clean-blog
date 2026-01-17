@@ -7,6 +7,11 @@ const categorySchema = new mongoose.Schema({
         unique: true,
         trim: true
     },
+    parent: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Category',
+        default: null
+    },
     createdAt: {
         type: Date,
         default: Date.now

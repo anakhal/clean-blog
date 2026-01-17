@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-    <%-include('layouts/header')-%>
+<%-include('layouts /header')-%>
     <style>
         /* Reduce masthead spacing and position title at bottom */
         header.masthead {
@@ -11,194 +11,206 @@
             align-items: flex-end !important;
             min-height: 400px !important;
         }
-        
+
         @media (min-width: 992px) {
             header.masthead {
                 padding-top: 6rem !important;
                 padding-bottom: 3rem !important;
                 min-height: 500px !important;
             }
-        }
-        
-        /* Position the post heading container at the bottom */
-        header.masthead .container {
-            margin-top: auto !important;
-        }
-        
-        /* Ensure post content starts right after the header */
-        article.mb-4 {
-            margin-bottom: 2rem !important;
-            padding-top: 2rem !important;
-        }
-        
-        /* Add some spacing between title and content */
-        .post-content {
-            margin-top: 1rem;
-        }
-        
-        /* Make sure the post heading text is readable */
-        .post-heading {
-            background: rgba(0, 0, 0, 0.3) !important;
-            padding: 1.5rem !important;
-            border-radius: 8px !important;
-            backdrop-filter: blur(5px) !important;
-        }
-        
-        /* Enhanced styling for post content lists */
-        .post-content ul {
-            margin-bottom: 1.5rem;
-            padding-left: 2rem;
-            list-style-type: disc;
-        }
-        
-        .post-content ul li {
-            margin-bottom: 0.5rem;
-            line-height: 1.6;
-        }
-        
-        /* Custom ordered list styling: 1.), 2.), ... and nested a.), b.), ... */
-        .post-content ol {
-            list-style: none !important;
-            counter-reset: outer-counter;
-            padding-left: 0 !important;
-            margin-bottom: 1.5rem;
-        }
-        .post-content ol > li {
-            counter-increment: outer-counter;
-            position: relative;
-            padding-left: 2.5em;
-            margin-bottom: 0.5em;
-            line-height: 1.6;
-        }
-        .post-content ol > li::before {
-            content: counter(outer-counter) ".) ";
-            position: absolute;
-            left: 0;
-            font-weight: normal;
-        }
-        .post-content ol ol {
-            list-style: none !important;
-            counter-reset: inner-counter;
-            margin-top: 0.5em;
-            padding-left: 1em !important;
-        }
-        .post-content ol ol > li {
-            counter-increment: inner-counter;
-        }
-        .post-content ol ol > li::before {
-            content: counter(inner-counter, lower-alpha) ".) ";
-        }
-        
-        /* Nested lists */
-        .post-content ul ul,
-        .post-content ol ul,
-        .post-content ul ol {
-            margin-top: 0.5rem;
-            margin-bottom: 0.5rem;
-        }
-        
-        /* Solution link styling */
-        .solution-link {
-            margin-top: 2rem;
-            padding: 1.5rem;
-            background: #e7f3ff;
-            border-left: 4px solid #0085A1;
-            border-radius: 4px;
-        }
-        
-        .solution-link h4 {
-            color: #0085A1;
-            margin-bottom: 1rem;
-        }
-        
-        .btn-view-solution {
-            background: #0085A1;
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 4px;
-            text-decoration: none;
-            display: inline-block;
-            transition: background 0.3s;
-        }
-        
-        .btn-view-solution:hover {
-            background: #006d85;
-            color: white;
-        }
+
+            /* Position the post heading container at the bottom */
+            header.masthead .container {
+                margin-top: auto !important;
+            }
+
+            /* Ensure post content starts right after the header */
+            article.mb-4 {
+                margin-bottom: 2rem !important;
+                padding-top: 2rem !important;
+            }
+
+            /* Add some spacing between title and content */
+            .post-content {
+                margin-top: 1rem;
+            }
+
+            /* Make sure the post heading text is readable */
+            .post-heading {
+                background: rgba(0, 0, 0, 0.3) !important;
+                padding: 1.5rem !important;
+                border-radius: 8px !important;
+                backdrop-filter: blur(5px) !important;
+            }
+
+            /* Enhanced styling for post content lists */
+            .post-content ul {
+                margin-bottom: 1.5rem;
+                padding-left: 2rem;
+                list-style-type: disc;
+            }
+
+            .post-content ul li {
+                margin-bottom: 0.5rem;
+                line-height: 1.6;
+            }
+
+            /* Custom ordered list styling: 1.), 2.), ... and nested a.), b.), ... */
+            .post-content ol {
+                list-style: none !important;
+                counter-reset: outer-counter;
+                padding-left: 0 !important;
+                margin-bottom: 1.5rem;
+            }
+
+            .post-content ol>li {
+                counter-increment: outer-counter;
+                position: relative;
+                padding-left: 2.5em;
+                margin-bottom: 0.5em;
+                line-height: 1.6;
+            }
+
+            .post-content ol>li::before {
+                content: counter(outer-counter) ".) ";
+                position: absolute;
+                left: 0;
+                font-weight: normal;
+            }
+
+            .post-content ol ol {
+                list-style: none !important;
+                counter-reset: inner-counter;
+                margin-top: 0.5em;
+                padding-left: 1em !important;
+            }
+
+            .post-content ol ol>li {
+                counter-increment: inner-counter;
+            }
+
+            .post-content ol ol>li::before {
+                content: counter(inner-counter, lower-alpha) ".) ";
+            }
+
+            /* Nested lists */
+            .post-content ul ul,
+            .post-content ol ul,
+            .post-content ul ol {
+                margin-top: 0.5rem;
+                margin-bottom: 0.5rem;
+            }
+
+            /* Solution link styling */
+            .solution-link {
+                margin-top: 2rem;
+                padding: 1.5rem;
+                background: #e7f3ff;
+                border-left: 4px solid #0085A1;
+                border-radius: 4px;
+            }
+
+            .solution-link h4 {
+                color: #0085A1;
+                margin-bottom: 1rem;
+            }
+
+            .btn-view-solution {
+                background: #0085A1;
+                color: white;
+                border: none;
+                padding: 0.75rem 1.5rem;
+                border-radius: 4px;
+                text-decoration: none;
+                display: inline-block;
+                transition: background 0.3s;
+            }
+
+            .btn-view-solution:hover {
+                background: #006d85;
+                color: white;
+            }
     </style>
+
     <body>
         <!-- Navigation-->
-        <%-include('layouts/navbar')-%>
-        <!-- Page Header-->
-        <header class="masthead">
-            <div class="container position-relative px-4 px-lg-5">
-                <div class="row gx-4 gx-lg-5 justify-content-center">
-                    <div class="col-md-10 col-lg-8 col-xl-7">
-                        <div class="post-heading">
-                            <h3><%= post.title %></h3>
-                            <% if (post.type === 'exercise') { %>
-                                <span class="badge bg-primary">Exercise</span>
-                            <% } else if (post.type === 'solution') { %>
-                                <span class="badge bg-success">Solution</span>
-                            <% } %>
-                            <span class="meta">
-                                Posted by admin
-                                on <%= new Date(post.createdAt || Date.now()).toDateString() %>
-                            </span>
+        <%-include('layouts /navbar')-%>
+            <!-- Page Header-->
+            <header class="masthead">
+                <div class="container position-relative px-4 px-lg-5">
+                    <div class="row gx-4 gx-lg-5 justify-content-center">
+                        <div class="col-md-10 col-lg-8 col-xl-7">
+                            <div class="post-heading">
+                                <h3>
+                                    <%= post.title %>
+                                </h3>
+                                <% if (post.type==='exercise' ) { %>
+                                    <span class="badge bg-primary">Exercise</span>
+                                    <% } else if (post.type==='solution' ) { %>
+                                        <span class="badge bg-success">Solution</span>
+                                        <% } %>
+                                            <span class="meta">
+                                                Posted by admin
+                                                on <%= new Date(post.createdAt || Date.now()).toDateString() %>
+                                            </span>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </header>
-        <!-- Post Content-->
-        <article class="mb-4">
-            <div class="container px-4 px-lg-5">
-                <div class="row gx-4 gx-lg-5 justify-content-center">
-                    <div class="col-12 col-lg-10 col-xl-9">
-                        <!-- Display the full blog post content -->
-                        <div class="post-content">
-                            <%- post.body %>
-                        </div>
-                        
-                        <!-- Solution Link for Exercises -->
-                        <% if (post.type === 'exercise' && post.solutionId) { %>
-                            <div class="solution-link">
-                                <h4>📚 Solution Available</h4>
-                                <p>A solution has been written for this exercise.</p>
-                                <a href="/post/<%= post.solutionId._id || post.solutionId %>" target="_blank" class="btn-view-solution">
-                                    View Solution (Opens in New Tab) →
-                                </a>
+            </header>
+            <!-- Post Content-->
+            <article class="mb-4">
+                <div class="container px-4 px-lg-5">
+                    <div class="row gx-4 gx-lg-5 justify-content-center">
+                        <div class="col-12 col-lg-10 col-xl-9">
+                            <!-- Display the full blog post content -->
+                            <div class="post-content">
+                                <%- post.body %>
                             </div>
-                        <% } else if (post.type === 'exercise' && !post.solutionId) { %>
-                            <div class="solution-link" style="background: #fff3cd; border-left: 4px solid #ffc107;">
-                                <h4 style="color: #856404;">⏳ Solution Non Disponible</h4>
-                                <p style="color: #856404;">La solution pour cet exercice n'est pas encore disponible. Revenez bientôt !</p>
-                            </div>
-                        <% } %>
-                        
-                        <!-- Link back to Exercise for Solutions -->
-                        <% if (post.type === 'solution' && post.exerciseId) { %>
-                            <div class="solution-link">
-                                <h4>📝 Related Exercise</h4>
-                                <p>This is a solution to an exercise.</p>
-                                <a href="/post/<%= post.exerciseId._id || post.exerciseId %>" class="btn-view-solution">
-                                    View Exercise →
-                                </a>
-                            </div>
-                        <% } %>
-                        
-                        <!-- Navigation back to home -->
-                        <div class="mt-5 pt-3">
-                            <a href="/" class="btn btn-outline-primary">← Back to All Posts</a>
+
+                            <!-- Solution Link for Exercises -->
+                            <% if (post.type==='exercise' && post.solutionId) { %>
+                                <div class="solution-link">
+                                    <h4>📚 Solution Available</h4>
+                                    <p>A solution has been written for this exercise.</p>
+                                    <a href="/post/<%= post.solutionId._id || post.solutionId %>" target="_blank"
+                                        class="btn-view-solution">
+                                        View Solution (Opens in New Tab) →
+                                    </a>
+                                </div>
+                                <% } else if (post.type==='exercise' && !post.solutionId) { %>
+                                    <div class="solution-link"
+                                        style="background: #fff3cd; border-left: 4px solid #ffc107;">
+                                        <h4 style="color: #856404;">⏳ Solution Non Disponible</h4>
+                                        <p style="color: #856404;">La solution pour cet exercice n'est pas encore
+                                            disponible. Revenez bientôt !</p>
+                                    </div>
+                                    <% } %>
+
+                                        <!-- Link back to Exercise for Solutions -->
+                                        <% if (post.type==='solution' && post.exerciseId) { %>
+                                            <div class="solution-link">
+                                                <h4>📝 Related Exercise</h4>
+                                                <p>This is a solution to an exercise.</p>
+                                                <a href="/post/<%= post.exerciseId._id || post.exerciseId %>"
+                                                    class="btn-view-solution">
+                                                    View Exercise →
+                                                </a>
+                                            </div>
+                                            <% } %>
+
+                                                <!-- Navigation back to home -->
+                                                <div class="mt-5 pt-3">
+                                                    <a href="/" class="btn btn-outline-primary">← Back to All Posts</a>
+                                                </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </article>
-        <!-- Footer-->
-        <%-include('layouts/footer')-%>        
-        <!-- Bootstrap core JS-->
-        <%-include('layouts/script')-%>
+            </article>
+            <!-- Footer-->
+            <%-include('layouts /footer')-%>
+                <!-- Bootstrap core JS-->
+                <%-include('layouts /script')-%>
     </body>
+
 </html>

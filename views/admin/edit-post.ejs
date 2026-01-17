@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<%-include('../layouts/header')-%>
+<%-include('.. /layouts/header')-%>
     <style>
         /* Live Preview Styles - Full Width */
         .main-centered-container {
@@ -83,7 +83,7 @@
                 style="display:none;visibility:hidden"></iframe></noscript>
         <!-- End Google Tag Manager (noscript) -->
         <!-- Navigation-->
-        <%-include('../layouts/navbar')-%>
+        <%-include('.. /layouts/navbar')-%>
 
             <!-- Page Header-->
             <header class="masthead">
@@ -135,7 +135,10 @@
                                     <select class="form-control" name="category" id="category" required>
                                         <% if (categories && categories.length> 0) { %>
                                             <% categories.forEach(cat=> { %>
-                                                <option value="<%= cat.name %>" <%=post.category===cat.name ? 'selected'
+                                                <option value="<%= cat._id %>" <%=(post.category &&
+                                                    (post.category.name===cat.name ||
+                                                    post.category.toString()===cat._id.toString() ||
+                                                    post.category._id?.toString()===cat._id.toString())) ? 'selected'
                                                     : '' %>><%= cat.name %>
                                                 </option>
                                                 <% }) %>
@@ -198,7 +201,7 @@
             </main>
 
             <!-- Footer-->
-            <%-include('../layouts/footer')-%>
+            <%-include('.. /layouts/footer')-%>
                 <!-- Live Preview JavaScript -->
                 <script>
                     document.addEventListener('DOMContentLoaded', function () {

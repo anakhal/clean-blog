@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-    <%-include('layouts/header')-%>
+<%-include('layouts /header')-%>
     <style>
         /* Custom ordered list styling for post excerpts: 1.), 2.), ... and nested a.), b.), ... */
         .post-subtitle ol {
@@ -9,93 +9,123 @@
             padding-left: 0 !important;
             margin-bottom: 1rem;
         }
-        .post-subtitle ol > li {
+
+        .post-subtitle ol>li {
             counter-increment: outer-counter;
             position: relative;
             padding-left: 2.5em;
             margin-bottom: 0.5em;
             line-height: 1.6;
         }
-        .post-subtitle ol > li::before {
+
+        .post-subtitle ol>li::before {
             content: counter(outer-counter) ".) ";
             position: absolute;
             left: 0;
             font-weight: normal;
         }
+
         .post-subtitle ol ol {
             list-style: none !important;
             counter-reset: inner-counter;
             margin-top: 0.5em;
             padding-left: 1em !important;
         }
-        .post-subtitle ol ol > li {
+
+        .post-subtitle ol ol>li {
             counter-increment: inner-counter;
         }
-        .post-subtitle ol ol > li::before {
+
+        .post-subtitle ol ol>li::before {
             content: counter(inner-counter, lower-alpha) ".) ";
         }
     </style>
+
     <body>
         <!-- Navigation-->
-        <%-include('layouts/navbar')-%>
-        <!-- Page Header-->
-        <header class="masthead">
-            <div class="container position-relative px-4 px-lg-5">
-                <div class="row gx-4 gx-lg-5 justify-content-center">
-                    <div class="col-md-10 col-lg-8 col-xl-7">
-                        <div class="site-heading">
-                            <h1>Mathematiques- Bac Marocain</h1>
-                            <span class="subheading">Mathematics at High school</span>
+        <%-include('layouts /navbar')-%>
+            <!-- Page Header-->
+            <header class="masthead">
+                <div class="container position-relative px-4 px-lg-5">
+                    <div class="row gx-4 gx-lg-5 justify-content-center">
+                        <div class="col-md-10 col-lg-8 col-xl-7">
+                            <div class="site-heading">
+                                <h1>Mathematiques- Bac Marocain</h1>
+                                <span class="subheading">Mathematics at High school</span>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </header>
-        <!-- Main Content-->
-        <div class="container px-4 px-lg-5">
-            <div class="row gx-4 gx-lg-5 justify-content-center">
-                <div class="col-12 col-lg-10 col-xl-9">
-                    <!-- Category Filter -->
-                    <div class="mb-5 p-4 bg-light rounded-3 shadow-sm">
-                        <h5 class="text-center mb-3 text-muted">Filtrer par catégorie</h5>
-                        <div class="d-flex flex-wrap gap-2 justify-content-center align-items-center">
-                            <a href="/" class="btn btn-sm <%=!category ? 'btn-primary' : 'btn-outline-primary'%> px-3 py-2">
-                                📚 Toutes
-                            </a>
-                            <% if (categories && categories.length > 0) { %>
-                                <% categories.forEach(cat => { %>
-                                    <a href="/?category=<%= cat.name %>" 
-                                       class="btn btn-sm <%=category === cat.name ? 'btn-primary' : 'btn-outline-primary'%> px-3 py-2">
-                                        <%= cat.name %>
-                                    </a>
-                                <% }) %>
-                            <% } %>
+            </header>
+            <!-- Main Content-->
+            <div class="container px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-12 col-lg-10 col-xl-9">
+                        <!-- Category Filter -->
+                        <!-- Grouped Category Filter -->
+                        <div class="mb-5 p-4 bg-light rounded-3 shadow-sm">
+                            <h5 class="text-center mb-4 text-muted">Filtrer par chapitre</h5>
+                            <div class="category-filters">
+                                <% if (typeof hierarchy !=='undefined' && hierarchy.length> 0) { %>
+                                    <% hierarchy.forEach(parent=> { %>
+                                        <div class="mb-3">
+                                            <!-- Parent Category Button -->
+                                            <a href="/?category=<%= parent.name %>"
+                                                class="btn w-100 fw-bold mb-2 <%= category === parent.name ? 'btn-primary' : 'btn-outline-primary' %>"
+                                                style="text-transform: uppercase; letter-spacing: 1px;">
+                                                <%= parent.name %>
+                                            </a>
+                                            <!-- Children Categories -->
+                                            <div class="d-flex flex-wrap gap-2 justify-content-center">
+                                                <% if (parent.children && parent.children.length> 0) { %>
+                                                    <% parent.children.forEach(child=> { %>
+                                                        <a href="/?category=<%= child.name %>"
+                                                            class="btn btn-sm <%= category === child.name ? 'btn-secondary' : 'btn-outline-secondary' %>">
+                                                            <%= child.name %>
+                                                        </a>
+                                                        <% }) %>
+                                                            <% } %>
+                                            </div>
+                                        </div>
+                                        <% }) %>
+                                            <% } else { %>
+                                                <!-- Fallback if hierarchy is missing -->
+                                                <div class="alert alert-warning">No categories found.</div>
+                                                <% } %>
+                            </div>
                         </div>
+
+                        <%for (var i=0;i<posts.length;i++){%>
+                            <!-- Post preview-->
+                            <div class="post-preview">
+                                <a href="/post/<%=posts[i]._id%>">
+                                    <h2 class="post-title">
+                                        <%=posts[i].title%>
+                                    </h2>
+                                    <h3 class="post-subtitle">
+                                        <%=posts[i].body.replace( /<[^>]*>/g, '').substring(0,200)%>...
+                                    </h3>
+                                </a>
+                                <p class="post-meta">
+                                    <span class="badge bg-primary me-2">
+                                        <%= (posts[i].category && posts[i].category.name) ? posts[i].category.name :
+                                            (posts[i].category || 'Arithmétique' ) %>
+                                    </span>
+                                    <% if (posts[i].solutionId) { %>
+                                        <span class="badge bg-success me-2">Solution</span>
+                                        <% } %>
+                                            Posted by admin on <%=new Date().toDateString()%>
+                                </p>
+                            </div>
+                            <!-- Divider-->
+                            <hr class="my-4" />
+                            <%}%>
                     </div>
-                    
-                    <%for (var i=0;i<posts.length;i++){%>
-                    <!-- Post preview-->
-                    <div class="post-preview">
-                        <a href="/post/<%=posts[i]._id%>">
-                            <h2 class="post-title"><%=posts[i].title%></h2>
-                            <h3 class="post-subtitle"><%=posts[i].body.replace(/<[^>]*>/g, '').substring(0,200)%>...</h3>
-                        </a>
-                        <p class="post-meta">
-                            <span class="badge bg-primary me-2"><%=posts[i].category || 'Arithmétique'%></span>
-                            <% if (posts[i].solutionId) { %>
-                                <span class="badge bg-success me-2">Solution</span>
-                            <% } %>
-                            Posted by admin on <%=new Date().toDateString()%>
-                        </p>
-                    </div>
-                    <!-- Divider-->
-                    <hr class="my-4" />
-                    <%}%>
-        </div>
-    </div>
-        <!-- Footer-->
-       <%-include('layouts/footer')-%>
-        <!-- Bootstrap core JS-->
-        <%-include('layouts/script')-%>
+                </div>
+                <!-- Footer-->
+                <%-include('layouts /footer')-%>
+                    <!-- Bootstrap core JS-->
+                    <%-include('layouts /script')-%>
     </body>
+
 </html>

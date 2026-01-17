@@ -4,42 +4,96 @@ const Category = require("../models/Category");
 
 exports.index = async (req, res) => {
   try {
-    const category = req.query.category;
-    const query = {
-      isDeleted: { $ne: true },
-      type: "exercise", // Only show exercises, not solutions
-    };
+    // 1. Fetch all categories and build hierarchy
+    const allCategories = await Category.find().sort({ name: 1 }).lean();
 
-    if (category) {
-      query.category = category;
+    // Group into hierarchy: Parent -> Children
+    const hierarchy = [];
+    const parents = allCategories.filter(c => !c.parent);
+    const children = allCategories.filter(c => c.parent);
+
+    parents.forEach(p => {
+      // Attach children array to parent object
+      p.children = children.filter(c => c.parent && c.parent.toString() === p._id.toString());
+      hierarchy.push(p);
+    });
+
+    // 2. Handle Default Category Redirect
+    // If no category is selected, redirect to the first parent (e.g., Algèbre)
+    let categoryName = req.query.category;
+    if (!categoryName) {
+      if (hierarchy.length > 0) {
+        return res.redirect(`/?category=${encodeURIComponent(hierarchy[0].name)}`);
+      }
     }
 
-    const categories = await Category.find().sort({ name: 1 });
+    // 3. Determine Query based on selection
+    const query = {
+      isDeleted: { $ne: true },
+      type: "exercise",
+    };
+
+    let selectedCategory = null;
+
+    if (categoryName) {
+      // Find the selected category object
+      selectedCategory = allCategories.find(c => c.name === categoryName);
+
+      if (selectedCategory) {
+        // Check if it's a parent category (has no parent itself, or is in our parents list)
+        const isParent = !selectedCategory.parent;
+
+        if (isParent) {
+          // It's a parent: fetch posts for this parent AND all its children
+          const childIds = allCategories
+            .filter(c => c.parent && c.parent.toString() === selectedCategory._id.toString())
+            .map(c => c._id);
+
+          // Query: category IN [this_parent_id, ...all_child_ids]
+          query.category = { $in: [selectedCategory._id, ...childIds] };
+        } else {
+          // It's a child: fetch posts for just this category
+          query.category = selectedCategory._id;
+        }
+      } else {
+        // Category name in URL doesn't exist in DB
+        query.category = null; // Will result in 0 posts
+      }
+    }
 
     const posts = await BlogPost.find(query)
       .populate("author", "username")
-      .sort({ createdAt: 1 }); // Tri chronologique : du premier créé au dernier créé
+      .populate("category")
+      .sort({ createdAt: 1 });
 
-    // SEO metadata for homepage
+    // SEO metadata
     const seo = {
-      title: category
-        ? `${category} - Exercices Corrigés Bac Marocain | Mathématiques-Bac.org`
-        : "Mathématiques Bac Marocain - Exercices Corrigés, Cours et Examens Nationaux",
-      description: category
-        ? `Exercices corrigés de ${category} pour le baccalauréat marocain. Solutions détaillées et cours complets pour réussir votre bac sciences mathématiques.`
-        : "Plus de 500 exercices corrigés de mathématiques pour le bac marocain. Arithmétique, algèbre, probabilités, nombres complexes et plus. Préparation complète pour l'examen national.",
-      keywords: category
-        ? `${category.toLowerCase()}, bac maroc, exercices corrigés, mathématiques, sciences maths`
-        : "mathématiques bac marocain, exercices corrigés, examen national, sciences maths, arithmétique, algèbre, probabilités, nombres complexes, espaces vectoriels, structures algébriques",
-      canonical: category
-        ? `https://www.mathematiques-bac.org/?category=${encodeURIComponent(category)}`
+      title: categoryName
+        ? `${categoryName} - Exercices Corrigés Bac Marocain | Mathématiques-Bac.org`
+        : "Mathématiques Bac Marocain",
+      description: categoryName
+        ? `Exercices corrigés de ${categoryName}. Solutions détaillées.`
+        : "Exercices corrigés de mathématiques.",
+      keywords: categoryName
+        ? `${categoryName.toLowerCase()}, bac maroc, exercices`
+        : "mathématiques, bac maroc",
+      canonical: categoryName
+        ? `https://www.mathematiques-bac.org/?category=${encodeURIComponent(categoryName)}`
         : "https://www.mathematiques-bac.org/",
       ogImage: "https://www.mathematiques-bac.org/assets/img/home-bg.jpg",
     };
 
-    // Only show ads if there is sufficient content (at least 3 posts)
     const hasEnoughContent = posts.length >= 3;
-    res.render("index", { posts, categories, category: category || null, seo, showAds: hasEnoughContent });
+
+    // Pass hierarchy and allCategories to view
+    res.render("index", {
+      posts,
+      categories: allCategories,
+      hierarchy, // New hierarchical structure
+      category: categoryName || null,
+      seo,
+      showAds: hasEnoughContent
+    });
   } catch (err) {
     console.error(err);
     res.status(500).send("Server error");
@@ -94,7 +148,7 @@ exports.store = async (req, res) => {
       title: req.body.title,
       body: req.body.body,
       author: req.session.userId,
-      category: req.body.category || "Arithmétique",
+      category: req.body.category || (await Category.findOne({ name: "Arithmétique" }))._id,
       type: type,
       exerciseId: exerciseId || null,
     });
@@ -133,6 +187,7 @@ exports.show = async (req, res) => {
       isDeleted: { $ne: true },
     })
       .populate("author", "username")
+      .populate("category")
       .populate("solutionId", "title")
       .populate("exerciseId", "title");
 
@@ -146,8 +201,8 @@ exports.show = async (req, res) => {
 
     const seo = {
       title: `${cleanTitle} - Exercice Corrigé Bac Marocain | Mathématiques`,
-      description: `${cleanBody}... Solution détaillée pour ${post.category || "mathématiques"} - Bac Marocain`,
-      keywords: `${post.category?.toLowerCase() || "mathématiques"}, exercice corrigé, bac maroc, ${cleanTitle.toLowerCase()}, solution mathématiques`,
+      description: `${cleanBody}... Solution détaillée pour ${post.category?.name || "mathématiques"} - Bac Marocain`,
+      keywords: `${post.category?.name?.toLowerCase() || "mathématiques"}, exercice corrigé, bac maroc, ${cleanTitle.toLowerCase()}, solution mathématiques`,
       canonical: `https://www.mathematiques-bac.org/post/${post._id}`,
       ogImage: "https://www.mathematiques-bac.org/assets/img/post-bg.jpg",
     };

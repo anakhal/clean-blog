@@ -1,7 +1,7 @@
-const mongoose=require('mongoose');
-const blogPostSchema=new mongoose.Schema({
-    title:String,
-    body:String,
+const mongoose = require('mongoose');
+const blogPostSchema = new mongoose.Schema({
+    title: String,
+    body: String,
     author: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
@@ -19,10 +19,11 @@ const blogPostSchema=new mongoose.Schema({
     exerciseId: { type: mongoose.Schema.Types.ObjectId, ref: 'BlogPost', default: null }, // For solutions: link to parent exercise
     solutionId: { type: mongoose.Schema.Types.ObjectId, ref: 'BlogPost', default: null }, // For exercises: link to solution
     category: {
-        type: String,
-        default: 'Arithmétique'
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Category',
+        required: false // Optional temporarily during migration
     }
 }, { timestamps: true });
 
-const BlogPost=mongoose.model('BlogPost', blogPostSchema);
-module.exports=BlogPost;
+const BlogPost = mongoose.model('BlogPost', blogPostSchema);
+module.exports = BlogPost;
