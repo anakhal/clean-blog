@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<%-include('layouts /header')-%>
+<%-include('layouts/header')-%>
     <style>
         /* Custom ordered list styling for post excerpts: 1.), 2.), ... and nested a.), b.), ... */
         .post-subtitle ol {
@@ -39,93 +39,253 @@
         .post-subtitle ol ol>li::before {
             content: counter(inner-counter, lower-alpha) ".) ";
         }
+
+        /* Category Filter Styling */
+        .category-filter-box {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .filter-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Algèbre - Blue */
+        .btn-algebre {
+            background-color: #0085A1;
+            border-color: #0085A1;
+            color: white;
+        }
+
+        .btn-algebre:hover {
+            background-color: #006d85;
+            border-color: #006d85;
+            color: white;
+        }
+
+        .btn-outline-algebre {
+            background-color: white;
+            border: 2px solid #0085A1;
+            color: #0085A1;
+        }
+
+        .btn-outline-algebre:hover {
+            background-color: #0085A1;
+            color: white;
+        }
+
+        /* Analyse - Green */
+        .btn-analyse {
+            background-color: #28a745;
+            border-color: #28a745;
+            color: white;
+        }
+
+        .btn-analyse:hover {
+            background-color: #218838;
+            border-color: #218838;
+            color: white;
+        }
+
+        .btn-outline-analyse {
+            background-color: white;
+            border: 2px solid #28a745;
+            color: #28a745;
+        }
+
+        .btn-outline-analyse:hover {
+            background-color: #28a745;
+            color: white;
+        }
+
+        /* Olympiades - Orange */
+        .btn-olympiades {
+            background-color: #ff6b35;
+            border-color: #ff6b35;
+            color: white;
+        }
+
+        .btn-olympiades:hover {
+            background-color: #e55a2b;
+            border-color: #e55a2b;
+            color: white;
+        }
+
+        .btn-outline-olympiades {
+            background-color: white;
+            border: 2px solid #ff6b35;
+            color: #ff6b35;
+        }
+
+        .btn-outline-olympiades:hover {
+            background-color: #ff6b35;
+            color: white;
+        }
+
+        .parent-btn,
+        .child-btn,
+        .child-btn-outline {
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .child-btn,
+        .child-btn-outline {
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            text-transform: none;
+            letter-spacing: normal;
+        }
+
+        .parent-btn:hover,
+        .child-btn:hover,
+        .child-btn-outline:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Masthead colors per category */
+        header.masthead.masthead-algebre {
+            background: linear-gradient(to bottom, rgba(0, 133, 161, 0.8), rgba(0, 109, 133, 0.9)), url('/assets/img/home-bg.jpg') !important;
+            background-position: center !important;
+            background-repeat: no-repeat !important;
+            background-attachment: scroll !important;
+            background-size: cover !important;
+        }
+
+        header.masthead.masthead-analyse {
+            background: linear-gradient(to bottom, rgba(40, 167, 69, 0.8), rgba(33, 136, 56, 0.9)), url('/assets/img/home-bg.jpg') !important;
+            background-position: center !important;
+            background-repeat: no-repeat !important;
+            background-attachment: scroll !important;
+            background-size: cover !important;
+        }
+
+        header.masthead.masthead-olympiades {
+            background: linear-gradient(to bottom, rgba(255, 107, 53, 0.8), rgba(229, 90, 43, 0.9)), url('/assets/img/home-bg.jpg') !important;
+            background-position: center !important;
+            background-repeat: no-repeat !important;
+            background-attachment: scroll !important;
+            background-size: cover !important;
+        }
     </style>
 
     <body>
         <!-- Navigation-->
-        <%-include('layouts /navbar')-%>
-            <!-- Page Header-->
-            <header class="masthead">
-                <div class="container position-relative px-4 px-lg-5">
-                    <div class="row gx-4 gx-lg-5 justify-content-center">
-                        <div class="col-md-10 col-lg-8 col-xl-7">
-                            <div class="site-heading">
-                                <h1>Mathematiques- Bac Marocain</h1>
-                                <span class="subheading">Mathematics at High school</span>
+        <%-include('layouts/navbar')-%>
+            <% let selectedParent=null; let colorClass='algebre' ; if (category && hierarchy) {
+                selectedParent=hierarchy.find(p=> p.name === category);
+                if (!selectedParent) {
+                for (const parent of hierarchy) {
+                if (parent.children && parent.children.some(c => c.name === category)) {
+                selectedParent = parent;
+                break;
+                }
+                }
+                }
+                if (selectedParent) {
+                if (selectedParent.name === 'Analyse') colorClass = 'analyse';
+                else if (selectedParent.name === 'Olympiades de mathématiques') colorClass = 'olympiades';
+                }
+                }
+                %>
+                <!-- Page Header-->
+                <header class="masthead masthead-<%= colorClass %>">
+                    <div class="container position-relative px-4 px-lg-5">
+                        <div class="row gx-4 gx-lg-5 justify-content-center">
+                            <div class="col-md-10 col-lg-8 col-xl-7">
+                                <div class="site-heading">
+                                    <h1>Mathematiques- Bac Marocain</h1>
+                                    <span class="subheading">Mathematics at High school</span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </header>
-            <!-- Main Content-->
-            <div class="container px-4 px-lg-5">
-                <div class="row gx-4 gx-lg-5 justify-content-center">
-                    <div class="col-12 col-lg-10 col-xl-9">
-                        <!-- Category Filter -->
-                        <!-- Grouped Category Filter -->
-                        <div class="mb-5 p-4 bg-light rounded-3 shadow-sm">
-                            <h5 class="text-center mb-4 text-muted">Filtrer par chapitre</h5>
-                            <div class="category-filters">
-                                <% if (typeof hierarchy !=='undefined' && hierarchy.length> 0) { %>
-                                    <% hierarchy.forEach(parent=> { %>
+                </header>
+                <!-- Main Content-->
+                <div class="container px-4 px-lg-5">
+                    <div class="row gx-4 gx-lg-5 justify-content-center">
+                        <div class="col-12 col-lg-10 col-xl-9">
+                            <div class="category-filter-box mb-5">
+                                <h5 class="text-center filter-title">Filtrer par chapitre</h5>
+                                <div class="category-filters">
+                                    <% if (selectedParent) { %>
                                         <div class="mb-3">
-                                            <!-- Parent Category Button -->
-                                            <a href="/?category=<%= parent.name %>"
-                                                class="btn w-100 fw-bold mb-2 <%= category === parent.name ? 'btn-primary' : 'btn-outline-primary' %>"
-                                                style="text-transform: uppercase; letter-spacing: 1px;">
-                                                <%= parent.name %>
+                                            <a href="/?category=<%= selectedParent.name %>"
+                                                class="btn w-100 parent-btn btn-<%= colorClass %> mb-3">
+                                                <%= selectedParent.name %>
                                             </a>
-                                            <!-- Children Categories -->
                                             <div class="d-flex flex-wrap gap-2 justify-content-center">
-                                                <% if (parent.children && parent.children.length> 0) { %>
-                                                    <% parent.children.forEach(child=> { %>
+                                                <% if (selectedParent.children && selectedParent.children.length> 0) {
+                                                    %>
+                                                    <% selectedParent.children.forEach(child=> { %>
                                                         <a href="/?category=<%= child.name %>"
-                                                            class="btn btn-sm <%= category === child.name ? 'btn-secondary' : 'btn-outline-secondary' %>">
+                                                            class="btn <%= category === child.name ? 'child-btn btn-'+colorClass : 'child-btn-outline btn-outline-'+colorClass %>">
                                                             <%= child.name %>
                                                         </a>
                                                         <% }) %>
                                                             <% } %>
                                             </div>
                                         </div>
-                                        <% }) %>
-                                            <% } else { %>
-                                                <!-- Fallback if hierarchy is missing -->
-                                                <div class="alert alert-warning">No categories found.</div>
-                                                <% } %>
+                                        <% } else { %>
+                                            <% if (typeof hierarchy !=='undefined' && hierarchy.length> 0) { %>
+                                                <div class="d-flex flex-wrap gap-3 justify-content-center">
+                                                    <a href="/?category=Algèbre"
+                                                        class="btn btn-lg parent-btn btn-algebre">Algèbre</a>
+                                                    <a href="/?category=Analyse"
+                                                        class="btn btn-lg parent-btn btn-analyse">Analyse</a>
+                                                    <a href="/?category=Olympiades de mathématiques"
+                                                        class="btn btn-lg parent-btn btn-olympiades">Olympiades</a>
+                                                </div>
+                                                <% } else { %>
+                                                    <div class="alert alert-warning">No categories found.</div>
+                                                    <% } %>
+                                                        <% } %>
+                                </div>
                             </div>
-                        </div>
 
-                        <%for (var i=0;i<posts.length;i++){%>
-                            <!-- Post preview-->
-                            <div class="post-preview">
-                                <a href="/post/<%=posts[i]._id%>">
-                                    <h2 class="post-title">
-                                        <%=posts[i].title%>
-                                    </h2>
-                                    <h3 class="post-subtitle">
-                                        <%=posts[i].body.replace( /<[^>]*>/g, '').substring(0,200)%>...
-                                    </h3>
-                                </a>
-                                <p class="post-meta">
-                                    <span class="badge bg-primary me-2">
-                                        <%= (posts[i].category && posts[i].category.name) ? posts[i].category.name :
-                                            (posts[i].category || 'Arithmétique' ) %>
-                                    </span>
-                                    <% if (posts[i].solutionId) { %>
-                                        <span class="badge bg-success me-2">Solution</span>
-                                        <% } %>
-                                            Posted by admin on <%=new Date().toDateString()%>
-                                </p>
-                            </div>
-                            <!-- Divider-->
-                            <hr class="my-4" />
-                            <%}%>
+                            <%for (var i=0;i<posts.length;i++){%>
+                                <!-- Post preview-->
+                                <div class="post-preview">
+                                    <a href="/post/<%=posts[i]._id%>">
+                                        <h2 class="post-title">
+                                            <%=posts[i].title%>
+                                        </h2>
+                                        <h3 class="post-subtitle">
+                                            <%=posts[i].body.replace( /<[^>]*>/g, '').substring(0,200)%>...
+                                        </h3>
+                                    </a>
+                                    <p class="post-meta">
+                                        <span class="badge bg-primary me-2">
+                                            <%= (posts[i].category && posts[i].category.name) ? posts[i].category.name :
+                                                (posts[i].category || 'Arithmétique' ) %>
+                                        </span>
+                                        <% if (posts[i].solutionId) { %>
+                                            <span class="badge bg-success me-2">Solution</span>
+                                            <% } %>
+                                                Posted by admin on <%=new Date().toDateString()%>
+                                    </p>
+                                </div>
+                                <!-- Divider-->
+                                <hr class="my-4" />
+                                <%}%>
+                        </div>
                     </div>
-                </div>
-                <!-- Footer-->
-                <%-include('layouts /footer')-%>
-                    <!-- Bootstrap core JS-->
-                    <%-include('layouts /script')-%>
+                    <!-- Footer-->
+                    <%-include('layouts/footer')-%>
+                        <!-- Bootstrap core JS-->
+                        <%-include('layouts/script')-%>
     </body>
 
 </html>

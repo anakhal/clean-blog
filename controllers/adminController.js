@@ -19,16 +19,33 @@ exports.dashboard = async (req, res) => {
       type: "exercise", // Only show exercises
     };
 
+    // Hierarchical category filtering
+    const allCategories = await Category.find().lean();
     if (categoryName) {
-      const categoryDoc = await Category.findOne({ name: categoryName });
-      if (categoryDoc) query.category = categoryDoc._id;
+      const selectedCategory = allCategories.find(c => c.name === categoryName);
+
+      if (selectedCategory) {
+        const isParent = !selectedCategory.parent;
+
+        if (isParent) {
+          // It's a parent: include this parent AND all its children
+          const childIds = allCategories
+            .filter(c => c.parent && c.parent.toString() === selectedCategory._id.toString())
+            .map(c => c._id);
+
+          query.category = { $in: [selectedCategory._id, ...childIds] };
+        } else {
+          // It's a child: just filter by this category
+          query.category = selectedCategory._id;
+        }
+      }
     }
 
     const totalPosts = await BlogPost.countDocuments({
       isDeleted: { $ne: true },
     });
     const totalUsers = await User.countDocuments();
-    const categories = await Category.find().sort({ name: 1 });
+    const categories = allCategories;
 
     // Filter to show only exercises (not solutions), sorted chronologically
     const recentPosts = await BlogPost.find(query)
@@ -43,7 +60,7 @@ exports.dashboard = async (req, res) => {
       totalUsers,
       recentPosts,
       categories,
-      category: category || null,
+      category: categoryName || null,
       success: req.query.success || null,
       showAds: false,
     });
@@ -66,12 +83,29 @@ exports.managePosts = async (req, res) => {
     const categoryName = req.query.category;
     const query = { type: "exercise" };
 
+    // Hierarchical category filtering
+    const allCategories = await Category.find().lean();
     if (categoryName) {
-      const categoryDoc = await Category.findOne({ name: categoryName });
-      if (categoryDoc) query.category = categoryDoc._id;
+      const selectedCategory = allCategories.find(c => c.name === categoryName);
+
+      if (selectedCategory) {
+        const isParent = !selectedCategory.parent;
+
+        if (isParent) {
+          // It's a parent: include this parent AND all its children
+          const childIds = allCategories
+            .filter(c => c.parent && c.parent.toString() === selectedCategory._id.toString())
+            .map(c => c._id);
+
+          query.category = { $in: [selectedCategory._id, ...childIds] };
+        } else {
+          // It's a child: just filter by this category
+          query.category = selectedCategory._id;
+        }
+      }
     }
 
-    const categories = await Category.find().sort({ name: 1 });
+    const categories = allCategories;
 
     // Filter to show only exercises (not solutions), sorted chronologically
     const posts = await BlogPost.find(query)
@@ -83,7 +117,7 @@ exports.managePosts = async (req, res) => {
     res.render("admin/posts", {
       posts,
       categories,
-      category: category || null,
+      category: categoryName || null,
       success: req.query.success,
       error: req.query.error,
       timestamp: new Date().toISOString(),

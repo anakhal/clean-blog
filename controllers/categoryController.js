@@ -3,7 +3,7 @@ const Category = require('../models/Category');
 // Display all categories
 exports.index = async (req, res) => {
     try {
-        const categories = await Category.find().sort({ name: 1 });
+        const categories = await Category.find().populate('parent').sort({ name: 1 });
         res.render('admin/categories', { categories, showAds: false });
     } catch (err) {
         console.error(err);
@@ -14,8 +14,8 @@ exports.index = async (req, res) => {
 // Store a new category
 exports.store = async (req, res) => {
     try {
-        const { name } = req.body;
-        
+        const { name, parent } = req.body;
+
         if (!name || !name.trim()) {
             return res.status(400).send('Category name is required');
         }
@@ -27,7 +27,8 @@ exports.store = async (req, res) => {
         }
 
         const category = new Category({
-            name: name.trim()
+            name: name.trim(),
+            parent: parent || null
         });
 
         await category.save();

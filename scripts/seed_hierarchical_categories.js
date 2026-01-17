@@ -9,6 +9,11 @@ const hierarchy = {
         'Nombres complexes',
         'Espaces vectoriels',
         'Structures algébriques'
+    ],
+    'Analyse': [
+        'Limites et Continuité',
+        'Suites numériques',
+        'Dérivation et étude de fonctions'
     ]
 };
 
