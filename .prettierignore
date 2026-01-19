@@ -1,0 +1,10 @@
+node_modules
+*.min.js
+*.min.css
+package-lock.json
+public/assets/**
+.env
+.env.*
+# Désactiver le formatage pour EJS (cause des problèmes d'espaces)
+*.ejs
+views/**/*.ejs

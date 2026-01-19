@@ -18,15 +18,9 @@ exports.index = async (req, res) => {
       hierarchy.push(p);
     });
 
-    // 2. Handle Default Category Redirect
-    // If no category is selected, redirect to the first parent (e.g., Algèbre)
+    // 2. Handle Category Selection (Default to 'Algèbre' if none selected, but DON'T redirect)
     let categoryName = req.query.category;
-    if (!categoryName) {
-      if (hierarchy.length > 0) {
-        return res.redirect(`/?category=${encodeURIComponent(hierarchy[0].name)}`);
-      }
-    }
-
+    
     // 3. Determine Query based on selection
     const query = {
       isDeleted: { $ne: true },
@@ -34,10 +28,17 @@ exports.index = async (req, res) => {
     };
 
     let selectedCategory = null;
+    let targetCategoryName = categoryName;
 
-    if (categoryName) {
+    // If no category selected in URL, default to first parent (usually Algèbre) for content
+    // but keep URL clean for SEO (no redirect)
+    if (!targetCategoryName && hierarchy.length > 0) {
+       targetCategoryName = hierarchy[0].name; // Default content source
+    }
+
+    if (targetCategoryName) {
       // Find the selected category object
-      selectedCategory = allCategories.find(c => c.name === categoryName);
+      selectedCategory = allCategories.find(c => c.name === targetCategoryName);
 
       if (selectedCategory) {
         // Check if it's a parent category (has no parent itself, or is in our parents list)
@@ -57,7 +58,9 @@ exports.index = async (req, res) => {
         }
       } else {
         // Category name in URL doesn't exist in DB
-        query.category = null; // Will result in 0 posts
+        if (categoryName) {
+            query.category = null; // Will result in 0 posts only if user explicitly asked for bad category
+        }
       }
     }
 
@@ -69,14 +72,14 @@ exports.index = async (req, res) => {
     // SEO metadata
     const seo = {
       title: categoryName
-        ? `${categoryName} - Exercices Corrigés Bac Marocain | Mathématiques-Bac.org`
-        : "Mathématiques Bac Marocain",
+        ? `${categoryName} - Exercices Corrigés Bac & Lycée | Mathématiques-Bac.org`
+        : "Mathématiques Bac & High School Math - Exercices Corrigés",
       description: categoryName
-        ? `Exercices corrigés de ${categoryName}. Solutions détaillées.`
-        : "Exercices corrigés de mathématiques.",
+        ? `Exercices corrigés de ${categoryName}. Solutions détaillées pour le Bac et Lycée (High School).`
+        : "Exercices corrigés de mathématiques pour le Baccalauréat et le Lycée. Mathematics exercises with solutions.",
       keywords: categoryName
-        ? `${categoryName.toLowerCase()}, bac maroc, exercices`
-        : "mathématiques, bac maroc",
+        ? `${categoryName.toLowerCase()}, bac math, exercices, high school math, lycée`
+        : "mathématiques, bac math, exercices, high school math, terminale",
       canonical: categoryName
         ? `https://www.mathematiques-bac.org/?category=${encodeURIComponent(categoryName)}`
         : "https://www.mathematiques-bac.org/",
@@ -200,9 +203,9 @@ exports.show = async (req, res) => {
     const cleanBody = post.body.replace(/<[^>]*>/g, "").substring(0, 155);
 
     const seo = {
-      title: `${cleanTitle} - Exercice Corrigé Bac Marocain | Mathématiques`,
-      description: `${cleanBody}... Solution détaillée pour ${post.category?.name || "mathématiques"} - Bac Marocain`,
-      keywords: `${post.category?.name?.toLowerCase() || "mathématiques"}, exercice corrigé, bac maroc, ${cleanTitle.toLowerCase()}, solution mathématiques`,
+      title: `${cleanTitle} - Exercice Corrigé Math Bac & High School`,
+      description: `${cleanBody}... Solution détaillée pour ${post.category?.name || "mathématiques"} - Bac & Lycée / High School Math`,
+      keywords: `${post.category?.name?.toLowerCase() || "mathématiques"}, exercice corrigé, bac math, ${cleanTitle.toLowerCase()}, solution mathématiques, high school math`,
       canonical: `https://www.mathematiques-bac.org/post/${post._id}`,
       ogImage: "https://www.mathematiques-bac.org/assets/img/post-bg.jpg",
     };
@@ -243,12 +246,12 @@ exports.search = async (req, res) => {
     // SEO metadata for search page
     const seo = {
       title: searchQuery
-        ? `Résultats pour "${searchQuery}" - Mathématiques Bac Marocain`
-        : "Recherche - Mathématiques Bac Marocain",
+        ? `Résultats pour "${searchQuery}" - Mathématiques Bac & High School`
+        : "Recherche - Mathématiques Bac & High School",
       description: searchQuery
-        ? `${posts.length} résultat(s) trouvé(s) pour "${searchQuery}". Exercices corrigés de mathématiques pour le baccalauréat marocain.`
-        : "Recherchez parmi nos exercices corrigés de mathématiques pour le bac marocain.",
-      keywords: `recherche, ${searchQuery || "exercices"}, mathématiques, bac maroc`,
+        ? `${posts.length} résultat(s) trouvé(s) pour "${searchQuery}". Exercices corrigés de mathématiques pour le baccalauréat et lycée.`
+        : "Recherchez parmi nos exercices corrigés de mathématiques pour le bac et le lycée.",
+      keywords: `recherche, ${searchQuery || "exercices"}, mathématiques, bac math, high school`,
       canonical: `https://www.mathematiques-bac.org/search${searchQuery ? "?q=" + encodeURIComponent(searchQuery) : ""}`,
       ogImage: "https://www.mathematiques-bac.org/assets/img/home-bg.jpg",
     };
