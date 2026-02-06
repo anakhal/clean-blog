@@ -173,8 +173,13 @@
                                 <!-- End Editor Container -->
 
                                 <br>
-                                <div class="d-flex justify-content-between">
-                                    <button type="submit" class="btn btn-primary">Update Post</button>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="d-flex gap-2">
+                                        <button type="button" class="btn btn-success" id="openGraphGeneratorBtn">
+                                            <i class="fas fa-chart-line me-2"></i> Générer des Graphiques
+                                        </button>
+                                        <button type="submit" class="btn btn-primary">Update Post</button>
+                                    </div>
                                     <div>
                                         <a href="/admin/posts?refresh=<%= Date.now() %>"
                                             class="btn btn-secondary me-2">Cancel</a>
@@ -184,7 +189,7 @@
                                                    }">
                                                 Delete Post
                                             </a>
-                                            <% } %>
+                                        <% } %>
                                     </div>
                                 </div>
                             </form>
@@ -202,9 +207,602 @@
 
             <!-- Footer-->
             <%-include('../layouts/footer')-%>
+
+    <!-- Graph Generator Modal -->
+    <div class="modal fade" id="graphGeneratorModal" tabindex="-1" aria-labelledby="graphGeneratorModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                    <h5 class="modal-title" id="graphGeneratorModalLabel">
+                        <i class="fas fa-chart-line me-2"></i>Générateur de Graphiques
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="background: #f8f9fa;">
+                    <div class="container-fluid">
+                        <!-- Functions Input Section -->
+                        <div class="card mb-3 shadow-sm">
+                            <div class="card-header bg-primary text-white">
+                                <h6 class="mb-0"><i class="fas fa-function me-2"></i>Fonctions à tracer</h6>
+                            </div>
+                            <div class="card-body">
+                                <div id="functionsContainer">
+                                    <!-- Function 1 -->
+                                    <div class="function-group mb-3 p-3 border rounded bg-white" data-function-id="1">
+                                        <div class="row align-items-center">
+                                            <div class="col-md-4">
+                                                <label class="form-label fw-bold">Nom (légende):</label>
+                                                <input type="text" class="form-control function-name-input" 
+                                                       placeholder="Ex: f, g, h" 
+                                                       value="f"
+                                                       data-function-id="1">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label fw-bold">Fonction 1:</label>
+                                                <input type="text" class="form-control function-input" 
+                                                       placeholder="Ex: x^2 * exp(x/5)" 
+                                                       data-function-id="1">
+                                                <small class="text-muted">Utilisez: +, -, *, /, ^, exp(), sin(), cos(), tan(), log(), sqrt()</small>
+                                                <small class="text-info d-block">💡 Astuce: Pour x², vous pouvez aussi écrire x*x</small>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label class="form-label fw-bold">Tangentes en x:</label>
+                                                <input type="text" class="form-control tangent-input" 
+                                                       placeholder="Ex: 0, 1, -1" 
+                                                       data-function-id="1">
+                                            </div>
+                                            <div class="col-md-1 text-center">
+                                                <label class="form-label fw-bold d-block">&nbsp;</label>
+                                                <button type="button" class="btn btn-sm btn-outline-danger remove-function-btn" 
+                                                        data-function-id="1" style="display: none;">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-outline-primary btn-sm" id="addFunctionBtn">
+                                    <i class="fas fa-plus me-1"></i>Ajouter une fonction
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Interval Settings -->
+                        <div class="card mb-3 shadow-sm">
+                            <div class="card-header bg-info text-white">
+                                <h6 class="mb-0"><i class="fas fa-arrows-alt-h me-2"></i>Intervalle de tracé</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">De:</label>
+                                        <input type="number" class="form-control" id="intervalMin" value="-6" step="0.5">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">À:</label>
+                                        <input type="number" class="form-control" id="intervalMax" value="6" step="0.5">
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Échelle Y - Min:</label>
+                                        <input type="number" class="form-control" id="yAxisMin" value="-10" step="1">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Échelle Y - Max:</label>
+                                        <input type="number" class="form-control" id="yAxisMax" value="10" step="1">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Graph Title and Legend Settings -->
+                        <div class="card mb-3 shadow-sm">
+                            <div class="card-header bg-warning text-dark">
+                                <h6 class="mb-0"><i class="fas fa-heading me-2"></i>Titre et Légende</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Titre du graphique:</label>
+                                    <input type="text" class="form-control" id="graphTitle" 
+                                           placeholder="Ex: Graphique de la fonction" 
+                                           value="Graphique de la fonction">
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="showLegend" checked>
+                                    <label class="form-check-label fw-bold" for="showLegend">
+                                        Afficher la légende
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Generate Button -->
+                        <div class="text-center mb-3">
+                            <button type="button" class="btn btn-success btn-lg px-5" id="generateGraphBtn">
+                                <i class="fas fa-magic me-2"></i>Générer l'aperçu
+                            </button>
+                        </div>
+
+                        <!-- Graph Preview -->
+                        <div class="card shadow-sm" id="graphPreviewCard" style="display: none;">
+                            <div class="card-header bg-success text-white">
+                                <h6 class="mb-0"><i class="fas fa-eye me-2"></i>Aperçu du Graphique</h6>
+                            </div>
+                            <div class="card-body">
+                                <div id="graphContainer" style="width: 100%; height: 500px; background: white; border: 1px solid #ddd; border-radius: 8px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Fermer
+                    </button>
+                    <button type="button" class="btn btn-primary" id="insertGraphBtn" style="display: none;">
+                        <i class="fas fa-check me-2"></i>Valider et Insérer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
                 <!-- Live Preview JavaScript -->
                 <script>
                     document.addEventListener('DOMContentLoaded', function () {
+                        // --- GRAPH GENERATOR LOGIC START ---
+                        console.log('🚀 Graph Generator script loaded');
+                        
+                        let functionCounter = 1;
+                        let currentGraphData = null;
+
+                        // Check if modal element exists
+                        const modalElement = document.getElementById('graphGeneratorModal');
+                        if (!modalElement) {
+                            console.error('❌ Modal element not found!');
+                            return;
+                        }
+
+                        // Modal elements
+                        // Modal elements
+                        let modal;
+                        try {
+                            if (typeof bootstrap !== 'undefined') {
+                                modal = new bootstrap.Modal(modalElement);
+                            } else {
+                                console.error('❌ Bootstrap is not defined! Modal will not work.');
+                            }
+                        } catch (e) {
+                            console.error('❌ Error initializing modal:', e);
+                        }
+
+                        const openModalBtn = document.getElementById('openGraphGeneratorBtn');
+                        const addFunctionBtn = document.getElementById('addFunctionBtn');
+                        const generateGraphBtn = document.getElementById('generateGraphBtn');
+                        const insertGraphBtn = document.getElementById('insertGraphBtn');
+                        const functionsContainer = document.getElementById('functionsContainer');
+                        const graphPreviewCard = document.getElementById('graphPreviewCard');
+                        const graphContainer = document.getElementById('graphContainer');
+
+                        // Check if button exists
+                        if (!openModalBtn) {
+                            console.error('❌ Open button not found!');
+                            // Don't return here, let the preview logic runs even if modal is broken
+                        }
+
+                        console.log('✅ All elements found, adding event listeners');
+
+                        // Open modal
+                        openModalBtn.addEventListener('click', function (e) {
+                            console.log('🖱️ Button clicked!');
+                            e.preventDefault();
+                            e.stopPropagation();
+                            try {
+                                modal.show();
+                                console.log('✅ Modal opened');
+                            } catch (error) {
+                                console.error('❌ Error opening modal:', error);
+                            }
+                        });
+
+                        // Add new function input
+                        addFunctionBtn.addEventListener('click', function () {
+                            functionCounter++;
+                            const functionNames = ['g', 'h', 'k', 'p', 'q', 'r'];
+                            const defaultName = functionNames[functionCounter - 2] || `f${functionCounter}`;
+                            
+                            const newFunctionGroup = document.createElement('div');
+                            newFunctionGroup.className = 'function-group mb-3 p-3 border rounded bg-white';
+                            newFunctionGroup.setAttribute('data-function-id', functionCounter);
+                            newFunctionGroup.innerHTML = `
+                                <div class="row align-items-center">
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-bold">Nom (légende):</label>
+                                        <input type="text" class="form-control function-name-input" 
+                                               placeholder="Ex: f, g, h" 
+                                               value="${defaultName}"
+                                               data-function-id="${functionCounter}">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-bold">Fonction ${functionCounter}:</label>
+                                        <input type="text" class="form-control function-input" 
+                                               placeholder="Ex: sin(x)" 
+                                               data-function-id="${functionCounter}">
+                                        <small class="text-muted">Utilisez: +, -, *, /, ^, exp(), sin(), cos(), tan(), log(), sqrt()</small>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-bold">Tangentes en x:</label>
+                                        <input type="text" class="form-control tangent-input" 
+                                               placeholder="Ex: 0, 1, -1" 
+                                               data-function-id="${functionCounter}">
+                                    </div>
+                                    <div class="col-md-1 text-center">
+                                        <label class="form-label fw-bold d-block">&nbsp;</label>
+                                        <button type="button" class="btn btn-sm btn-outline-danger remove-function-btn" 
+                                                data-function-id="${functionCounter}">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                            functionsContainer.appendChild(newFunctionGroup);
+                            updateRemoveButtons();
+                        });
+
+                        // Remove function
+                        functionsContainer.addEventListener('click', function (e) {
+                            if (e.target.closest('.remove-function-btn')) {
+                                const btn = e.target.closest('.remove-function-btn');
+                                const functionId = btn.getAttribute('data-function-id');
+                                const functionGroup = document.querySelector(`.function-group[data-function-id="${functionId}"]`);
+                                if (functionGroup) {
+                                    functionGroup.remove();
+                                    updateRemoveButtons();
+                                }
+                            }
+                        });
+
+                        function updateRemoveButtons() {
+                            const functionGroups = document.querySelectorAll('.function-group');
+                            functionGroups.forEach((group, index) => {
+                                const removeBtn = group.querySelector('.remove-function-btn');
+                                if (functionGroups.length > 1) {
+                                    removeBtn.style.display = 'inline-block';
+                                } else {
+                                    removeBtn.style.display = 'none';
+                                }
+                            });
+                        }
+
+                        // Convert expression for function-plot library (keeps ^ as is)
+                        function convertExpressionForPlot(expr) {
+                            console.log('📊 Converting for plot:', expr);
+                            // function-plot uses its own parser that understands ^ natively
+                            // Just return the expression as-is, it already supports ^, sin, cos, exp, etc.
+                            return expr;
+                        }
+
+                        // Convert mathematical expression for JavaScript eval()
+                        function convertExpressionForEval(expr) {
+                            console.log('📝 Converting for eval:', expr);
+                            
+                            // Handle power operations (^) - convert to Math.pow()
+                            let prevExpr = '';
+                            while (prevExpr !== expr) {
+                                prevExpr = expr;
+                                expr = expr.replace(/([a-zA-Z_]\w*|\d+(?:\.\d+)?|\([^()]+\))\s*\^\s*([a-zA-Z_]\w*|\d+(?:\.\d+)?|\([^()]+\))/g, 'Math.pow($1, $2)');
+                            }
+                            
+                            // Replace mathematical functions with Math. prefix
+                            expr = expr.replace(/\bexp\(/g, 'Math.exp(');
+                            expr = expr.replace(/\blog\(/g, 'Math.log(');
+                            expr = expr.replace(/\bsqrt\(/g, 'Math.sqrt(');
+                            expr = expr.replace(/\bsin\(/g, 'Math.sin(');
+                            expr = expr.replace(/\bcos\(/g, 'Math.cos(');
+                            expr = expr.replace(/\btan\(/g, 'Math.tan(');
+                            expr = expr.replace(/\babs\(/g, 'Math.abs(');
+                            
+                            console.log('✅ Converted to:', expr);
+                            return expr;
+                        }
+
+                        // Evaluate function at a point
+                        function evaluateFunction(expr, xValue) {
+                            try {
+                                const x = xValue;
+                                const convertedExpr = convertExpressionForEval(expr);
+                                return eval(convertedExpr);
+                            } catch (e) {
+                                console.error('Error evaluating function:', e);
+                                return null;
+                            }
+                        }
+
+                        // Calculate derivative numerically
+                        function derivative(expr, xValue, h = 0.0001) {
+                            const f1 = evaluateFunction(expr, xValue + h);
+                            const f2 = evaluateFunction(expr, xValue - h);
+                            if (f1 === null || f2 === null) return null;
+                            return (f1 - f2) / (2 * h);
+                        }
+
+                        // Generate tangent line equation
+                        function getTangentLine(expr, x0) {
+                            const y0 = evaluateFunction(expr, x0);
+                            const slope = derivative(expr, x0);
+                            if (y0 === null || slope === null) return null;
+                            
+                            // Tangent line: y = slope * (x - x0) + y0
+                            return `${slope} * (x - ${x0}) + ${y0}`;
+                        }
+
+                        // Generate graph
+                        generateGraphBtn.addEventListener('click', function () {
+                            const intervalMin = parseFloat(document.getElementById('intervalMin').value);
+                            const intervalMax = parseFloat(document.getElementById('intervalMax').value);
+                            const yAxisMin = parseFloat(document.getElementById('yAxisMin').value);
+                            const yAxisMax = parseFloat(document.getElementById('yAxisMax').value);
+                            const graphTitle = document.getElementById('graphTitle').value.trim() || 'Graphique des fonctions';
+                            const showLegend = document.getElementById('showLegend').checked;
+
+                            if (isNaN(intervalMin) || isNaN(intervalMax) || intervalMin >= intervalMax) {
+                                alert('Veuillez entrer un intervalle X valide (min < max)');
+                                return;
+                            }
+
+                            if (isNaN(yAxisMin) || isNaN(yAxisMax) || yAxisMin >= yAxisMax) {
+                                alert('Veuillez entrer une échelle Y valide (min < max)');
+                                return;
+                            }
+
+                            // Collect all functions
+                            const functionInputs = document.querySelectorAll('.function-input');
+                            const data = [];
+                            const colors = ['#2563eb', '#dc2626', '#16a34a', '#9333ea', '#ea580c', '#0891b2'];
+                            const legendData = [];
+
+                            let hasValidFunction = false;
+
+                            functionInputs.forEach((input, index) => {
+                                const expr = input.value.trim();
+                                if (!expr) return;
+
+                                hasValidFunction = true;
+                                const functionId = input.getAttribute('data-function-id');
+                                const nameInput = document.querySelector(`.function-name-input[data-function-id="${functionId}"]`);
+                                const functionName = nameInput ? nameInput.value.trim() : `f${index + 1}`;
+                                const tangentInput = document.querySelector(`.tangent-input[data-function-id="${functionId}"]`);
+                                const tangentPoints = tangentInput.value.split(',').map(v => parseFloat(v.trim())).filter(v => !isNaN(v));
+                                const color = colors[index % colors.length];
+
+                                // Add to legend data
+                                legendData.push({
+                                    name: functionName,
+                                    expr: expr,
+                                    color: color
+                                });
+
+                                // Add main function
+                                data.push({
+                                    fn: convertExpressionForPlot(expr),
+                                    color: color,
+                                    graphType: 'polyline'
+                                });
+
+                                // Calculate and add tangent segments as native conditional functions
+                                tangentPoints.forEach(x0 => {
+                                    const y0 = evaluateFunction(expr, x0);
+                                    const slope = derivative(expr, x0);
+                                    
+                                    if (y0 !== null && slope !== null) {
+                                        const tangentLength = 2; // Total length of segment logic
+                                        const halfLength = tangentLength / 2;
+                                        const xStart = x0 - halfLength;
+                                        const xEnd = x0 + halfLength;
+                                        const yIntercept = y0 - slope * x0;
+                                        
+                                        // Conditional function: (x >= start && x <= end) ? line : 0/0
+                                        // "builtIn" sampler handles this perfectly without trying to join gaps
+                                        // We use 0/0 instead of NaN because the parser might not recognize "NaN" symbol
+                                        const fnString = `(x >= ${xStart} && x <= ${xEnd}) ? (${slope} * x + (${yIntercept})) : (0/0)`;
+                                        
+                                        data.push({
+                                            fn: fnString,
+                                            fnType: 'linear',
+                                            graphType: 'polyline',
+                                            color: color,
+                                            attr: { 
+                                                "stroke-width": 2,
+                                                "stroke-dasharray": "5,5"
+                                            },
+                                            sampler: 'builtIn', // Important: avoid interval arithmetic
+                                            nSamples: 100
+                                        });
+                                    }
+                                });
+                            });
+
+                            if (!hasValidFunction) {
+                                alert('Veuillez entrer au moins une fonction');
+                                return;
+                            }
+
+                            // Clear previous graph
+                            graphContainer.innerHTML = '';
+                            try {
+                                // Render graph
+                                const instance = functionPlot({
+                                    target: '#graphContainer',
+                                    width: graphContainer.offsetWidth,
+                                    height: 500,
+                                    xAxis: { domain: [intervalMin, intervalMax] },
+                                    yAxis: { domain: [yAxisMin, yAxisMax] },
+                                    grid: true,
+                                    data: data
+                                });
+
+                                // Add legend if enabled
+                                if (showLegend && legendData.length > 0) {
+                                    const legendContainer = document.createElement('div');
+                                    legendContainer.style.cssText = 'position: absolute; right: 20px; top: 20px; width: 200px; padding: 15px; background: white; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);';
+                                    legendContainer.innerHTML = `
+                                        <strong style="display: block; margin-bottom: 10px; font-size: 14px;">Légende:</strong>
+                                        ${legendData.map(item => `
+                                            <div style="margin: 8px 0; font-size: 13px;">
+                                                <span style="display: inline-block; width: 25px; height: 3px; background: ${item.color}; vertical-align: middle; margin-right: 8px;"></span>
+                                                <strong>${item.name}(x)</strong> = ${item.expr}
+                                            </div>
+                                        `).join('')}
+                                    `;
+                                    graphContainer.style.position = 'relative';
+                                    graphContainer.appendChild(legendContainer);
+                                }
+                                
+                                // Add title at bottom
+                                const titleElement = document.createElement('li');
+                                titleElement.textContent = graphTitle;
+                                titleElement.style.cssText = 'text-align: center; margin-top: 15px; color: #333; font-size: 18px;';
+                                graphContainer.parentElement.appendChild(titleElement);
+
+                                // Store graph data for insertion
+                                currentGraphData = {
+                                    functions: Array.from(functionInputs).map(input => input.value.trim()).filter(v => v),
+                                    functionNames: Array.from(document.querySelectorAll('.function-name-input')).map(input => input.value.trim()),
+                                    interval: [intervalMin, intervalMax],
+                                    yAxis: [yAxisMin, yAxisMax],
+                                    title: graphTitle,
+                                    showLegend: showLegend,
+                                    tangents: Array.from(document.querySelectorAll('.tangent-input')).map(input => input.value.trim()),
+                                    legendData: legendData
+                                };
+
+                                // Show preview and insert button
+                                graphPreviewCard.style.display = 'block';
+                                insertGraphBtn.style.display = 'inline-block';
+
+                                console.log('✅ Graph generated successfully');
+                            } catch (error) {
+                                console.error('❌ Error rendering graph:', error);
+                                alert('Erreur lors du rendu du graphique. Vérifiez vos fonctions.');
+                            }
+                        });
+
+                        // Insert graph into editor
+                        insertGraphBtn.addEventListener('click', function () {
+                            if (!currentGraphData) return;
+
+                            const graphId = 'graph-' + Date.now();
+                            const colors = ['#2563eb', '#dc2626', '#16a34a', '#9333ea', '#ea580c', '#0891b2'];
+                            
+                            // Rebuild complete data array with only functions (no tangents in data)
+                            const allGraphData = [];
+                            
+                            currentGraphData.functions.forEach((fn, idx) => {
+                                const color = colors[idx % 6];
+                                
+                                // Add main function
+                                allGraphData.push({
+                                    fn: convertExpressionForPlot(fn),
+                                    color: color,
+                                    graphType: 'polyline'
+                                });
+                                
+                                // Calculate and add tangent segments as native conditional functions for the inserted graph
+                                const tangentsStr = currentGraphData.tangents[idx];
+                                if (tangentsStr) {
+                                    const tangentPoints = tangentsStr.split(',').map(v => parseFloat(v.trim())).filter(v => !isNaN(v));
+                                    tangentPoints.forEach(x0 => {
+                                        const y0 = evaluateFunction(fn, x0);
+                                        const slope = derivative(fn, x0);
+                                        
+                                        if (y0 !== null && slope !== null) {
+                                            const tangentLength = 2; // Fixed length for consistency
+                                            const halfLength = tangentLength / 2;
+                                            const xStart = x0 - halfLength;
+                                            const xEnd = x0 + halfLength;
+                                            const yIntercept = y0 - slope * x0;
+                                            
+                                            // Conditional function string: (x >= start && x <= end) ? line : 0/0
+                                            const fnString = `(x >= ${xStart} && x <= ${xEnd}) ? (${slope} * x + (${yIntercept})) : (0/0)`;
+                                            
+                                            allGraphData.push({
+                                                fn: fnString,
+                                                fnType: 'linear',
+                                                graphType: 'polyline',
+                                                color: color,
+                                                attr: { 
+                                                    "stroke-width": 2,
+                                                    "stroke-dasharray": "5,5"
+                                                },
+                                                sampler: 'builtIn',
+                                                nSamples: 100
+                                            });
+                                        }
+                                    });
+                                }
+                            });
+                            
+                            // Create legend HTML if enabled
+                            const legendHTML = currentGraphData.showLegend && currentGraphData.legendData ? `
+                <div style="flex: 0 0 200px; padding: 20px; background: white; border: 1px solid #ddd; border-radius: 5px;">
+                    <strong style="display: block; margin-bottom: 10px; font-size: 16px;">Légende:</strong>
+                    ${currentGraphData.legendData.map(item => `
+                        <div style="margin: 8px 0; font-size: 14px;">
+                            <span style="display: inline-block; width: 25px; height: 3px; background: ${item.color}; vertical-align: middle; margin-right: 8px;"></span>
+                            <strong>${item.name}(x)</strong> = ${item.expr}
+                        </div>
+                    `).join('')}
+                </div>` : '';
+
+                            // Create HTML for the graph with legend on the right
+                            const graphHTML = `
+<div class="graph-container" style="margin: 20px 0; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+    <div style="display: flex; gap: 20px; align-items: flex-start;">
+        <div style="flex: 1;">
+            <div id="${graphId}" style="width: 100%; height: 400px;"></div>
+            <li style="text-align: center; margin-top: 15px; color: #333; font-size: 18px;">${currentGraphData.title}</li>
+        </div>
+        ${legendHTML}
+    </div>
+    <script>
+        (function() {
+            const data = ${JSON.stringify(allGraphData)};
+            
+            if (typeof functionPlot !== 'undefined') {
+                const instance = functionPlot({
+                    target: '#${graphId}',
+                    width: ${legendHTML ? '600' : '800'},
+                    height: 400,
+                    xAxis: { domain: [${currentGraphData.interval[0]}, ${currentGraphData.interval[1]}] },
+                    yAxis: { domain: [${currentGraphData.yAxis[0]}, ${currentGraphData.yAxis[1]}] },
+                    grid: true,
+                    data: data
+                });
+            } else {
+                document.getElementById('${graphId}').innerHTML = '<p class="text-danger">Erreur: bibliothèque function-plot non chargée</p>';
+            }
+        })();
+    <\/script>
+</div>
+`;
+
+                            // Insert into the body textarea
+                            const bodyTextarea = document.getElementById('body');
+                            const cursorPos = bodyTextarea.selectionStart;
+                            const textBefore = bodyTextarea.value.substring(0, cursorPos);
+                            const textAfter = bodyTextarea.value.substring(cursorPos);
+                            bodyTextarea.value = textBefore + graphHTML + textAfter;
+
+                            // Trigger preview update
+                            bodyTextarea.dispatchEvent(new Event('input'));
+
+                            // Close modal
+                            modal.hide();
+
+                            // Show success message
+                            alert('Graphique inséré avec succès!');
+                        });
+                        // --- GRAPH GENERATOR LOGIC END ---
+
                         const titleInput = document.getElementById('title');
                         const bodyTextarea = document.getElementById('body');
                         const previewTitle = document.getElementById('preview-title');
@@ -227,38 +825,51 @@
                             };
                         }
 
+                        // Helper to execute scripts in the preview container
+                        function executeScripts(container) {
+                            const scripts = container.querySelectorAll('script');
+                            scripts.forEach(oldScript => {
+                                const newScript = document.createElement('script');
+                                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                                newScript.textContent = oldScript.textContent;
+                                try {
+                                    oldScript.parentNode.replaceChild(newScript, oldScript);
+                                } catch (e) {
+                                    console.error('Error executing script in preview:', e);
+                                }
+                            });
+                        }
+
                         function updatePreview() {
                             const titleValue = titleInput.value.trim();
                             previewTitle.textContent = titleValue || 'Your Post Title';
 
                             const bodyValue = bodyTextarea.value.trim();
+                            
+                            // 1. Update HTML content
                             if (bodyValue) {
                                 previewBody.innerHTML = bodyValue;
-
-                                if (isMathJaxReady()) {
-                                    MathJax.typesetPromise([previewBody]).then(() => {
-                                        console.log('✅ MathJax rendered successfully in preview');
-                                    }).catch(function (err) {
-                                        console.error('❌ MathJax rendering error:', err);
-                                    });
-                                } else {
-                                    console.warn('⚠️ MathJax not ready yet, will retry...');
-                                    setTimeout(() => {
-                                        if (isMathJaxReady()) {
-                                            MathJax.typesetPromise([previewBody]).catch(err => {
-                                                console.error('❌ MathJax rendering error on retry:', err);
-                                            });
-                                        } else {
-                                            console.error('❌ MathJax failed to load');
-                                        }
-                                    }, 500);
-                                }
+                                
+                                // 2. Execute scripts (for graphs)
+                                executeScripts(previewBody);
                             } else {
                                 previewBody.innerHTML = '<em>Start typing to see your content preview...</em>';
                             }
+
+                            // 3. Render MathJax
+                            if (isMathJaxReady()) {
+                                // Typeset both title and body
+                                MathJax.typesetPromise([previewTitle, previewBody]).then(() => {
+                                    console.log('✅ MathJax rendered successfully in preview');
+                                }).catch(function (err) {
+                                    console.error('❌ MathJax rendering error:', err);
+                                });
+                            } else {
+                                console.warn('⚠️ MathJax not ready yet (will retry)...');
+                            }
                         }
 
-                        const debouncedUpdate = debounce(updatePreview, 300);
+                        const debouncedUpdate = debounce(updatePreview, 500); // Increased debounce to 500ms
                         titleInput.addEventListener('input', debouncedUpdate);
                         bodyTextarea.addEventListener('input', debouncedUpdate);
 
@@ -276,6 +887,11 @@
                         initializePreview();
                     });
                 </script>
+    <!-- Footer-->
+    <%-include('../layouts/footer')-%>
+    
+    <!-- Scripts -->
+    <%-include('../layouts/script')-%>
     </body>
 
 </html>
