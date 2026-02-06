@@ -120,7 +120,11 @@
                 });
         </script>
         <script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js" id="MathJax-script" async></script>
-        <script src="https://unpkg.com/function-plot/dist/function-plot.js"></script>
+        
+        <!-- ✅ FIX: Using jsDelivr which is allowed by your CSP -->
+        <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+        <script src="https://cdn.jsdelivr.net/npm/function-plot@1.24.0/dist/function-plot.js"></script>
+
         <% if (isProduction && umami && umami.src && umami.websiteId) { %>
         <script defer src="<%= umami.src %>" data-website-id="<%= umami.websiteId %>"></script>
         <% } else { %>
