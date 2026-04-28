@@ -19,7 +19,7 @@ const UMAMI_SRC = process.env.UMAMI_SRC || "";
 const UMAMI_WEBSITE_ID = process.env.UMAMI_WEBSITE_ID || "";
 // 🔒 Redirect middleware (place this FIRST)
 app.use((req, res, next) => {
-    if (req.headers.host === "mathematiques-bac.org") {
+    if (isProduction && req.headers.host === "mathematiques-bac.org") {
         // Only redirect if it's a valid relative path (prevents open redirect attacks)
         if (req.url.startsWith("/") && !req.url.startsWith("//")) {
             return res.redirect(
@@ -194,6 +194,7 @@ app.use(
             directives: cspDirectives,
         },
         crossOriginEmbedderPolicy: false,
+        strictTransportSecurity: isProduction,
     }),
 );
 
@@ -224,10 +225,10 @@ app.use((req, res, next) => {
     // Set proper headers for SEO
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('X-Frame-Options', 'SAMEORIGIN');
-    
+
     // Don't set X-Robots-Tag on main content pages
-    if (!req.path.includes('/admin') && 
-        !req.path.includes('/users') && 
+    if (!req.path.includes('/admin') &&
+        !req.path.includes('/users') &&
         !req.path.includes('/login') &&
         !req.path.includes('/register')) {
         // Allow indexing on public pages
@@ -236,7 +237,7 @@ app.use((req, res, next) => {
         // Block indexing on private/admin pages
         res.setHeader('X-Robots-Tag', 'noindex, nofollow');
     }
-    
+
     next();
 });
 

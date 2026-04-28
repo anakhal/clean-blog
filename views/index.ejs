@@ -127,6 +127,30 @@
             color: white;
         }
 
+        /* Prépas - Purple */
+        .btn-prepas {
+            background-color: #7c3aed;
+            border-color: #7c3aed;
+            color: white;
+        }
+
+        .btn-prepas:hover {
+            background-color: #6d28d9;
+            border-color: #6d28d9;
+            color: white;
+        }
+
+        .btn-outline-prepas {
+            background-color: white;
+            border: 2px solid #7c3aed;
+            color: #7c3aed;
+        }
+
+        .btn-outline-prepas:hover {
+            background-color: #7c3aed;
+            color: white;
+        }
+
         .parent-btn,
         .child-btn,
         .child-btn-outline {
@@ -155,6 +179,36 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
         }
 
+        /* Site heading typography override */
+        header.masthead .site-heading h1 {
+            font-size: 2.4rem !important;
+            font-weight: 800;
+            line-height: 1.15;
+            letter-spacing: -0.5px;
+        }
+
+        header.masthead .site-heading h1 .title-sub {
+            display: block;
+            font-size: 0.85em;
+            font-weight: 300;
+            opacity: 0.92;
+            letter-spacing: 1px;
+        }
+
+        header.masthead .site-heading .subheading {
+            font-size: 1rem !important;
+            font-weight: 400;
+            opacity: 0.80;
+            margin-top: 0.75rem;
+            letter-spacing: 0.3px;
+        }
+
+        @media (min-width: 992px) {
+            header.masthead .site-heading h1 {
+                font-size: 3rem !important;
+            }
+        }
+
         /* Masthead colors per category */
         header.masthead.masthead-algebre {
             background: linear-gradient(to bottom, rgba(0, 133, 161, 0.8), rgba(0, 109, 133, 0.9)), url('/assets/img/home-bg.jpg') !important;
@@ -179,6 +233,14 @@
             background-attachment: scroll !important;
             background-size: cover !important;
         }
+
+        header.masthead.masthead-prepas {
+            background: linear-gradient(to bottom, rgba(124, 58, 237, 0.8), rgba(109, 40, 217, 0.9)), url('/assets/img/home-bg.jpg') !important;
+            background-position: center !important;
+            background-repeat: no-repeat !important;
+            background-attachment: scroll !important;
+            background-size: cover !important;
+        }
     </style>
 
     <body>
@@ -197,6 +259,7 @@
                 if (selectedParent) {
                 if (selectedParent.name === 'Analyse') colorClass = 'analyse';
                 else if (selectedParent.name === 'Olympiades de mathématiques') colorClass = 'olympiades';
+                else if (selectedParent.name === 'Prépas') colorClass = 'prepas';
                 }
                 }
                 %>
@@ -206,8 +269,8 @@
                         <div class="row gx-4 gx-lg-5 justify-content-center">
                             <div class="col-md-10 col-lg-8 col-xl-7">
                                 <div class="site-heading">
-                                    <h1>Mathematiques- Bac Marocain</h1>
-                                    <span class="subheading">Mathematics at High school</span>
+                                    <h1>Mathématiques<span class="title-sub">Du Bac aux Prépas</span></h1>
+                                    <span class="subheading">Exercices &amp; ressources · Bac Marocain &amp; Classes Préparatoires</span>
                                 </div>
                             </div>
                         </div>
@@ -241,13 +304,15 @@
                                         <% } else { %>
                                             <% if (typeof hierarchy !=='undefined' && hierarchy.length> 0) { %>
                                                 <div class="d-flex flex-wrap gap-3 justify-content-center">
-                                                    <a href="/?category=Algèbre"
-                                                        class="btn btn-lg parent-btn btn-algebre">Algèbre</a>
-                                                    <a href="/?category=Analyse"
-                                                        class="btn btn-lg parent-btn btn-analyse">Analyse</a>
-                                                    <a href="/?category=Olympiades de mathématiques"
-                                                        class="btn btn-lg parent-btn btn-olympiades">Olympiades</a>
-                                                </div>
+                                                     <a href="/?category=Algèbre"
+                                                         class="btn btn-lg parent-btn btn-algebre">Algèbre</a>
+                                                     <a href="/?category=Analyse"
+                                                         class="btn btn-lg parent-btn btn-analyse">Analyse</a>
+                                                     <a href="/?category=Olympiades de mathématiques"
+                                                         class="btn btn-lg parent-btn btn-olympiades">Olympiades</a>
+                                                     <a href="/?category=Prépas"
+                                                         class="btn btn-lg parent-btn btn-prepas">Prépas</a>
+                                                 </div>
                                                 <% } else { %>
                                                     <div class="alert alert-warning">No categories found.</div>
                                                     <% } %>
