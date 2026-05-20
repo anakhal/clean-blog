@@ -107,45 +107,39 @@
                                         </div>
                                         <div class="card-body p-4 bg-light" id="filters">
                                                  <%
-                                            var selectedParent = null;
-                                            var defaultCategory = 'Algèbre';
-                                            var activeCategory = category || defaultCategory;
-                                            var algebre = null;
-                                            var analyse = null;
-                                            var children = [];
-                                            
-                                            for (var i = 0; i < categories.length; i++) {
-                                                if (categories[i].name === 'Algèbre' && !categories[i].parent) {
-                                                    algebre = categories[i];
-                                                }
-                                                if (categories[i].name === 'Analyse' && !categories[i].parent) {
-                                                    analyse = categories[i];
-                                                }
-                                            }
-                                            
-                                            if (activeCategory === 'Algèbre') {
-                                                selectedParent = algebre;
-                                            } else if (activeCategory === 'Analyse') {
-                                                selectedParent = analyse;
-                                            } else {
-                                                for (var i = 0; i < categories.length; i++) {
-                                                    if (!categories[i].parent) {
-                                                        for (var j = 0; j < categories.length; j++) {
-                                                            if (categories[j].parent && 
-                                                                categories[j].parent.toString() === categories[i]._id.toString() && 
-                                                                categories[j].name === activeCategory) {
-                                                                selectedParent = categories[i];
-                                                                break;
-                                                            }
-                                                        }
-                                                        if (selectedParent) break;
-                                                    }
-                                                }
-                                            }
-                                            
-                                            if (!selectedParent) {
-                                                selectedParent = algebre;
-                                            }
+                                             var parentCategories = [];
+                                             var selectedParent = null;
+                                             var children = [];
+
+                                             for (var i = 0; i < categories.length; i++) {
+                                                 if (!categories[i].parent) parentCategories.push(categories[i]);
+                                             }
+
+                                             var activeCategory = category || (parentCategories.length > 0 ? parentCategories[0].name : null);
+                                             
+                                             // Find selected parent — by direct name match or via child
+                                             for (var i = 0; i < parentCategories.length; i++) {
+                                                 if (parentCategories[i].name === activeCategory) {
+                                                     selectedParent = parentCategories[i];
+                                                     break;
+                                                 }
+                                             }
+                                             if (!selectedParent) {
+                                                 for (var i = 0; i < categories.length; i++) {
+                                                     if (categories[i].name === activeCategory && categories[i].parent) {
+                                                         for (var j = 0; j < parentCategories.length; j++) {
+                                                             if (parentCategories[j]._id.toString() === categories[i].parent.toString()) {
+                                                                 selectedParent = parentCategories[j];
+                                                                 break;
+                                                             }
+                                                         }
+                                                         break;
+                                                     }
+                                                 }
+                                             }
+                                             if (!selectedParent && parentCategories.length > 0) {
+                                                 selectedParent = parentCategories[0];
+                                             }
                                             
                                             if (selectedParent) {
                                                 for (var i = 0; i < categories.length; i++) {
@@ -159,17 +153,15 @@
                                             
                                             <h5 class="text-center mb-3 text-muted">Filtrer par catégorie</h5>
                                             
-                                            <div class="d-flex gap-3 justify-content-center mb-3">
-                                                <a href="/admin/dashboard?category=Algèbre#filters"
-                                                   class="btn btn-lg <%= selectedParent && selectedParent.name === 'Algèbre' ? 'btn-primary' : 'btn-outline-primary' %>"
-                                                   style="min-width: 150px; font-weight: 700;">
-                                                    ALGÈBRE                                                    </a>
-                                                <a href="/admin/dashboard?category=Analyse#filters"
-                                                   class="btn btn-lg <%= selectedParent && selectedParent.name === 'Analyse' ? 'btn-success' : 'btn-outline-success' %>"
-                                                   style="min-width: 150px; font-weight: 700;">
-                                                    ANALYSE
-                                                </a>
-                                            </div>
+                                            <div class="d-flex flex-wrap gap-3 justify-content-center mb-3">
+                                                 <% for (var p = 0; p < parentCategories.length; p++) { %>
+                                                     <a href="/admin/dashboard?category=<%= parentCategories[p].name %>#filters"
+                                                        class="btn btn-lg <%= selectedParent && selectedParent._id.toString() === parentCategories[p]._id.toString() ? 'btn-primary' : 'btn-outline-primary' %>"
+                                                        style="min-width: 130px; font-weight: 700;">
+                                                         <%= parentCategories[p].name.toUpperCase() %>
+                                                     </a>
+                                                 <% } %>
+                                             </div>
 
                                                 <% if (children && children.length> 0) { %>
                                                     <div class="d-flex flex-wrap gap-2 justify-content-center">
