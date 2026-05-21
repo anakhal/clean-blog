@@ -12,11 +12,7 @@ const port = process.env.PORT || 4000;
 const mongoose = require("mongoose");
 const winston = require("winston");
 const morgan = require("morgan");
-// Expose Umami configuration to templates via app.locals
-// Set these env vars on Railway: UMAMI_SRC (full URL to script.js) and UMAMI_WEBSITE_ID
-// Example UMAMI_SRC=https://umami.example.com/script.js
-const UMAMI_SRC = process.env.UMAMI_SRC || "";
-const UMAMI_WEBSITE_ID = process.env.UMAMI_WEBSITE_ID || "";
+
 // 🔒 Redirect middleware (place this FIRST)
 app.use((req, res, next) => {
     if (isProduction && req.headers.host === "mathematiques-bac.org") {
@@ -102,7 +98,6 @@ app.use(compression());
 app.use(morgan(isProduction ? "combined" : "dev"));
 
 // Security middleware - Helmet
-// Build CSP directives and include Umami origin if provided
 const cspDirectives = {
     defaultSrc: ["'self'"],
     styleSrc: [
@@ -175,18 +170,6 @@ const cspDirectives = {
     childSrc: ["'self'", "blob:", "https://www.google.com", "https://www.recaptcha.net"],
 };
 
-if (UMAMI_SRC) {
-    try {
-        const umamiUrl = new URL(UMAMI_SRC);
-        const umamiOrigin = umamiUrl.origin;
-        // Allow loading the script and making connections to the Umami origin
-        cspDirectives.scriptSrc.push(umamiOrigin);
-        cspDirectives.scriptSrcElem.push(umamiOrigin);
-        cspDirectives.connectSrc.push(umamiOrigin);
-    } catch (e) {
-        console.warn('Invalid UMAMI_SRC, skipping CSP addition:', UMAMI_SRC);
-    }
-}
 
 app.use(
     helmet({
@@ -296,11 +279,7 @@ app.use((req, res, next) => {
 app.set("view engine", "ejs");
 app.set("trust proxy", 1);
 
-// Make Umami config and environment flag available to all templates
-app.locals.umami = {
-    src: UMAMI_SRC,
-    websiteId: UMAMI_WEBSITE_ID,
-};
+// Make environment flag available to all templates
 app.locals.isProduction = isProduction;
 
 // Routes

@@ -124,9 +124,5 @@
         <!-- D3.js and function-plot are now loaded only on pages that need them (create/edit) -->
         <!-- This reduces memory usage and prevents MongoDB timeouts on Railway -->
 
-        <% if (isProduction && umami && umami.src && umami.websiteId) { %>
-        <script defer src="<%= umami.src %>" data-website-id="<%= umami.websiteId %>"></script>
-        <% } else { %>
-        <!-- Umami not loaded: set UMAMI_SRC and UMAMI_WEBSITE_ID in Railway for production tracking -->
-        <% } %>
+
 </head>
