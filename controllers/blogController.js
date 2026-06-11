@@ -7,16 +7,16 @@ exports.index = async (req, res) => {
     // 1. Fetch all categories and build hierarchy
     const allCategories = await Category.find().sort({ name: 1 }).lean();
 
-    // Group into hierarchy: Parent -> Children
-    const hierarchy = [];
-    const parents = allCategories.filter(c => !c.parent);
-    const children = allCategories.filter(c => c.parent);
-
-    parents.forEach(p => {
-      // Attach children array to parent object
-      p.children = children.filter(c => c.parent && c.parent.toString() === p._id.toString());
-      hierarchy.push(p);
-    });
+    // Build hierarchy recursively
+    const buildHierarchy = (parentId) => {
+      return allCategories
+        .filter(c => (parentId ? (c.parent && c.parent.toString() === parentId.toString()) : !c.parent))
+        .map(c => ({
+          ...c,
+          children: buildHierarchy(c._id)
+        }));
+    };
+    const hierarchy = buildHierarchy(null);
 
     // 2. Handle Category Selection (Default to 'Algèbre' if none selected, but DON'T redirect)
     let categoryName = req.query.category;
@@ -41,21 +41,21 @@ exports.index = async (req, res) => {
       selectedCategory = allCategories.find(c => c.name === targetCategoryName);
 
       if (selectedCategory) {
-        // Check if it's a parent category (has no parent itself, or is in our parents list)
-        const isParent = !selectedCategory.parent;
+        // Recursive function to get all descendant IDs
+        const getDescendantIds = (categoryId) => {
+            let ids = [];
+            const children = allCategories.filter(c => c.parent && c.parent.toString() === categoryId.toString());
+            for (const child of children) {
+                ids.push(child._id);
+                ids = ids.concat(getDescendantIds(child._id));
+            }
+            return ids;
+        };
 
-        if (isParent) {
-          // It's a parent: fetch posts for this parent AND all its children
-          const childIds = allCategories
-            .filter(c => c.parent && c.parent.toString() === selectedCategory._id.toString())
-            .map(c => c._id);
-
-          // Query: category IN [this_parent_id, ...all_child_ids]
-          query.category = { $in: [selectedCategory._id, ...childIds] };
-        } else {
-          // It's a child: fetch posts for just this category
-          query.category = selectedCategory._id;
-        }
+        const descendantIds = getDescendantIds(selectedCategory._id);
+        
+        // Query: category IN [this_category_id, ...all_descendant_ids]
+        query.category = { $in: [selectedCategory._id, ...descendantIds] };
       } else {
         // Category name in URL doesn't exist in DB
         if (categoryName) {

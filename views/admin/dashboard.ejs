@@ -107,72 +107,81 @@
                                         </div>
                                         <div class="card-body p-4 bg-light" id="filters">
                                                  <%
-                                             var parentCategories = [];
-                                             var selectedParent = null;
-                                             var children = [];
-
-                                             for (var i = 0; i < categories.length; i++) {
-                                                 if (!categories[i].parent) parentCategories.push(categories[i]);
+                                             function buildHierarchy(parentId) {
+                                                 return categories
+                                                 .filter(c => (parentId ? (c.parent && c.parent.toString() === parentId.toString()) : !c.parent))
+                                                 .map(c => ({
+                                                     ...c,
+                                                     children: buildHierarchy(c._id)
+                                                 }));
                                              }
+                                             const hierarchy = buildHierarchy(null);
+                                             let activeCategoryName = category || (hierarchy.length > 0 ? hierarchy[0].name : null);
 
-                                             var activeCategory = category || (parentCategories.length > 0 ? parentCategories[0].name : null);
-                                             
-                                             // Find selected parent — by direct name match or via child
-                                             for (var i = 0; i < parentCategories.length; i++) {
-                                                 if (parentCategories[i].name === activeCategory) {
-                                                     selectedParent = parentCategories[i];
-                                                     break;
-                                                 }
-                                             }
-                                             if (!selectedParent) {
-                                                 for (var i = 0; i < categories.length; i++) {
-                                                     if (categories[i].name === activeCategory && categories[i].parent) {
-                                                         for (var j = 0; j < parentCategories.length; j++) {
-                                                             if (parentCategories[j]._id.toString() === categories[i].parent.toString()) {
-                                                                 selectedParent = parentCategories[j];
-                                                                 break;
-                                                             }
-                                                         }
-                                                         break;
+                                             function findNode(nodes, name) {
+                                                 for (let n of nodes) {
+                                                     if (n.name === name) return n;
+                                                     if (n.children && n.children.length > 0) {
+                                                         let found = findNode(n.children, name);
+                                                         if (found) return found;
                                                      }
                                                  }
+                                                 return null;
                                              }
-                                             if (!selectedParent && parentCategories.length > 0) {
-                                                 selectedParent = parentCategories[0];
+
+                                             function getAncestors(nodes, targetName, currentPath = []) {
+                                                 for (let n of nodes) {
+                                                     if (n.name === targetName) return currentPath;
+                                                     if (n.children && n.children.length > 0) {
+                                                         let path = getAncestors(n.children, targetName, [...currentPath, n]);
+                                                         if (path) return path;
+                                                     }
+                                                 }
+                                                 return null;
                                              }
-                                            
-                                            if (selectedParent) {
-                                                for (var i = 0; i < categories.length; i++) {
-                                                    if (categories[i].parent && 
-                                                        categories[i].parent.toString() === selectedParent._id.toString()) {
-                                                        children.push(categories[i]);
-                                                    }
-                                                }
-                                            }
-                                            %>
-                                            
-                                            <h5 class="text-center mb-3 text-muted">Filtrer par catégorie</h5>
-                                            
-                                            <div class="d-flex flex-wrap gap-3 justify-content-center mb-3">
-                                                 <% for (var p = 0; p < parentCategories.length; p++) { %>
-                                                     <a href="/admin/dashboard?category=<%= parentCategories[p].name %>#filters"
-                                                        class="btn btn-lg <%= selectedParent && selectedParent._id.toString() === parentCategories[p]._id.toString() ? 'btn-primary' : 'btn-outline-primary' %>"
+
+                                             let activeNode = findNode(hierarchy, activeCategoryName);
+                                             let ancestors = getAncestors(hierarchy, activeCategoryName) || [];
+                                             let activeBranch = [...ancestors, activeNode].filter(Boolean);
+
+                                             let topLevel = hierarchy;
+                                             let secondLevel = activeBranch.length > 0 && activeBranch[0].children ? activeBranch[0].children : [];
+                                             let thirdLevel = activeBranch.length > 1 && activeBranch[1].children ? activeBranch[1].children : [];
+                                             %>
+                                             
+                                             <h5 class="text-center mb-3 text-muted">Filtrer par catégorie</h5>
+                                             
+                                             <div class="d-flex flex-wrap gap-3 justify-content-center mb-3">
+                                                 <% for (var p = 0; p < topLevel.length; p++) { %>
+                                                     <a href="/admin/dashboard?category=<%= topLevel[p].name %>#filters"
+                                                        class="btn btn-lg <%= activeBranch[0] && activeBranch[0].name === topLevel[p].name ? 'btn-primary' : 'btn-outline-primary' %>"
                                                         style="min-width: 130px; font-weight: 700;">
-                                                         <%= parentCategories[p].name.toUpperCase() %>
+                                                         <%= topLevel[p].name.toUpperCase() %>
                                                      </a>
                                                  <% } %>
                                              </div>
 
-                                                <% if (children && children.length> 0) { %>
-                                                    <div class="d-flex flex-wrap gap-2 justify-content-center">
-                                                        <% for (var i=0; i < children.length; i++) { %>
-                                                            <a href="/admin/dashboard?category=<%= children[i].name %>#filters"
-                                                                class="btn btn-sm <%= activeCategory === children[i].name ? 'btn-secondary' : 'btn-outline-secondary' %>">
-                                                                <%= children[i].name %>
-                                                            </a>
-                                                            <% } %>
-                                                    </div>
-                                                    <% } %>
+                                             <% if (secondLevel.length > 0) { %>
+                                                 <div class="d-flex flex-wrap gap-2 justify-content-center mb-3">
+                                                     <% for (var i=0; i < secondLevel.length; i++) { %>
+                                                         <a href="/admin/dashboard?category=<%= secondLevel[i].name %>#filters"
+                                                             class="btn btn-sm <%= activeBranch[1] && activeBranch[1].name === secondLevel[i].name ? 'btn-secondary' : 'btn-outline-secondary' %>">
+                                                             <%= secondLevel[i].name %>
+                                                         </a>
+                                                     <% } %>
+                                                 </div>
+                                             <% } %>
+
+                                             <% if (thirdLevel.length > 0) { %>
+                                                 <div class="d-flex flex-wrap gap-2 justify-content-center mb-3">
+                                                     <% for (var i=0; i < thirdLevel.length; i++) { %>
+                                                         <a href="/admin/dashboard?category=<%= thirdLevel[i].name %>#filters"
+                                                             class="btn btn-sm <%= activeBranch[2] && activeBranch[2].name === thirdLevel[i].name ? 'btn-info text-white' : 'btn-outline-info' %>">
+                                                             <%= thirdLevel[i].name %>
+                                                         </a>
+                                                     <% } %>
+                                                 </div>
+                                             <% } %>
                                                         <div class="card-body">
                                                             <% if (recentPosts.length> 0) { %>
                                                                 <div class="table-responsive"

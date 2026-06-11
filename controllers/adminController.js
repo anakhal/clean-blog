@@ -25,19 +25,20 @@ exports.dashboard = async (req, res) => {
       const selectedCategory = allCategories.find(c => c.name === categoryName);
 
       if (selectedCategory) {
-        const isParent = !selectedCategory.parent;
+        // Recursive function to get all descendant IDs
+        const getDescendantIds = (categoryId) => {
+            let ids = [];
+            const children = allCategories.filter(c => c.parent && c.parent.toString() === categoryId.toString());
+            for (const child of children) {
+                ids.push(child._id);
+                ids = ids.concat(getDescendantIds(child._id));
+            }
+            return ids;
+        };
 
-        if (isParent) {
-          // It's a parent: include this parent AND all its children
-          const childIds = allCategories
-            .filter(c => c.parent && c.parent.toString() === selectedCategory._id.toString())
-            .map(c => c._id);
-
-          query.category = { $in: [selectedCategory._id, ...childIds] };
-        } else {
-          // It's a child: just filter by this category
-          query.category = selectedCategory._id;
-        }
+        const descendantIds = getDescendantIds(selectedCategory._id);
+        
+        query.category = { $in: [selectedCategory._id, ...descendantIds] };
       }
     }
 
@@ -89,19 +90,20 @@ exports.managePosts = async (req, res) => {
       const selectedCategory = allCategories.find(c => c.name === categoryName);
 
       if (selectedCategory) {
-        const isParent = !selectedCategory.parent;
+        // Recursive function to get all descendant IDs
+        const getDescendantIds = (categoryId) => {
+            let ids = [];
+            const children = allCategories.filter(c => c.parent && c.parent.toString() === categoryId.toString());
+            for (const child of children) {
+                ids.push(child._id);
+                ids = ids.concat(getDescendantIds(child._id));
+            }
+            return ids;
+        };
 
-        if (isParent) {
-          // It's a parent: include this parent AND all its children
-          const childIds = allCategories
-            .filter(c => c.parent && c.parent.toString() === selectedCategory._id.toString())
-            .map(c => c._id);
-
-          query.category = { $in: [selectedCategory._id, ...childIds] };
-        } else {
-          // It's a child: just filter by this category
-          query.category = selectedCategory._id;
-        }
+        const descendantIds = getDescendantIds(selectedCategory._id);
+        
+        query.category = { $in: [selectedCategory._id, ...descendantIds] };
       }
     }
 

@@ -79,6 +79,32 @@
             color: white;
         }
 
+        /* BacSM - Blue */
+        .btn-bacsm {
+            background-color: #0085A1;
+            border-color: #0085A1;
+            color: white;
+        }
+
+        .btn-bacsm:hover {
+            background-color: #006d85;
+            border-color: #006d85;
+            color: white;
+        }
+
+        .btn-outline-bacsm {
+            background-color: white;
+            border: 2px solid #0085A1;
+            color: #0085A1;
+        }
+
+        .btn-outline-bacsm:hover {
+            background-color: #0085A1;
+            color: white;
+        }
+
+
+
         /* Analyse - Green */
         .btn-analyse {
             background-color: #28a745;
@@ -218,6 +244,16 @@
             background-size: cover !important;
         }
 
+        header.masthead.masthead-bacsm {
+            background: linear-gradient(to bottom, rgba(0, 133, 161, 0.8), rgba(0, 109, 133, 0.9)), url('/assets/img/home-bg.jpg') !important;
+            background-position: center !important;
+            background-repeat: no-repeat !important;
+            background-attachment: scroll !important;
+            background-size: cover !important;
+        }
+
+
+
         header.masthead.masthead-analyse {
             background: linear-gradient(to bottom, rgba(40, 167, 69, 0.8), rgba(33, 136, 56, 0.9)), url('/assets/img/home-bg.jpg') !important;
             background-position: center !important;
@@ -247,17 +283,40 @@
         <!-- Navigation-->
         <%-include('layouts/navbar')-%>
             <% let selectedParent=null; let colorClass='algebre' ; if (category && hierarchy) {
-                selectedParent=hierarchy.find(p=> p.name === category);
-                if (!selectedParent) {
-                for (const parent of hierarchy) {
-                if (parent.children && parent.children.some(c => c.name === category)) {
-                selectedParent = parent;
-                break;
+                function findNode(nodes, name) {
+                    for (let n of nodes) {
+                        if (n.name === name) return n;
+                        if (n.children && n.children.length > 0) {
+                            let found = findNode(n.children, name);
+                            if (found) return found;
+                        }
+                    }
+                    return null;
                 }
+                function findParentOf(nodes, name, currentParent = null) {
+                    for (let n of nodes) {
+                        if (n.name === name) return currentParent;
+                        if (n.children && n.children.length > 0) {
+                            let found = findParentOf(n.children, name, n);
+                            if (found) return found;
+                        }
+                    }
+                    return null;
                 }
+                
+                let node = findNode(hierarchy, category);
+                if (node) {
+                    if (node.children && node.children.length > 0) {
+                        selectedParent = node;
+                    } else {
+                        selectedParent = findParentOf(hierarchy, category);
+                    }
                 }
+                
                 if (selectedParent) {
                 if (selectedParent.name === 'Analyse') colorClass = 'analyse';
+                else if (selectedParent.name === 'Algèbre') colorClass = 'algebre';
+                else if (selectedParent.name === 'BacSM') colorClass = 'bacsm';
                 else if (selectedParent.name === 'Olympiades de mathématiques') colorClass = 'olympiades';
                 else if (selectedParent.name === 'Prépas') colorClass = 'prepas';
                 }
@@ -304,10 +363,8 @@
                                         <% } else { %>
                                             <% if (typeof hierarchy !=='undefined' && hierarchy.length> 0) { %>
                                                 <div class="d-flex flex-wrap gap-3 justify-content-center">
-                                                     <a href="/?category=Algèbre"
-                                                         class="btn btn-lg parent-btn btn-algebre">Algèbre</a>
-                                                     <a href="/?category=Analyse"
-                                                         class="btn btn-lg parent-btn btn-analyse">Analyse</a>
+                                                     <a href="/?category=BacSM"
+                                                         class="btn btn-lg parent-btn btn-bacsm">BacSM</a>
                                                      <a href="/?category=Olympiades de mathématiques"
                                                          class="btn btn-lg parent-btn btn-olympiades">Olympiades</a>
                                                      <a href="/?category=Prépas"
