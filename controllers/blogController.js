@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const BlogPost = require("../models/BlogPost");
 const User = require("../models/User");
 const Category = require("../models/Category");
@@ -216,35 +217,75 @@ exports.store = async (req, res) => {
 
 exports.show = async (req, res) => {
   try {
-    const post = await BlogPost.findOne({
-      _id: req.params.id,
-      isDeleted: { $ne: true },
-    })
-      .populate("author", "username")
-      .populate("category")
-      .populate("solutionId", "title")
-      .populate("exerciseId", "title");
+    const identifier = req.params.id;
+    const isObjectId = mongoose.Types.ObjectId.isValid(identifier);
+    let post = null;
+
+    // Search by ObjectId first if valid format, otherwise search by slug
+    if (isObjectId) {
+      post = await BlogPost.findOne({
+        _id: identifier,
+        isDeleted: { $ne: true },
+      })
+        .populate("author", "username")
+        .populate("category")
+        .populate("solutionId")
+        .populate("exerciseId");
+    }
+
+    if (!post) {
+      post = await BlogPost.findOne({
+        slug: identifier,
+        isDeleted: { $ne: true },
+      })
+        .populate("author", "username")
+        .populate("category")
+        .populate("solutionId")
+        .populate("exerciseId");
+    }
 
     if (!post) {
       return res.status(404).send("Post not Found");
     }
 
+    // 1. Redirection 301 : Les solutions autonomes redirigent vers leur exercice parent
+    if (post.type === "solution" && post.exerciseId) {
+      const parentTarget = post.exerciseId.slug || post.exerciseId._id || post.exerciseId;
+      return res.redirect(301, `/post/${parentTarget}#solution`);
+    }
+
+    // 2. Redirection 301 vers le slug sémantique si la requête utilise l'ObjectId brut
+    if (post.slug && isObjectId && identifier === post._id.toString() && identifier !== post.slug) {
+      return res.redirect(301, `/post/${post.slug}`);
+    }
+
     // SEO metadata for individual post
-    const cleanTitle = post.title.substring(0, 60);
-    const cleanBody = post.body.replace(/<[^>]*>/g, "").substring(0, 155);
+    const cleanTitle = (post.title || "Exercice").substring(0, 60);
+    // Nettoyage des balises et de la syntaxe LaTeX brute pour une méta-description lisible
+    const cleanBody = (post.body || "")
+      .replace(/<[^>]*>/g, "")
+      .replace(/\$+/g, "")
+      .replace(/\\(frac|sqrt|ln|int|sum|prod|alpha|beta|pi|quad|text)/g, "")
+      .replace(/\s+/g, " ")
+      .trim()
+      .substring(0, 150);
+
+    const postIdentifier = post.slug || post._id;
+    const categoryName = post.category?.name || "Mathématiques Bac";
 
     const seo = {
-      title: `${cleanTitle} - Exercice Corrigé Math Bac & High School`,
-      description: `${cleanBody}... Solution détaillée pour ${post.category?.name || "mathématiques"} - Bac & Lycée / High School Math`,
-      keywords: `${post.category?.name?.toLowerCase() || "mathématiques"}, exercice corrigé, bac math, ${cleanTitle.toLowerCase()}, solution mathématiques, high school math`,
-      canonical: `https://www.mathematiques-bac.org/post/${post._id}`,
+      title: `${cleanTitle} : Énoncé & Corrigé Détaillé - Bac & Lycée`,
+      description: `${cleanBody}... Exercice et solution détaillée en ${categoryName} pour le Baccalauréat et le Lycée.`,
+      keywords: `${categoryName.toLowerCase()}, exercice corrigé, bac math, ${cleanTitle.toLowerCase()}, solution mathématiques, high school math`,
+      canonical: `https://www.mathematiques-bac.org/post/${postIdentifier}`,
       ogImage: "https://www.mathematiques-bac.org/assets/img/post-bg.jpg",
     };
 
-    // Only show ads if post has sufficient content (300+ characters of actual text)
-    // Strip HTML and check content length to comply with AdSense policy
-    const textContent = post.body.replace(/<[^>]*>/g, '').trim();
-    const hasEnoughContent = textContent.length >= 300;
+    // Le contenu combiné (énoncé + solution intégrée) élimine le Thin Content
+    const combinedText = (post.body || "") + (post.solutionId?.body || "");
+    const textContent = combinedText.replace(/<[^>]*>/g, "").trim();
+    const hasEnoughContent = textContent.length >= 200;
+
     res.render("post", { post, seo, showAds: hasEnoughContent });
   } catch (error) {
     console.error(error);

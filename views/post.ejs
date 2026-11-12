@@ -104,34 +104,57 @@
                 margin-bottom: 0.5rem;
             }
 
-            /* Solution link styling */
-            .solution-link {
-                margin-top: 2rem;
-                padding: 1.5rem;
-                background: #e7f3ff;
+            /* Solution accordion and pedagogical box styling */
+            .pedagogical-box {
+                background: linear-gradient(135deg, #f8f9fa 0%, #eef2f7 100%);
                 border-left: 4px solid #0085A1;
-                border-radius: 4px;
+                border-radius: 8px;
+                padding: 1.25rem 1.5rem;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
             }
 
-            .solution-link h4 {
-                color: #0085A1;
-                margin-bottom: 1rem;
+            .solution-container {
+                margin-top: 2.5rem;
             }
 
-            .btn-view-solution {
-                background: #0085A1;
-                color: white;
-                border: none;
-                padding: 0.75rem 1.5rem;
-                border-radius: 4px;
-                text-decoration: none;
-                display: inline-block;
-                transition: background 0.3s;
+            .solution-details {
+                border-radius: 8px;
+                overflow: hidden;
+                border: 1px solid #d0e3f0;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
             }
 
-            .btn-view-solution:hover {
-                background: #006d85;
-                color: white;
+            .solution-summary {
+                background: linear-gradient(to right, #e8f4fd, #f2f8fc);
+                padding: 1.25rem 1.5rem;
+                cursor: pointer;
+                list-style: none;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-left: 5px solid #28a745;
+                user-select: none;
+                transition: background-color 0.2s ease;
+            }
+
+            .solution-summary:hover {
+                background: #dbeefa;
+            }
+
+            .solution-summary::-webkit-details-marker {
+                display: none;
+            }
+
+            .solution-body {
+                background: #ffffff;
+                border-top: 1px solid #e1e8ed;
+                padding: 1.75rem !important;
+            }
+
+            .solution-pending {
+                background: #fff8e6;
+                border-left: 4px solid #ffc107;
+                border-radius: 6px;
             }
         }
     </style>
@@ -149,13 +172,13 @@
                                     <%= post.title %>
                                 </h3>
                                 <% if (post.type==='exercise' ) { %>
-                                    <span class="badge bg-primary">Exercise</span>
+                                    <span class="badge bg-primary">Exercice</span>
                                     <% } else if (post.type==='solution' ) { %>
-                                        <span class="badge bg-success">Solution</span>
+                                        <span class="badge bg-success">Corrigé</span>
                                         <% } %>
                                             <span class="meta">
-                                                Posted by admin
-                                                on <%= new Date(post.createdAt || Date.now()).toDateString() %>
+                                                Publié par admin
+                                                le <%= post.createdAt ? new Date(post.createdAt).toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Mathématiques-Bac' %>
                                             </span>
                             </div>
                         </div>
@@ -167,46 +190,71 @@
                 <div class="container px-4 px-lg-5">
                     <div class="row gx-4 gx-lg-5 justify-content-center">
                         <div class="col-12 col-lg-10 col-xl-9">
-                            <!-- Display the full blog post content -->
-                            <div class="post-content">
-                                <%- post.body %>
+
+                            <!-- Bloc Pédagogique & Contexte SEO -->
+                            <div class="pedagogical-box mb-4">
+                                <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
+                                    <span class="badge bg-primary"><i class="fas fa-graduation-cap me-1"></i> Bac Sciences Mathématiques &amp; Lycée</span>
+                                    <% if (post.category && post.category.name) { %>
+                                        <span class="badge bg-secondary"><i class="fas fa-folder me-1"></i> <%= post.category.name %></span>
+                                    <% } %>
+                                    <span class="badge bg-success"><i class="fas fa-check-double me-1"></i> Énoncé avec corrigé détaillé</span>
+                                </div>
+                                <p class="small text-muted mb-0">
+                                    <i class="fas fa-lightbulb text-warning me-1"></i> <strong>Conseil méthodologique :</strong> Cherchez attentivement cet exercice au brouillon pendant 15 à 30 minutes avant de consulter la solution détaillée ci-dessous.
+                                </p>
                             </div>
 
-                            <!-- Solution Link for Exercises -->
-                            <% if (post.type==='exercise' && post.solutionId) { %>
-                                <div class="solution-link">
-                                    <h4>📚 Solution Available</h4>
-                                    <p>A solution has been written for this exercise.</p>
-                                    <a href="/post/<%= post.solutionId._id || post.solutionId %>" target="_blank"
-                                        class="btn-view-solution">
-                                        View Solution (Opens in New Tab) →
-                                    </a>
-                                </div>
-                                <% } else if (post.type==='exercise' && !post.solutionId) { %>
-                                    <div class="solution-link"
-                                        style="background: #fff3cd; border-left: 4px solid #ffc107;">
-                                        <h4 style="color: #856404;">⏳ Solution Non Disponible</h4>
-                                        <p style="color: #856404;">La solution pour cet exercice n'est pas encore
-                                            disponible. Revenez bientôt !</p>
+                            <!-- Énoncé de l'exercice -->
+                            <div class="card shadow-sm border-0 mb-4">
+                                <div class="card-body p-4">
+                                    <h4 class="h5 text-primary mb-3"><i class="fas fa-file-alt me-2"></i>Énoncé de l'exercice :</h4>
+                                    <div class="post-content">
+                                        <%- post.body %>
                                     </div>
-                                    <% } %>
+                                </div>
+                            </div>
 
-                                        <!-- Link back to Exercise for Solutions -->
-                                        <% if (post.type==='solution' && post.exerciseId) { %>
-                                            <div class="solution-link">
-                                                <h4>📝 Related Exercise</h4>
-                                                <p>This is a solution to an exercise.</p>
-                                                <a href="/post/<%= post.exerciseId._id || post.exerciseId %>"
-                                                    class="btn-view-solution">
-                                                    View Exercise →
-                                                </a>
+                            <!-- Corrigé Détaillé Intégré (Résolution du Thin Content & Fusion des URLs) -->
+                            <% if (post.solutionId && post.solutionId.body) { %>
+                                <div id="solution" class="solution-container my-4">
+                                    <details class="solution-details" open>
+                                        <summary class="solution-summary">
+                                            <span class="d-flex align-items-center">
+                                                <i class="fas fa-check-circle text-success me-2 fa-lg"></i>
+                                                <strong>Solution Détaillée &amp; Corrigé Pas à Pas</strong>
+                                            </span>
+                                            <span class="badge bg-success">Corrigé complet</span>
+                                        </summary>
+                                        <div class="solution-body p-4 mt-2">
+                                            <div class="post-content">
+                                                <%- post.solutionId.body %>
                                             </div>
-                                            <% } %>
+                                        </div>
+                                    </details>
+                                </div>
+                            <% } else if (post.type === 'solution') { %>
+                                <div id="solution" class="solution-container my-4">
+                                    <div class="card shadow-sm border-0">
+                                        <div class="card-body p-4">
+                                            <h4 class="h5 text-success mb-3"><i class="fas fa-check-circle me-2"></i>Solution &amp; Corrigé :</h4>
+                                            <div class="post-content">
+                                                <%- post.body %>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            <% } else { %>
+                                <div class="solution-pending my-4 p-4 border rounded bg-light">
+                                    <h5 class="text-secondary mb-2"><i class="fas fa-hourglass-half me-2 text-warning"></i>Solution en cours de rédaction</h5>
+                                    <p class="mb-0 text-muted">Le corrigé complet de cet exercice est actuellement en cours de préparation par notre équipe pédagogique.</p>
+                                </div>
+                            <% } %>
 
-                                                <!-- Navigation back to home -->
-                                                <div class="mt-5 pt-3">
-                                                    <a href="/" class="btn btn-outline-primary">← Back to All Posts</a>
-                                                </div>
+                            <!-- Navigation back to home -->
+                            <div class="mt-5 pt-3 border-top d-flex justify-content-between align-items-center">
+                                <a href="/" class="btn btn-outline-primary">← Retour à tous les exercices</a>
+                            </div>
                         </div>
                     </div>
                 </div>
