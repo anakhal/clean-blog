@@ -1,0 +1,57 @@
+# ==============================================================================
+# Pipeline Google Cloud Build pour Clean Blog (CI/CD natif GCP)
+# Déploiement automatique sur Cloud Run avec contrôle strict des ressources
+# ==============================================================================
+
+steps:
+  # Étape 1 : Construction de l'image Docker multi-stage
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-image'
+    args:
+      - 'build'
+      - '-t'
+      - '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA'
+      - '-t'
+      - '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/$_SERVICE_NAME:latest'
+      - '.'
+
+  # Étape 2 : Publication de l'image dans Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-image'
+    args:
+      - 'push'
+      - '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA'
+
+  # Étape 3 : Déploiement sur Cloud Run sous contraintes budgétaires strictes
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'deploy-cloud-run'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - '$_SERVICE_NAME'
+      - '--image=$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA'
+      - '--region=$_REGION'
+      - '--platform=managed'
+      - '--allow-unauthenticated'
+      - '--port=8080'
+      - '--max-instances=2'
+      - '--min-instances=1'
+      - '--cpu=1'
+      - '--memory=1Gi'
+      - '--cpu-throttling'
+      - '--cpu-boost'
+      - '--concurrency=80'
+
+# Variables par défaut (surchargeables via déclencheur Cloud Build ou CLI)
+substitutions:
+  _REGION: 'europe-west9'
+  _REPO_NAME: 'clean-blog-repo'
+  _SERVICE_NAME: 'clean-blog'
+
+images:
+  - '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA'
+  - '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/$_SERVICE_NAME:latest'
+
+options:
+  logging: CLOUD_LOGGING_ONLY

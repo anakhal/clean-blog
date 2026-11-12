@@ -64,38 +64,69 @@ exports.index = async (req, res) => {
       }
     }
 
+    // Pagination setup (limit to 15 posts per page for optimal DOM size and Core Web Vitals)
+    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+    const limit = 15;
+    const totalPosts = await BlogPost.countDocuments(query);
+    const totalPages = Math.ceil(totalPosts / limit) || 1;
+
     const posts = await BlogPost.find(query)
       .populate("author", "username")
       .populate("category")
-      .sort({ createdAt: 1 });
+      .sort({ createdAt: 1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    // Build canonical and rel="prev"/"next" URLs for SEO
+    const categoryParam = categoryName ? `category=${encodeURIComponent(categoryName)}` : "";
+    const buildPageUrl = (p) => {
+      const parts = [];
+      if (categoryParam) parts.push(categoryParam);
+      if (p > 1) parts.push(`page=${p}`);
+      return parts.length > 0 ? `https://www.mathematiques-bac.org/?${parts.join("&")}` : "https://www.mathematiques-bac.org/";
+    };
+
+    const canonical = buildPageUrl(page);
+    const prevPageUrl = page > 1 ? buildPageUrl(page - 1) : null;
+    const nextPageUrl = page < totalPages ? buildPageUrl(page + 1) : null;
 
     // SEO metadata
     const seo = {
       title: categoryName
-        ? `${categoryName} - Exercices Corrigés Bac & Lycée | Mathématiques-Bac.org`
-        : "Mathématiques Bac & High School Math - Exercices Corrigés",
+        ? `${categoryName}${page > 1 ? ` (Page ${page})` : ""} - Exercices Corrigés Bac & Lycée | Mathématiques-Bac.org`
+        : (page > 1 ? `Exercices Corrigés (Page ${page}) - Mathématiques Bac & High School` : "Mathématiques Bac & High School Math - Exercices Corrigés"),
       description: categoryName
-        ? `Exercices corrigés de ${categoryName}. Solutions détaillées pour le Bac et Lycée (High School).`
-        : "Exercices corrigés de mathématiques pour le Baccalauréat et le Lycée. Mathematics exercises with solutions.",
+        ? `Exercices corrigés de ${categoryName}${page > 1 ? ` - Page ${page}` : ""}. Solutions détaillées pour le Bac et Lycée (High School).`
+        : `Exercices corrigés de mathématiques pour le Baccalauréat et le Lycée${page > 1 ? ` - Page ${page}` : ""}. Mathematics exercises with solutions.`,
       keywords: categoryName
         ? `${categoryName.toLowerCase()}, bac math, exercices, high school math, lycée`
         : "mathématiques, bac math, exercices, high school math, terminale",
-      canonical: categoryName
-        ? `https://www.mathematiques-bac.org/?category=${encodeURIComponent(categoryName)}`
-        : "https://www.mathematiques-bac.org/",
+      canonical,
+      prevPageUrl,
+      nextPageUrl,
       ogImage: "https://www.mathematiques-bac.org/assets/img/home-bg.jpg",
     };
 
     const hasEnoughContent = posts.length >= 3;
 
-    // Pass hierarchy and allCategories to view
+    // Pass hierarchy, allCategories and pagination data to view
     res.render("index", {
       posts,
       categories: allCategories,
       hierarchy, // New hierarchical structure
       category: categoryName || null,
       seo,
-      showAds: hasEnoughContent
+      showAds: hasEnoughContent,
+      pagination: {
+        page,
+        totalPages,
+        totalPosts,
+        limit,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
+        nextPage: page + 1,
+        prevPage: page - 1,
+      },
     });
   } catch (err) {
     console.error(err);

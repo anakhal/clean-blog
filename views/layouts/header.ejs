@@ -29,8 +29,14 @@
         <meta name="bingbot" content="index, follow" />
         <% } %>
 
-        <!-- Canonical URL -->
+        <!-- Canonical & Pagination URLs -->
         <link rel="canonical" href="<%= typeof seo !== 'undefined' && seo?.canonical ? seo.canonical : 'https://www.mathematiques-bac.org/' %>" />
+        <% if (typeof seo !== 'undefined' && seo?.prevPageUrl) { %>
+        <link rel="prev" href="<%= seo.prevPageUrl %>" />
+        <% } %>
+        <% if (typeof seo !== 'undefined' && seo?.nextPageUrl) { %>
+        <link rel="next" href="<%= seo.nextPageUrl %>" />
+        <% } %>
 
         <!-- Language and Region -->
         <meta http-equiv="content-language" content="fr" />

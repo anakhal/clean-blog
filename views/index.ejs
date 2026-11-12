@@ -396,12 +396,74 @@
                                         <% if (posts[i].solutionId) { %>
                                             <span class="badge bg-success me-2">Solution</span>
                                             <% } %>
-                                                Posted by admin on <%=new Date().toDateString()%>
+                                                Posted by admin on <%= posts[i].createdAt ? new Date(posts[i].createdAt).toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Mathématiques-Bac' %>
                                     </p>
                                 </div>
                                 <!-- Divider-->
                                 <hr class="my-4" />
                                 <%}%>
+
+                                <% if (typeof pagination !== 'undefined' && pagination.totalPages > 1) { %>
+                                <!-- Pagination Controls -->
+                                <nav aria-label="Navigation des pages d'exercices" class="my-5">
+                                    <ul class="pagination justify-content-center">
+                                        <!-- Previous Page -->
+                                        <% if (pagination.hasPrevPage) { %>
+                                            <li class="page-item">
+                                                <a class="page-link" href="/?<%= category ? 'category=' + encodeURIComponent(category) + '&' : '' %>page=<%= pagination.prevPage %>" aria-label="Précédent">
+                                                    <span aria-hidden="true">&laquo; Précédent</span>
+                                                </a>
+                                            </li>
+                                        <% } else { %>
+                                            <li class="page-item disabled">
+                                                <span class="page-link">&laquo; Précédent</span>
+                                            </li>
+                                        <% } %>
+
+                                        <!-- Page Numbers -->
+                                        <% 
+                                            var startPage = Math.max(1, pagination.page - 2);
+                                            var endPage = Math.min(pagination.totalPages, pagination.page + 2);
+                                            if (startPage > 1) { 
+                                        %>
+                                            <li class="page-item">
+                                                <a class="page-link" href="/?<%= category ? 'category=' + encodeURIComponent(category) + '&' : '' %>page=1">1</a>
+                                            </li>
+                                            <% if (startPage > 2) { %>
+                                                <li class="page-item disabled"><span class="page-link">…</span></li>
+                                            <% } %>
+                                        <% } %>
+
+                                        <% for (var p = startPage; p <= endPage; p++) { %>
+                                            <li class="page-item <%= p === pagination.page ? 'active' : '' %>">
+                                                <a class="page-link" href="/?<%= category ? 'category=' + encodeURIComponent(category) + '&' : '' %>page=<%= p %>"><%= p %></a>
+                                            </li>
+                                        <% } %>
+
+                                        <% if (endPage < pagination.totalPages) { %>
+                                            <% if (endPage < pagination.totalPages - 1) { %>
+                                                <li class="page-item disabled"><span class="page-link">…</span></li>
+                                            <% } %>
+                                            <li class="page-item">
+                                                <a class="page-link" href="/?<%= category ? 'category=' + encodeURIComponent(category) + '&' : '' %>page=<%= pagination.totalPages %>"><%= pagination.totalPages %></a>
+                                            </li>
+                                        <% } %>
+
+                                        <!-- Next Page -->
+                                        <% if (pagination.hasNextPage) { %>
+                                            <li class="page-item">
+                                                <a class="page-link" href="/?<%= category ? 'category=' + encodeURIComponent(category) + '&' : '' %>page=<%= pagination.nextPage %>" aria-label="Suivant">
+                                                    <span aria-hidden="true">Suivant &raquo;</span>
+                                                </a>
+                                            </li>
+                                        <% } else { %>
+                                            <li class="page-item disabled">
+                                                <span class="page-link">Suivant &raquo;</span>
+                                            </li>
+                                        <% } %>
+                                    </ul>
+                                </nav>
+                                <% } %>
                         </div>
                     </div>
                     <!-- Footer-->

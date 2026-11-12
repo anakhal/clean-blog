@@ -5,13 +5,15 @@ const rateLimit = require("express-rate-limit");
 const cors = require("cors");
 const compression = require("compression");
 const app = express();
+app.set("trust proxy", 1);
 
 // Production environment configuration
 const isProduction = process.env.NODE_ENV === "production";
-const port = process.env.PORT || 4000;
+const port = process.env.PORT || 8080;
 const mongoose = require("mongoose");
 const winston = require("winston");
 const morgan = require("morgan");
+const fs = require("fs");
 
 // 🔒 Redirect middleware (place this FIRST)
 app.use((req, res, next) => {
@@ -65,6 +67,41 @@ console.log("NODE_ENV:", process.env.NODE_ENV || "(not set)");
 console.log("=== End diagnostics ===\n");
 
 // Configure Winston logger
+if (!fs.existsSync("logs")) {
+    try {
+        fs.mkdirSync("logs", { recursive: true });
+    } catch (e) {
+        // In environments where filesystem is restricted, ignore error
+    }
+}
+
+const winstonTransports = [
+    new winston.transports.Console({
+        format: isProduction
+            ? winston.format.combine(
+                  winston.format.timestamp(),
+                  winston.format.json(),
+              )
+            : winston.format.combine(
+                  winston.format.colorize(),
+                  winston.format.simple(),
+              ),
+    }),
+];
+
+// Add file transports if logs directory is available
+try {
+    winstonTransports.push(
+        new winston.transports.File({
+            filename: "logs/error.log",
+            level: "error",
+        }),
+        new winston.transports.File({ filename: "logs/combined.log" }),
+    );
+} catch (e) {
+    // File logging fallback
+}
+
 const logger = winston.createLogger({
     level: isProduction ? "info" : "debug",
     format: winston.format.combine(
@@ -73,23 +110,8 @@ const logger = winston.createLogger({
         winston.format.json(),
     ),
     defaultMeta: { service: "clean-blog" },
-    transports: [
-        new winston.transports.File({
-            filename: "logs/error.log",
-            level: "error",
-        }),
-        new winston.transports.File({ filename: "logs/combined.log" }),
-    ],
+    transports: winstonTransports,
 });
-
-// Add console logging in development
-if (!isProduction) {
-    logger.add(
-        new winston.transports.Console({
-            format: winston.format.simple(),
-        }),
-    );
-}
 
 // Enable gzip compression
 app.use(compression());
@@ -181,13 +203,30 @@ app.use(
     }),
 );
 
-// Rate limiting middleware
+// Detect search engine crawlers to prevent SEO indexing blocks (HTTP 429)
+const isSearchEngineBot = (req) => {
+    const userAgent = req.get("user-agent") || "";
+    return /Googlebot|Google-InspectionTool|Google-PageSpeed-Insights|Google-Cloud-VertexBot|bingbot|Baiduspider|YandexBot|DuckDuckBot/i.test(
+        userAgent,
+    );
+};
+
+// Rate limiting middleware (generous for public browsing, immune for crawlers)
 const limiter = rateLimit({
     windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000,
-    max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
+    max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 1000,
     message: "Too many requests from this IP, please try again later.",
     standardHeaders: true,
     legacyHeaders: false,
+    skip: (req) => {
+        // Always allow Cloud Run health check probes
+        if (req.path === "/health") return true;
+        // Exempt legitimate search engine crawlers on read-only requests
+        if ((req.method === "GET" || req.method === "HEAD") && isSearchEngineBot(req)) {
+            return true;
+        }
+        return false;
+    },
 });
 
 app.use(limiter);
@@ -229,20 +268,24 @@ app.use(
     cors({
         origin: isProduction
             ? process.env.CORS_ORIGIN || false
-            : ["http://localhost:3000", "http://localhost:4000"],
+            : ["http://localhost:3000", "http://localhost:4000", "http://localhost:8080"],
         credentials: true,
         optionsSuccessStatus: 200,
     }),
 );
 
-// MongoDB connection
-const MONGODB_URI =
-    process.env.MONGODB_URI || "mongodb://localhost:27017/clean-blog-database";
+// MongoDB / Firestore (Enterprise Edition with MongoDB compatibility) connection
+const MONGODB_URI = process.env.MONGODB_URI;
+if (!MONGODB_URI) {
+    console.error("❌ MONGODB_URI is not defined! Please set process.env.MONGODB_URI.");
+}
 mongoose.set("strictQuery", true);
-mongoose
-    .connect(MONGODB_URI)
-    .then(() => console.log("Connected to MongoDB"))
-    .catch((err) => console.error("MongoDB connection error:", err.message));
+if (MONGODB_URI) {
+    mongoose
+        .connect(MONGODB_URI)
+        .then(() => console.log("Connected to MongoDB / Firestore (MongoDB API)"))
+        .catch((err) => console.error("Database connection error:", err.message));
+}
 
 // Middlewares setup
 app.use(express.json());
@@ -325,10 +368,34 @@ app.get("/about", (req, res) => res.render("about", { showAds: false }));
 app.get("/privacy", (req, res) => res.render("privacy", { showAds: false }));
 
 // Start server
-app.listen(port, "0.0.0.0", () => {
+const server = app.listen(port, "0.0.0.0", () => {
     console.log(
         `Server is running on port ${port} (listening on 0.0.0.0 - all interfaces)`,
     );
     console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
     console.log(`Ready to accept connections!`);
 });
+
+// Graceful shutdown handling for Cloud Run lifecycle
+const handleShutdown = async (signal) => {
+    console.log(`\n${signal} signal received. Starting graceful shutdown...`);
+    server.close(async () => {
+        console.log("HTTP server closed.");
+        try {
+            await mongoose.connection.close(false);
+            console.log("MongoDB / Firestore connection closed.");
+        } catch (err) {
+            console.error("Error closing database connection:", err.message);
+        }
+        process.exit(0);
+    });
+
+    // Force exit if connections take too long to drain
+    setTimeout(() => {
+        console.error("Could not close connections in time, forcefully shutting down");
+        process.exit(1);
+    }, 10000).unref();
+};
+
+process.on("SIGTERM", () => handleShutdown("SIGTERM"));
+process.on("SIGINT", () => handleShutdown("SIGINT"));
