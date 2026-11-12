@@ -345,6 +345,11 @@ exports.show = async (req, res) => {
       url: `https://www.mathematiques-bac.org/post/${postIdentifier}`,
     });
 
+    // Le contenu combiné (énoncé + solution intégrée) élimine le Thin Content
+    const combinedText = (post.body || "") + (post.solutionId?.body || "");
+    const textContent = combinedText.replace(/<[^>]*>/g, "").trim();
+    const hasEnoughContent = textContent.length >= 200;
+
     res.render("post", {
       post,
       seo,

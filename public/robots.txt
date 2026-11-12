@@ -14,6 +14,7 @@ Disallow: /register
 Allow: /about
 Allow: /search
 Allow: /post/*
+Allow: /chapitre/*
 
 # Sitemap
 Sitemap: https://www.mathematiques-bac.org/sitemap.xml
