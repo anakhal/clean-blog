@@ -287,7 +287,31 @@ mongoose.connection.on("error", (err) => {
 if (MONGODB_URI) {
     mongoose
         .connect(MONGODB_URI)
-        .then(() => console.log("Connected to MongoDB / Firestore (MongoDB API)"))
+        .then(async () => {
+            console.log("Connected to MongoDB / Firestore (MongoDB API)");
+            // Génération automatique des slugs manquants au démarrage (idempotent)
+            try {
+                const BlogPost = require("./models/BlogPost");
+                const { slugify } = BlogPost;
+                const postsWithoutSlug = await BlogPost.find({
+                    $or: [{ slug: { $exists: false } }, { slug: null }, { slug: "" }],
+                })
+                    .select("_id title")
+                    .lean();
+
+                if (postsWithoutSlug.length > 0) {
+                    console.log(`🔄 Génération automatique des slugs pour ${postsWithoutSlug.length} articles...`);
+                    for (const p of postsWithoutSlug) {
+                        const base = slugify(p.title || "exercice") || "exercice";
+                        const slug = `${base}-${p._id.toString().slice(-6)}`;
+                        await BlogPost.updateOne({ _id: p._id }, { $set: { slug } });
+                    }
+                    console.log(`✅ Slugs générés avec succès pour ${postsWithoutSlug.length} articles.`);
+                }
+            } catch (slugErr) {
+                console.error("Avertissement lors de l'initialisation des slugs :", slugErr.message);
+            }
+        })
         .catch((err) => console.error("Database connection error:", err.message));
 }
 

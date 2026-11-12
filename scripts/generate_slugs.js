@@ -10,8 +10,13 @@ async function generateSlugs() {
         process.exit(1);
     }
 
+    if (mongoUri.includes('<username>') || mongoUri.includes('<password>')) {
+        console.error('❌ Veuillez remplacer <username> et <password> par vos vrais identifiants Firestore dans MONGODB_URI.');
+        process.exit(1);
+    }
+
     try {
-        console.log('Connecting to database...');
+        console.log('Connecting to Firestore (MongoDB compatibility)...');
         await mongoose.connect(mongoUri);
         console.log('Connected successfully.');
 
@@ -21,7 +26,7 @@ async function generateSlugs() {
                 { slug: null },
                 { slug: '' }
             ]
-        });
+        }).select('_id title').lean();
 
         console.log(`Found ${postsWithoutSlug.length} posts without slugs.`);
 
@@ -32,38 +37,28 @@ async function generateSlugs() {
         }
 
         let updatedCount = 0;
-        const bulkOps = [];
 
         for (const post of postsWithoutSlug) {
-            const base = slugify(post.title || 'exercice');
+            const base = slugify(post.title || 'exercice') || 'exercice';
             const suffix = post._id.toString().slice(-6);
             const slug = `${base}-${suffix}`;
 
-            bulkOps.push({
-                updateOne: {
-                    filter: { _id: post._id },
-                    update: { $set: { slug } }
-                }
-            });
+            await BlogPost.updateOne(
+                { _id: post._id },
+                { $set: { slug } }
+            );
 
             updatedCount++;
-            if (bulkOps.length >= 200) {
-                await BlogPost.bulkWrite(bulkOps);
+            if (updatedCount % 50 === 0 || updatedCount === postsWithoutSlug.length) {
                 console.log(`Updated ${updatedCount}/${postsWithoutSlug.length} posts...`);
-                bulkOps.length = 0;
             }
-        }
-
-        if (bulkOps.length > 0) {
-            await BlogPost.bulkWrite(bulkOps);
-            console.log(`Updated ${updatedCount}/${postsWithoutSlug.length} posts.`);
         }
 
         console.log('✅ Slugs generation completed successfully.');
         await mongoose.disconnect();
         process.exit(0);
     } catch (err) {
-        console.error('❌ Error generating slugs:', err);
+        console.error('❌ Error generating slugs:', err.message);
         process.exit(1);
     }
 }
