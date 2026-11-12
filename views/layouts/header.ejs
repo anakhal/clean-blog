@@ -107,6 +107,36 @@
         }
         </script>
         <% } %>
+
+        <!-- Structured Data - Quiz & LearningResource Schema.org -->
+        <% if (typeof post !== 'undefined' && post && post.type === 'exercise') { %>
+        <script type="application/ld+json">
+        {
+                "@context": "https://schema.org",
+                "@type": "Quiz",
+                "name": "<%= (post.title || '').replace(/"/g, '\\"').replace(/\r?\n/g, ' ') %>",
+                "description": "<%= typeof seo !== 'undefined' && seo?.description ? seo.description.replace(/"/g, '\\"').replace(/\r?\n/g, ' ') : 'Exercice corrigé de mathématiques' %>",
+                "educationalLevel": "Baccalauréat / Lycée",
+                "inLanguage": "fr",
+                "learningResourceType": "PracticeProblem",
+                "about": {
+                        "@type": "Thing",
+                        "name": "<%= (post.category && post.category.name ? post.category.name : 'Mathématiques').replace(/"/g, '\\"') %>"
+                },
+                "hasPart": [
+                        {
+                                "@type": "Question",
+                                "name": "<%= (post.title || '').replace(/"/g, '\\"').replace(/\r?\n/g, ' ') %>",
+                                "text": "<%= (post.body || '').replace(/<[^>]*>/g, ' ').replace(/"/g, '\\"').replace(/\r?\n/g, ' ').substring(0, 300).trim() %>",
+                                "acceptedAnswer": {
+                                        "@type": "Answer",
+                                        "text": "<%= (post.solutionId && post.solutionId.body ? post.solutionId.body : 'Consultez la solution sur le site').replace(/<[^>]*>/g, ' ').replace(/"/g, '\\"').replace(/\r?\n/g, ' ').substring(0, 500).trim() %>"
+                                }
+                        }
+                ]
+        }
+        </script>
+        <% } %>
         <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
         <!-- Font Awesome icons (CSS version for better CSP compatibility)-->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
