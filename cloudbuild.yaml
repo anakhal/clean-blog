@@ -45,7 +45,7 @@ steps:
 
 # Variables par défaut (surchargeables via déclencheur Cloud Build ou CLI)
 substitutions:
-  _REGION: 'europe-west9'
+  _REGION: 'europe-west1'
   _REPO_NAME: 'clean-blog-repo'
   _SERVICE_NAME: 'clean-blog'
 

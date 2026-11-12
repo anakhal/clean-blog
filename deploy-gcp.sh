@@ -19,7 +19,8 @@ NC='\033[0m' # No Color
 # Configuration des variables (personnalisables via variables d'environnement)
 # ------------------------------------------------------------------------------
 PROJECT_ID="${PROJECT_ID:-$(gcloud config get-value project 2>/dev/null || true)}"
-REGION="${REGION:-europe-west9}"                   # Paris (ou europe-west1, us-central1)
+REGION="${REGION:-europe-west1}"                   # Région du service Cloud Run en production (Belgique)
+FIRESTORE_REGION="${FIRESTORE_REGION:-europe-west9}" # Région de la base Firestore (Paris)
 SERVICE_NAME="${SERVICE_NAME:-clean-blog}"         # Nom du service Cloud Run
 REPO_NAME="${REPO_NAME:-clean-blog-repo}"          # Dépôt Artifact Registry
 DATABASE_ID="${DATABASE_ID:-clean-blog-db}"        # Identifiant Firestore
