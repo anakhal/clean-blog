@@ -280,6 +280,10 @@ if (!MONGODB_URI) {
     console.error("❌ MONGODB_URI is not defined! Please set process.env.MONGODB_URI.");
 }
 mongoose.set("strictQuery", true);
+mongoose.connection.on("error", (err) => {
+    console.error("Database connection event error:", err.message);
+});
+
 if (MONGODB_URI) {
     mongoose
         .connect(MONGODB_URI)
@@ -399,3 +403,7 @@ const handleShutdown = async (signal) => {
 
 process.on("SIGTERM", () => handleShutdown("SIGTERM"));
 process.on("SIGINT", () => handleShutdown("SIGINT"));
+
+process.on("unhandledRejection", (reason) => {
+    console.error("Unhandled Promise Rejection:", reason?.message || reason);
+});
