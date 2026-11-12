@@ -1,0 +1,82 @@
+# ==============================================================================
+# .dockerignore for Clean Blog
+# Prevents unnecessary, sensitive, or heavy files from entering the Docker build context
+# ==============================================================================
+
+# Node dependencies (installed fresh inside the container)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm/
+
+# Environment variables & credentials (NEVER bake secrets into Docker images)
+.env
+.env*
+*.env
+.env.local
+.env.example
+.env.production.example
+
+# Git metadata
+.git/
+.gitignore
+.gitattributes
+
+# Database dumps, backups, and data exports
+dump/
+dumps/
+backups/
+*.dump
+*.sql
+*.bson
+*.archive
+*.mongodump
+*.csv
+Tableau.csv
+
+# Logs & runtime process files
+logs/
+*.log
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Test files, mocks, and test coverage
+tests/
+coverage/
+.nyc_output/
+*.test.js
+*.spec.js
+security-tests.js
+test-password-hashing.js
+test-graph-generator.html
+reproduce_issue.js
+verify_exercises.js
+check_existing_exercises.js
+seedCategories.js
+migratePostCategories.js
+
+# One-off utility, maintenance, and migration scripts
+scripts/
+fix_ejs_paths.py
+
+# Documentation & markdown files
+*.md
+
+# Editor / IDE configuration
+.vscode/
+.idea/
+.zed/
+.prettierrc
+.prettierignore
+.DS_Store
+*.swp
+*.swo
+
+# Docker and deployment scripts
+Dockerfile*
+.dockerignore
+deploy-gcp.sh
+Procfile
