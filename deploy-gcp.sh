@@ -122,14 +122,13 @@ echo -e "${GREEN}Image Docker compilée et publiée : ${IMAGE_TAG}${NC}"
 echo -e "\n${YELLOW}==> [4/5] Déploiement sur Cloud Run avec limites strictes de coûts...${NC}"
 
 # Vérifier si MONGODB_URI est fourni dans l'environnement courant
-ENV_VARS="NODE_ENV=production,PORT=8080"
+# Note: PORT est défini automatiquement par Cloud Run via --port=8080 (variable réservée)
+ENV_VARS="NODE_ENV=production"
 if [[ -n "${MONGODB_URI:-}" ]]; then
     ENV_VARS="${ENV_VARS},MONGODB_URI=${MONGODB_URI}"
     echo -e "${BLUE}Variable MONGODB_URI détectée et injectée dans le service.${NC}"
 else
-    echo -e "${YELLOW}[ATTENTION] Variable MONGODB_URI non définie localement.${NC}"
-    echo -e "            Pensez à la configurer après le déploiement via Secret Manager ou :"
-    echo -e "            gcloud run services update ${SERVICE_NAME} --update-env-vars MONGODB_URI=\"...\""
+    echo -e "${BLUE}Conservation des variables d'environnement existantes du service Cloud Run (MONGODB_URI, SESSION_SECRET...).${NC}"
 fi
 
 # Déploiement Cloud Run optimisé :
@@ -155,7 +154,7 @@ gcloud run deploy "${SERVICE_NAME}" \
     --cpu-boost \
     --concurrency=80 \
     --timeout=30s \
-    --set-env-vars="${ENV_VARS}" \
+    --update-env-vars="${ENV_VARS}" \
     --project="${PROJECT_ID}"
 
 SERVICE_URL=$(gcloud run services describe "${SERVICE_NAME}" --platform=managed --region="${REGION}" --project="${PROJECT_ID}" --format="value(status.url)")
