@@ -281,12 +281,79 @@ exports.show = async (req, res) => {
       ogImage: "https://www.mathematiques-bac.org/assets/img/post-bg.jpg",
     };
 
-    // Le contenu combiné (énoncé + solution intégrée) élimine le Thin Content
-    const combinedText = (post.body || "") + (post.solutionId?.body || "");
-    const textContent = combinedText.replace(/<[^>]*>/g, "").trim();
-    const hasEnoughContent = textContent.length >= 200;
+    // 3. Navigation Précédent / Suivant et Exercices Similaires (Maillage Interne & Crawlability)
+    let prevPost = null;
+    let nextPost = null;
+    let relatedPosts = [];
 
-    res.render("post", { post, seo, showAds: hasEnoughContent });
+    if (post.category) {
+      const categoryId = post.category._id || post.category;
+      const baseFilter = {
+        category: categoryId,
+        type: "exercise",
+        isDeleted: { $ne: true },
+      };
+
+      // Exercice précédent (créé avant dans la même catégorie)
+      prevPost = await BlogPost.findOne({
+        ...baseFilter,
+        createdAt: { $lt: post.createdAt },
+      })
+        .sort({ createdAt: -1 })
+        .select("title slug _id")
+        .lean();
+
+      // Exercice suivant (créé après dans la même catégorie)
+      nextPost = await BlogPost.findOne({
+        ...baseFilter,
+        createdAt: { $gt: post.createdAt },
+      })
+        .sort({ createdAt: 1 })
+        .select("title slug _id")
+        .lean();
+
+      // Exercices similaires recommandés dans le même chapitre (max 4)
+      const excludeIds = [post._id];
+      if (prevPost) excludeIds.push(prevPost._id);
+      if (nextPost) excludeIds.push(nextPost._id);
+
+      relatedPosts = await BlogPost.find({
+        category: categoryId,
+        type: "exercise",
+        isDeleted: { $ne: true },
+        _id: { $nin: excludeIds },
+      })
+        .sort({ createdAt: -1 })
+        .limit(4)
+        .select("title slug category createdAt _id")
+        .populate("category", "name")
+        .lean();
+    }
+
+    // 4. Fil d'Ariane (Breadcrumbs pour navigation et Schema.org)
+    const breadcrumbs = [
+      { name: "Accueil", url: "https://www.mathematiques-bac.org/" },
+    ];
+    if (post.category && post.category.name) {
+      breadcrumbs.push({
+        name: post.category.name,
+        url: `https://www.mathematiques-bac.org/chapitre/${encodeURIComponent(post.category.name)}`,
+      });
+    }
+    breadcrumbs.push({
+      name: cleanTitle,
+      url: `https://www.mathematiques-bac.org/post/${postIdentifier}`,
+    });
+
+    res.render("post", {
+      post,
+      seo,
+      showAds: hasEnoughContent,
+      prevPost,
+      nextPost,
+      relatedPosts,
+      breadcrumbs,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).send("Server Error");

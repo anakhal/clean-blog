@@ -191,6 +191,21 @@
                     <div class="row gx-4 gx-lg-5 justify-content-center">
                         <div class="col-12 col-lg-10 col-xl-9">
 
+                            <!-- Fil d'Ariane Visuel (Breadcrumbs) -->
+                            <% if (typeof breadcrumbs !== 'undefined' && breadcrumbs && breadcrumbs.length > 0) { %>
+                            <nav aria-label="breadcrumb" class="mb-4">
+                                <ol class="breadcrumb bg-light p-2 px-3 rounded small">
+                                    <% breadcrumbs.forEach(function(item, idx) { %>
+                                        <% if (idx === breadcrumbs.length - 1) { %>
+                                            <li class="breadcrumb-item active text-truncate" style="max-width: 320px;" aria-current="page"><%= item.name %></li>
+                                        <% } else { %>
+                                            <li class="breadcrumb-item"><a href="<%= item.url.replace('https://www.mathematiques-bac.org', '') || '/' %>" class="text-decoration-none"><%= item.name %></a></li>
+                                        <% } %>
+                                    <% }); %>
+                                </ol>
+                            </nav>
+                            <% } %>
+
                             <!-- Bloc Pédagogique & Contexte SEO -->
                             <div class="pedagogical-box mb-4">
                                 <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
@@ -249,6 +264,55 @@
                                     <h5 class="text-secondary mb-2"><i class="fas fa-hourglass-half me-2 text-warning"></i>Solution en cours de rédaction</h5>
                                     <p class="mb-0 text-muted">Le corrigé complet de cet exercice est actuellement en cours de préparation par notre équipe pédagogique.</p>
                                 </div>
+                            <% } %>
+
+                            <!-- Navigation Précédent / Suivant (Suppression des cul-de-sacs pour Googlebot) -->
+                            <% if ((typeof prevPost !== 'undefined' && prevPost) || (typeof nextPost !== 'undefined' && nextPost)) { %>
+                            <div class="card border-0 bg-light my-4 p-3 rounded shadow-sm">
+                                <div class="row g-2 align-items-center">
+                                    <div class="col-sm-6 text-start">
+                                        <% if (typeof prevPost !== 'undefined' && prevPost) { %>
+                                            <a href="/post/<%= prevPost.slug || prevPost._id %>" class="btn btn-sm btn-outline-secondary w-100 text-truncate d-inline-flex align-items-center justify-content-start" title="<%= prevPost.title %>">
+                                                <i class="fas fa-arrow-left me-2"></i>
+                                                <span class="text-truncate"><strong>Précédent :</strong> <%= prevPost.title %></span>
+                                            </a>
+                                        <% } %>
+                                    </div>
+                                    <div class="col-sm-6 text-end">
+                                        <% if (typeof nextPost !== 'undefined' && nextPost) { %>
+                                            <a href="/post/<%= nextPost.slug || nextPost._id %>" class="btn btn-sm btn-outline-secondary w-100 text-truncate d-inline-flex align-items-center justify-content-end text-end" title="<%= nextPost.title %>">
+                                                <span class="text-truncate"><strong>Suivant :</strong> <%= nextPost.title %></span>
+                                                <i class="fas fa-arrow-right ms-2"></i>
+                                            </a>
+                                        <% } %>
+                                    </div>
+                                </div>
+                            </div>
+                            <% } %>
+
+                            <!-- Exercices similaires (Circulation du PageRank interne) -->
+                            <% if (typeof relatedPosts !== 'undefined' && relatedPosts && relatedPosts.length > 0) { %>
+                            <div class="related-exercises my-5 p-4 border rounded bg-white shadow-sm">
+                                <h4 class="h5 mb-3 text-dark d-flex align-items-center">
+                                    <i class="fas fa-book-reader text-primary me-2"></i>
+                                    Exercices similaires dans <%= post.category ? post.category.name : 'ce chapitre' %>
+                                </h4>
+                                <div class="row row-cols-1 row-cols-md-2 g-3">
+                                    <% relatedPosts.forEach(function(rel) { %>
+                                        <div class="col">
+                                            <div class="p-3 border rounded h-100 bg-light d-flex flex-column justify-content-between">
+                                                <a href="/post/<%= rel.slug || rel._id %>" class="text-decoration-none text-dark fw-bold mb-2">
+                                                    <%= rel.title %>
+                                                </a>
+                                                <div class="d-flex justify-content-between align-items-center mt-2 small text-muted">
+                                                    <span class="badge bg-primary"><%= rel.category ? rel.category.name : 'Exercice' %></span>
+                                                    <span><i class="fas fa-arrow-right ms-1"></i> S'entraîner</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <% }); %>
+                                </div>
+                            </div>
                             <% } %>
 
                             <!-- Navigation back to home -->

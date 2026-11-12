@@ -9,6 +9,10 @@ const Category = require("../models/Category");
 
 // Public routes - no authentication required
 router.get("/", blogController.index);
+router.get("/chapitre/:category", (req, res, next) => {
+  req.query.category = req.params.category;
+  return blogController.index(req, res, next);
+});
 router.get("/post/:id", blogController.show);
 router.get("/search", blogController.search);
 router.get("/games/mastermind", (req, res) => {
